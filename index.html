@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Me To You Business Suite</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Poppins:wght@300;400;500;600&family=Cormorant+Garamond:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/login.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+</head>
+
+<body>
+<div class="background" aria-hidden="true">
+  <div class="cloud cloud1"></div>
+  <div class="cloud cloud2"></div>
+  <div class="cloud cloud3"></div>
+  <span class="sparkle sparkle1">✦</span>
+  <span class="sparkle sparkle2">✦</span>
+  <span class="sparkle sparkle3">✦</span>
+</div>
+
+<main class="login-page">
+  <img src="logo.PNG" class="logo" alt="Me To You Designs">
+
+  <h1>Welcome Back</h1>
+
+  <div class="divider">
+    <span></span>
+    <i class="fa-regular fa-heart"></i>
+    <span></span>
+  </div>
+
+  <p class="tagline">
+    Made with love,<br>
+    personalised for every occasion.
+  </p>
+
+  <section class="login-card" aria-labelledby="loginTitle">
+    <div class="lock-icon">
+      <i class="fa-solid fa-lock"></i>
+    </div>
+
+    <h2 id="loginTitle">Sign In</h2>
+
+    <form id="loginForm" novalidate>
+      <div class="field">
+        <label for="email">Email address</label>
+        <input
+          id="email"
+          name="email"
+          type="email"
+          autocomplete="username"
+          placeholder="Enter your email"
+          required
+        >
+      </div>
+
+      <div class="field">
+        <label for="password">Password</label>
+        <div class="password-wrap">
+          <input
+            id="password"
+            name="password"
+            type="password"
+            autocomplete="current-password"
+            placeholder="Enter your password"
+            required
+          >
+          <button type="button" id="togglePassword" class="password-toggle" aria-label="Show password">
+            <i class="fa-regular fa-eye"></i>
+          </button>
+        </div>
+      </div>
+
+      <label class="show-password">
+        <input type="checkbox" id="showPassword">
+        <span>Show Password</span>
+      </label>
+
+      <button type="submit" class="sign-in" id="signInButton">
+        <span>Sign In</span>
+      </button>
+
+      <button type="button" class="forgot-password" id="forgotPassword">
+        Forgot password?
+      </button>
+
+      <p id="loginMessage" class="login-message" role="alert" aria-live="polite"></p>
+    </form>
+  </section>
+
+  <footer>
+    <div class="divider footer-divider">
+      <span></span>
+      <i class="fa-regular fa-heart"></i>
+      <span></span>
+    </div>
+    <p>Me To You Designs © 2026</p>
+  </footer>
+</main>
+
+<script type="module" src="js/login.js"></script>
+</body>
+</html>
