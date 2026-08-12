@@ -1,0 +1,227 @@
+/* =======================================
+   CREATE ORDER
+======================================= */
+
+.page{
+max-width:900px;
+margin:0 auto;
+padding:20px;
+}
+
+.order-header{
+text-align:center;
+margin-bottom:30px;
+position:relative;
+}
+
+.back-button{
+position:absolute;
+left:0;
+top:15px;
+width:55px;
+height:55px;
+border-radius:18px;
+background:#fff;
+display:flex;
+align-items:center;
+justify-content:center;
+text-decoration:none;
+font-size:24px;
+color:#c87ba4;
+box-shadow:0 10px 30px rgba(0,0,0,.08);
+}
+
+.logo{
+width:110px;
+height:110px;
+object-fit:contain;
+display:block;
+margin:0 auto 15px;
+}
+
+.order-header h1{
+font-family:"Great Vibes",cursive;
+font-size:64px;
+color:#9c5c7b;
+font-weight:400;
+margin:0;
+}
+
+.heart{
+font-size:42px;
+color:#d88ab3;
+margin-top:8px;
+}
+
+.card{
+background:#fff;
+border-radius:30px;
+padding:30px;
+margin-bottom:30px;
+box-shadow:0 10px 30px rgba(236,185,210,.25);
+}
+
+.card h2{
+margin:0 0 25px;
+font-size:34px;
+font-family:"Playfair Display",serif;
+color:#b86d97;
+}
+
+.card h3{
+margin-top:25px;
+color:#7c5b6d;
+}
+
+label{
+display:block;
+margin-top:18px;
+margin-bottom:8px;
+font-weight:600;
+font-size:18px;
+color:#7b5d6d;
+}
+
+input,
+select,
+textarea{
+width:100%;
+padding:18px;
+border:2px solid #f2cddd;
+border-radius:24px;
+background:#fff9fc;
+font-size:18px;
+font-family:Poppins,sans-serif;
+box-sizing:border-box;
+}
+
+textarea{
+min-height:140px;
+resize:vertical;
+}
+
+button{
+width:100%;
+padding:18px;
+border:none;
+border-radius:24px;
+background:#d787af;
+color:#fff;
+font-size:22px;
+font-weight:600;
+cursor:pointer;
+margin-top:25px;
+transition:.2s;
+}
+
+button:hover{
+transform:translateY(-2px);
+}
+
+.removeItemButton{
+background:#ffe4ee;
+color:#d84848;
+}
+
+.progressIcons{
+display:flex;
+justify-content:space-between;
+text-align:center;
+margin-top:25px;
+font-size:15px;
+}
+
+.progressIcons div{
+flex:1;
+}
+
+/* =======================================
+   MOBILE LAYOUT
+======================================= */
+
+body{
+background:linear-gradient(90deg,#fdeef5,#fff,#fdeef5);
+font-family:Poppins,sans-serif;
+margin:0;
+padding:0;
+color:#6d5566;
+}
+
+.itemCard{
+background:#fff;
+border-radius:24px;
+padding:25px;
+margin-bottom:25px;
+border:2px solid #f7dce8;
+}
+
+.personalisationBox{
+margin-top:15px;
+}
+
+#paymentHistory{
+background:#fff9fc;
+border:2px solid #f2cddd;
+border-radius:20px;
+padding:18px;
+margin-top:15px;
+margin-bottom:20px;
+min-height:60px;
+}
+
+#paymentHistory p{
+margin:0;
+color:#777;
+}
+
+#deliveryAddress{
+margin-top:20px;
+}
+
+input:focus,
+select:focus,
+textarea:focus{
+outline:none;
+border-color:#d787af;
+box-shadow:0 0 0 4px rgba(215,135,175,.15);
+}
+
+button:active{
+transform:scale(.98);
+}
+
+@media(max-width:768px){
+
+.page{
+padding:15px;
+}
+
+.card{
+padding:22px;
+border-radius:25px;
+}
+
+.order-header h1{
+font-size:48px;
+}
+
+.logo{
+width:90px;
+height:90px;
+}
+
+.card h2{
+font-size:26px;
+}
+
+button{
+font-size:20px;
+padding:16px;
+}
+
+.progressIcons{
+font-size:13px;
+gap:8px;
+}
+
+}
