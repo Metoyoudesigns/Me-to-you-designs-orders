@@ -352,6 +352,8 @@ function getDateNeeded(order) {
 
 function getOrderTotal(order) {
     const value =
+        order.orderTotal ??
+        order.order_total ??
         order.total ??
         order.totalAmount ??
         order.total_amount ??
