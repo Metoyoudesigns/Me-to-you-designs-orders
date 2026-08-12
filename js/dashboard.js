@@ -299,13 +299,25 @@ function updateStats() {
     const totalOrders = document.getElementById("totalOrders");
     const pendingOrders = document.getElementById("pendingOrders");
 
-    if (totalOrders) totalOrders.textContent = orders.length;
+    if (totalOrders) {
+        totalOrders.textContent = orders.length;
+    }
 
-    const pending = orders.filter(order =>
-        String(order.orderStatus || "").toLowerCase() !== "completed"
-    );
+    const pending = orders.filter(order => {
+        // Supabase uses order_status
+        const status = String(
+            order.order_status ||
+            order.orderStatus ||
+            ""
+        ).trim().toLowerCase();
 
-    if (pendingOrders) pendingOrders.textContent = pending.length;
+        // Completed and cancelled orders are NOT pending
+        return status !== "completed" && status !== "cancelled";
+    });
+
+    if (pendingOrders) {
+        pendingOrders.textContent = pending.length;
+    }
 }
 
 // ======================================
