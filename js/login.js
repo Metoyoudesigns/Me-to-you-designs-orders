@@ -1,81 +1,71 @@
-// ============================================================
-// Me To You Designs — Supabase login
-// IMPORTANT: Replace ONLY the two values below with the
-// Supabase Project URL and publishable/anon key.
-// NEVER put your Supabase service-role key or password here.
-// ============================================================
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 
-const SUPABASE_URL = "PASTE_YOUR_SUPABASE_PROJECT_URL_HERE";
-const SUPABASE_ANON_KEY = "PASTE_YOUR_SUPABASE_PUBLISHABLE_OR_ANON_KEY_HERE";
+const SUPABASE_URL = "https://critutqwakaepgxgpkml.supabase.co";
 
-const { createClient } = window.supabase;
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const SUPABASE_KEY = "sb_publishable_KtXAtIRgtZADPODLn7inRw_vC6rBPFb";
 
-const form = document.getElementById("loginForm");
-const emailInput = document.getElementById("email");
-const passwordInput = document.getElementById("password");
-const togglePassword = document.getElementById("togglePassword");
-const signInButton = document.getElementById("signInButton");
-const loginMessage = document.getElementById("loginMessage");
+const supabase = createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+);
 
-togglePassword.addEventListener("click", () => {
-  const isPassword = passwordInput.type === "password";
-  passwordInput.type = isPassword ? "text" : "password";
-  togglePassword.innerHTML = isPassword
-    ? '<i class="fa-regular fa-eye-slash"></i>'
-    : '<i class="fa-regular fa-eye"></i>';
-  togglePassword.setAttribute(
-    "aria-label",
-    isPassword ? "Hide password" : "Show password"
-  );
-});
+const form = document.querySelector("#loginForm");
+const emailInput = document.querySelector("#email");
+const passwordInput = document.querySelector("#password");
+const loginMessage = document.querySelector("#loginMessage");
+const togglePassword = document.querySelector("#togglePassword");
 
-function showMessage(message, type = "error") {
-  loginMessage.textContent = message;
-  loginMessage.className = `login-message ${type}`;
+
+// Show / hide password
+if (togglePassword) {
+    togglePassword.addEventListener("click", () => {
+        if (passwordInput.type === "password") {
+            passwordInput.type = "text";
+            togglePassword.innerHTML = '<i class="fa-solid fa-eye-slash"></i>';
+        } else {
+            passwordInput.type = "password";
+            togglePassword.innerHTML = '<i class="fa-solid fa-eye"></i>';
+        }
+    });
 }
 
-form.addEventListener("submit", async (event) => {
-  event.preventDefault();
 
-  const email = emailInput.value.trim();
-  const password = passwordInput.value;
+// Sign in
+if (form) {
+    form.addEventListener("submit", async (event) => {
 
-  showMessage("");
+        event.preventDefault();
 
-  if (!email || !password) {
-    showMessage("Please enter your email address and password.");
-    return;
-  }
+        const email = emailInput.value.trim();
+        const password = passwordInput.value;
 
-  signInButton.disabled = true;
-  signInButton.querySelector("span").textContent = "Signing in…";
+        loginMessage.textContent = "";
+        loginMessage.className = "";
 
-  try {
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password
+        if (!email || !password) {
+            loginMessage.textContent = "Please enter your email and password.";
+            loginMessage.className = "error";
+            return;
+        }
+
+        const { data, error } = await supabase.auth.signInWithPassword({
+            email: email,
+            password: password
+        });
+
+        if (error) {
+            loginMessage.textContent = "Incorrect email or password.";
+            loginMessage.className = "error";
+            return;
+        }
+
+        if (data.session) {
+
+            loginMessage.textContent = "Login successful!";
+            loginMessage.className = "success";
+
+            // Change this to the page you want after login
+            window.location.href = "dashboard.html";
+        }
     });
-
-    if (error) {
-      showMessage("Incorrect email or password. Please try again.");
-      return;
-    }
-
-    if (!data.session) {
-      showMessage("We couldn't create a secure session. Please try again.");
-      return;
-    }
-
-    showMessage("Signed in successfully. Opening your Business Suite…", "success");
-
-    // Change this to the page you want members to see after signing in.
-    window.location.href = "dashboard.html";
-  } catch (error) {
-    console.error(error);
-    showMessage("Something went wrong. Please try again.");
-  } finally {
-    signInButton.disabled = false;
-    signInButton.querySelector("span").textContent = "Sign In";
-  }
-});
+}
