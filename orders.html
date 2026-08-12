@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Orders | Me To You Designs</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--pink:#c978a0;--pink2:#e8b7cb;--bg:#fbf2f7;--text:#62465a;--muted:#8b7181;--white:#fff;--line:#efd8e3;--shadow:0 8px 24px rgba(105,62,89,.10)}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(180deg,#fff7fb 0,#faeef5 100%);color:var(--text);font-family:Poppins,sans-serif;padding-bottom:90px}
+.top{background:rgba(255,255,255,.94);padding:6px 12px 7px;text-align:center;position:sticky;top:0;z-index:5;border-bottom:1px solid var(--line);backdrop-filter:blur(10px)}
+.logo{width:48px;height:48px;border-radius:50%;object-fit:cover;box-shadow:0 3px 10px rgba(0,0,0,.10);background:#fff}.brand{font-family:'Dancing Script',cursive;font-size:30px;color:var(--pink);margin:3px 0 0}
+.wrap{max-width:900px;margin:auto;padding:10px 14px 18px}.back{display:inline-block;text-decoration:none;color:var(--pink);font-weight:600;margin:2px 0 8px;font-size:13px}
+.hero{background:#fff;border-radius:20px;padding:13px;box-shadow:var(--shadow);border:1px solid #f2dfe8}.hero h1{margin:0;font-size:23px}.hero p{margin:2px 0 10px;color:var(--muted)}
+.searchWrap{margin-top:14px}
+.search{width:100%;padding:14px 16px;border:1px solid var(--line);border-radius:15px;background:#fff;font:inherit;color:var(--text);outline:none}
+.search:focus{border-color:var(--pink)}
+.statusTabs{display:flex;gap:8px;margin-top:14px;overflow-x:auto;overflow-y:hidden;padding:2px 1px 7px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.statusTabs::-webkit-scrollbar{display:none}
+.statusTab{flex:0 0 auto;border:1px solid var(--line);background:#fff;border-radius:999px;padding:10px 17px;color:var(--text);font:600 14px Poppins,sans-serif;white-space:nowrap;cursor:pointer}
+.statusTab.active{background:var(--pink);border-color:var(--pink);color:#fff}
+.orders{margin-top:16px;display:grid;gap:14px}.order{background:#fff;border:1px solid var(--line);border-radius:21px;padding:17px;box-shadow:var(--shadow)}
+.orderTop{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}.num{font-size:19px;font-weight:700;color:#684b5f}.name{font-size:17px;font-weight:600;margin-top:3px}.due{font-size:13px;color:var(--muted);margin-top:3px}
+.badge{white-space:nowrap;border-radius:999px;padding:8px 11px;font-size:12px;font-weight:700;background:#f4e4ec;color:#8c5874}.badge.new{background:#f5e8ee}.badge.mock{background:#f1e7f5}.badge.making{background:#fff0d7;color:#946b22}.badge.ready{background:#e5f3e9;color:#3e7a50}.badge.completed{background:#e5eef7;color:#416987}
+.details{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:14px 0;color:#6f5968;font-size:13px}.detail{background:#fcf7fa;border-radius:12px;padding:10px}.detail b{display:block;color:#8b6c7e;font-size:11px;margin-bottom:2px}
+.money{display:flex;justify-content:space-between;gap:10px;border-top:1px solid var(--line);padding-top:13px;font-size:13px}.money strong{color:var(--pink);font-size:15px}
+.actions{display:flex;gap:8px;margin-top:13px}.btn{flex:1;border:0;border-radius:12px;padding:11px 10px;font:600 13px Poppins;cursor:pointer}.btn.primary{background:var(--pink);color:#fff}.btn.light{background:#f8eaf1;color:#7a5369}
+.empty{background:#fff;border:1px dashed #dfbdcf;border-radius:20px;text-align:center;padding:42px 18px;color:var(--muted)}.empty strong{display:block;color:var(--text);font-size:17px;margin-bottom:5px}
+.error{background:#fff0f0;border:1px solid #edc3c3;color:#9b4b4b;border-radius:16px;padding:14px;margin-top:14px;display:none}.loading{text-align:center;padding:30px;color:var(--muted)}
+@media(max-width:650px){.details{grid-template-columns:1fr}.hero h1{font-size:27px}.statusTab{padding:9px 15px;font-size:14px}}
+
+
+.deleteOrderBtn{
+  border:1px solid #e3c4d2;
+  background:#fff;
+  color:#8b4f6d;
+  border-radius:12px;
+  padding:9px 12px;
+  font:600 13px Poppins,sans-serif;
+  cursor:pointer;
+}
+.deleteOrderBtn:hover{border-color:#c97aa1;background:#fff7fb}
+
+</style>
+
+<style>
+.orderModal{position:fixed;inset:0;background:rgba(54,34,45,.58);z-index:999;display:flex;align-items:flex-end;justify-content:center}
+.orderSheet{background:#fff;width:min(900px,100%);max-height:92vh;overflow:auto;border-radius:25px 25px 0 0;padding:20px;color:#62465a;position:relative}
+.closeModal{position:absolute;right:14px;top:14px;border:0;background:#f6e8ef;border-radius:50%;width:40px;height:40px;font-size:24px;color:#81596c}
+.orderSheet h2{color:#a65c7e;margin:0 45px 2px 0}.orderSheet h3{margin:0 0 12px}
+.viewBox{background:#fcf7fa;border-radius:14px;padding:11px;margin:8px 0;font-size:12px}.viewBox>b{display:block;color:#a65c7e;margin-bottom:4px}.viewBox p{margin:5px 0}
+.photoGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px}.photoGrid img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:11px}
+.editFull{width:100%;border:0;border-radius:13px;padding:14px;background:#c978a0;color:#fff;font:700 14px Poppins;margin-top:10px}
+</style>
+</head>
+<body>
+<header class="top">
+<img class="logo" src="logo.png.PNG" onerror="if(this.dataset.try2){this.onerror=null;this.src='logo.png';}else{this.dataset.try2='1';this.src='logo.PNG';}" alt="Me To You Designs">
+
+</header>
+
+<main class="wrap">
+<a class="back" href="dashboard.html">← Back to Dashboard</a>
+
+<section class="hero">
+<h1>📦 Orders</h1>
+<p>View and manage your customer orders</p>
+
+<div class="searchWrap">
+<input id="searchOrders" class="search" placeholder="🔍 Search customer, order number or product...">
+</div>
+
+<div class="statusTabs" id="statusTabs">
+<button class="statusTab active" data-filter="all">All</button>
+<button class="statusTab" data-filter="New Order">New</button>
+<button class="statusTab" data-filter="Mock Up">Mock Up</button>
+<button class="statusTab" data-filter="Making">Making</button>
+<button class="statusTab" data-filter="Ready">Ready</button>
+<button class="statusTab" data-filter="Completed">Completed</button>
+</div>
+
+<div id="error" class="error"></div>
+</section>
+
+<section id="ordersContainer" class="orders"><div class="loading">Loading orders…</div></section>
+</main>
+
+<script type="module">
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+const supabase=createClient("https://critutqwakaepgxgpkml.supabase.co","sb_publishable_KtXAtIRgtZADPODLn7inRw_vC6rBPFb");
+const $=id=>document.getElementById(id);let orders=[],filter="all";
+
+function v(o,...ks){for(const k of ks)if(o?.[k]!==undefined&&o[k]!==null&&o[k]!=="")return o[k];return""}
+function esc(x){return String(x??"").replace(/[&<>'"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"}[c]))}
+function money(x){return"£"+(Number(x)||0).toFixed(2)}
+function status(o){return v(o,"orderStatus","status","order_status")||"New Order"}
+function total(o){return Number(v(o,"orderTotal","total","total_amount","totalAmount","order_total"))||0}
+function paid(o){return Number(v(o,"totalPaid","paid","deposit","deposit_amount","depositAmount"))||0}
+function balance(o){const b=v(o,"remainingBalance","balance","remaining","remaining_balance");return b!==""?Number(b):Math.max(0,total(o)-paid(o))}
+function items(o){return Array.isArray(o.items)?o.items:[]}
+function product(o){return items(o).map(i=>i.product||i.itemName||i.item||"").filter(Boolean).join(", ")||v(o,"product","productOrdered","product_ordered")||"—"}
+function due(o){return v(o,"dateNeeded","date_needed","dueDate","due_date","dateNeededBy","date_needed_by")}
+function dateText(x){if(!x)return"Not set";const d=new Date(String(x).slice(0,10)+"T00:00:00");return isNaN(d)?"Not set":d.toLocaleDateString("en-GB")}
+function days(x){if(!x)return Infinity;const d=new Date(String(x).slice(0,10)+"T00:00:00"),n=new Date();n.setHours(0,0,0,0);return Math.ceil((d-n)/86400000)}
+function dueSoon(o){const d=days(due(o));return d>=0&&d<=3}
+function dueWeek(o){const d=days(due(o));return d>=0&&d<=7}
+function paymentDue(o){return balance(o)>0}
+function sc(s){s=s.toLowerCase();return s.includes("mock")||s.includes("design")?"mock":s.includes("mak")?"making":s.includes("ready")?"ready":s.includes("complet")?"completed":"new"}
+
+function render(){
+ const q=$("searchOrders").value.trim().toLowerCase();
+ const list=orders.filter(o=>{
+  const hay=[v(o,"orderNumber","order_number","orderNo","order_no","id"),v(o,"customerName","customer_name","name"),product(o),v(o,"customerContact","customer_contact","contact")].join(" ").toLowerCase();
+  const s=status(o);
+  return(!q||hay.includes(q))&&(filter==="all"||filter==="due"&&dueSoon(o)||filter==="week"&&dueWeek(o)||filter==="payment"&&paymentDue(o)||filter===s);
+ });
+if(!list.length){$("ordersContainer").innerHTML='<div class="empty">📦<br><strong>No orders match this filter.</strong><br>Try another filter or search.</div>';return}
+ $("ordersContainer").innerHTML=list.map(o=>{
+  const num=v(o,"orderNumber","order_number","orderNo","order_no")||"Order",name=v(o,"customerName","customer_name","name")||"Unnamed customer",s=status(o),d=due(o),n=days(d);
+  const dl=n===Infinity?"No due date":n<0?Math.abs(n)+" day(s) overdue":n===0?"Due today":n===1?"Due tomorrow":n+" day(s)";
+  return `<article class="order"><div class="orderTop"><div><div class="num">${esc(num)}</div><div class="name">${esc(name)}</div><div class="due">📅 ${esc(dateText(d))} · ${esc(dl)}</div></div><span class="badge ${sc(s)}">${esc(s.replace("Designing","Mock Up"))}</span></div>
+  <div class="details"><div class="detail"><b>PRODUCT</b>${esc(product(o))}</div><div class="detail"><b>ORDERED FROM</b>${esc(v(o,"orderSource","order_source","source")||"—")}</div><div class="detail"><b>TOTAL</b>${money(total(o))}</div><div class="detail"><b>PAYMENT</b>${balance(o)>0?money(balance(o))+" due":"Paid in full"}</div></div>
+  <div class="money"><span>Paid: <strong>${money(paid(o))}</strong></span><span>Balance: <strong>${money(balance(o))}</strong></span></div>
+  <div class="actions"><button type="button" class="deleteOrderBtn" data-order-id="${esc(o.id)}">🗑️ Delete</button><button class="btn view" data-view="${esc(o.id)}">👁 View</button><button class="btn edit" data-edit="${esc(o.id)}">✏️ Edit</button></div></article>`;
+ }).join("");
+}
+
+function show(o){
+ const photos=[...(Array.isArray(o.customerPhotos)?o.customerPhotos:[]),...(Array.isArray(o.mockupPhotos)?o.mockupPhotos:[])];
+ const its=items(o),ps=Array.isArray(o.payments)?o.payments:[];
+ const modal=document.createElement("div");modal.className="orderModal";
+ modal.innerHTML=`<div class="orderSheet"><button class="closeModal">×</button><h2>${esc(v(o,"orderNumber","order_number"))}</h2><h3>${esc(v(o,"customerName","customer_name"))}</h3>
+ <div class="viewBox"><b>📅 Due</b><span>${esc(dateText(due(o)))}</span></div>
+ <div class="viewBox"><b>✨ Status</b><span>${esc(status(o).replace("Designing","Mock Up"))}</span></div>
+ <div class="viewBox"><b>👤 Contact</b><span>${esc(v(o,"customerContact","customer_contact")||"—")}</span></div>
+ <div class="viewBox"><b>📱 Ordered From</b><span>${esc(v(o,"orderSource","order_source")||"—")} ${esc(v(o,"socialUsername")||"")}</span></div>
+ <div class="viewBox"><b>📦 Items</b><div>${its.length?its.map(i=>`<p><strong>${esc(i.product||"Item")}</strong> × ${esc(i.quantity??1)} — ${money(i.itemTotal??((Number(i.unitPrice||i.price)||0)*(Number(i.quantity)||1)))}<br>${esc([i.size,i.colour,i.personalisation].filter(Boolean).join(" · "))}</p>`).join(""):"No items recorded."}</div></div>
+ <div class="viewBox"><b>💷 Payment</b><span>Total ${money(total(o))} · Paid ${money(paid(o))} · Balance ${money(balance(o))}<br>${esc(v(o,"paymentStatus","payment_status")||"Not Paid")}</span></div>
+ <div class="viewBox"><b>🚚 Delivery</b><span>${esc(v(o,"deliveryMethod","delivery_method")||"—")}<br>${esc([o.address1,o.address2,o.town,o.county,o.postcode].filter(Boolean).join(", "))}</span></div>
+ <div class="viewBox"><b>📝 Notes</b><span style="white-space:pre-wrap">${esc(v(o,"orderNotes","notes")||"No notes.")}</span></div>
+ ${ps.length?`<div class="viewBox"><b>📜 Payments</b><span>${ps.map(p=>`${esc(p.date||"")} — ${money(p.amount)} — ${esc(p.method||"")}`).join("<br>")}</span></div>`:""}
+ ${photos.length?`<div class="viewBox"><b>🖼 Images</b><div class="photoGrid">${photos.map(u=>`<a href="${esc(u)}" target="_blank"><img src="${esc(u)}"></a>`).join("")}</div></div>`:""}
+ <button class="editFull">✏️ Edit This Order</button></div>`;
+ document.body.appendChild(modal);
+ modal.querySelector(".closeModal").onclick=()=>modal.remove();
+ modal.querySelector(".editFull").onclick=()=>location.href=`edit-order.html?edit=${encodeURIComponent(o.id)}`;
+}
+
+$("ordersContainer").addEventListener("click",e=>{
+ const b=e.target.closest("button");if(!b)return;
+ const id=b.dataset.view||b.dataset.edit;const o=orders.find(x=>String(x.id)===String(id));if(!o)return;
+ if(b.dataset.view)show(o);else location.href=`edit-order.html?edit=${encodeURIComponent(o.id)}`;
+});
+$("searchOrders").addEventListener("input",render);
+document.querySelectorAll(".statusTab").forEach(b=>b.addEventListener("click",()=>{document.querySelectorAll(".statusTab").forEach(x=>x.classList.remove("active"));b.classList.add("active");filter=b.dataset.filter;render()}));
+
+async function load(){
+ const{data,error}=await supabase.from("orders").select("*");
+ if(error){$("ordersContainer").innerHTML='<div class="empty">Unable to load orders.<br>'+esc(error.message)+'</div>';return}
+ orders=(data||[]).sort((a,b)=>new Date(b.createdAt||0)-new Date(a.createdAt||0));render();
+}
+(async()=>{const{data}=await supabase.auth.getSession();if(!data.session){location.href="index.html";return}await load()})();
+</script>
+
+<script>
+document.addEventListener("click", async (event) => {
+  const button = event.target.closest(".deleteOrderBtn");
+  if (!button) return;
+
+  const orderId = button.dataset.orderId;
+  if (!orderId) {
+    alert("Could not find this order.");
+    return;
+  }
+
+  const confirmed = confirm(
+    "Delete this order?\n\nThis will permanently remove the order and its saved details."
+  );
+  if (!confirmed) return;
+
+  button.disabled = true;
+  const originalText = button.textContent;
+  button.textContent = "Deleting…";
+
+  try {
+    const { error } = await supabase
+      .from("orders")
+      .delete()
+      .eq("id", orderId);
+
+    if (error) throw error;
+
+    alert("✅ Order deleted.");
+    await load();
+  } catch (error) {
+    console.error("Delete order error:", error);
+    alert("Could not delete the order.\n\n" + error.message);
+    button.disabled = false;
+    button.textContent = originalText;
+  }
+});
+</script>
+
+</body>
+</html>
