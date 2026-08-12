@@ -55,7 +55,9 @@ const logoutButton = document.getElementById("logoutButton");
 
 logoutButton?.addEventListener("click", async (event) => {
     event.preventDefault();
+
     await supabase.auth.signOut();
+
     window.location.href = "index.html";
 });
 
@@ -71,12 +73,16 @@ async function checkLogin() {
 }
 
 // ======================================
-// LOCAL DASHBOARD DATA
+// DASHBOARD DATA
 // ======================================
 
 let orders = [];
-let jobs = JSON.parse(localStorage.getItem("todayJobs")) || [];
-let notes = JSON.parse(localStorage.getItem("notes")) || [];
+
+let jobs =
+    JSON.parse(localStorage.getItem("todayJobs")) || [];
+
+let notes =
+    JSON.parse(localStorage.getItem("notes")) || [];
 
 // ======================================
 // LOAD ORDERS FROM SUPABASE
@@ -89,8 +95,11 @@ async function loadOrders() {
 
     if (error) {
         console.error("Could not load orders:", error);
+
         orders = [];
+
         updateDashboard();
+
         return;
     }
 
@@ -121,36 +130,52 @@ function subscribeToOrders() {
             }
         )
         .subscribe((status) => {
-            console.log("Order realtime status:", status);
+            console.log(
+                "Order realtime status:",
+                status
+            );
         });
 }
 
-// Fallback refresh as well, so the dashboard still catches changes
-// if Supabase Realtime has not yet been enabled for the orders table.
+// Also refresh every 10 seconds.
+// This catches changes even if realtime isn't enabled.
 setInterval(loadOrders, 10000);
 
 // ======================================
 // TODAY'S JOBS
 // ======================================
 
-const jobsList = document.getElementById("jobsList");
-const addJobButton = document.getElementById("addJobButton");
+const jobsList =
+    document.getElementById("jobsList");
 
-addJobButton?.addEventListener("click", () => openEntryModal({
-    type: "job",
-    title: "Add Today's Job",
-    subtitle: "Add a job you need to complete today.",
-    placeholder: "e.g. Finish McKenzie's pyjamas"
-}));
+const addJobButton =
+    document.getElementById("addJobButton");
+
+addJobButton?.addEventListener("click", () => {
+    openEntryModal({
+        type: "job",
+        title: "Add Today's Job",
+        subtitle:
+            "Add a job you need to complete today.",
+        placeholder:
+            "e.g. Finish McKenzie's pyjamas"
+    });
+});
 
 function addJob(value) {
     if (!value?.trim()) return;
+
     jobs.push(value.trim());
+
     saveJobs();
 }
 
 function saveJobs() {
-    localStorage.setItem("todayJobs", JSON.stringify(jobs));
+    localStorage.setItem(
+        "todayJobs",
+        JSON.stringify(jobs)
+    );
+
     loadJobs();
 }
 
@@ -160,26 +185,45 @@ function loadJobs() {
     jobsList.innerHTML = "";
 
     jobs.forEach((job, index) => {
-        const li = document.createElement("li");
+        const li =
+            document.createElement("li");
 
         li.innerHTML = `
             <span></span>
+
             <div>
-                <button class="completeButton" title="Complete">✅</button>
-                <button class="deleteButton" title="Delete">🗑️</button>
+                <button
+                    class="completeButton"
+                    title="Complete">
+                    ✅
+                </button>
+
+                <button
+                    class="deleteButton"
+                    title="Delete">
+                    🗑️
+                </button>
             </div>
         `;
 
-        li.querySelector("span").textContent = job;
+        li.querySelector("span")
+            .textContent = job;
 
-        li.querySelector(".completeButton").addEventListener("click", () => {
+        li.querySelector(
+            ".completeButton"
+        ).addEventListener("click", () => {
             jobs.splice(index, 1);
             saveJobs();
         });
 
-        li.querySelector(".deleteButton").addEventListener("click", () => {
-            if (!confirm("Delete this job?")) return;
+        li.querySelector(
+            ".deleteButton"
+        ).addEventListener("click", () => {
+            if (!confirm("Delete this job?"))
+                return;
+
             jobs.splice(index, 1);
+
             saveJobs();
         });
 
@@ -193,24 +237,37 @@ loadJobs();
 // NOTES
 // ======================================
 
-const notesList = document.getElementById("notesList");
-const addNoteButton = document.getElementById("addNoteButton");
+const notesList =
+    document.getElementById("notesList");
 
-addNoteButton?.addEventListener("click", () => openEntryModal({
-    type: "note",
-    title: "Add Note",
-    subtitle: "Add a note for your business dashboard.",
-    placeholder: "Type your note here..."
-}));
+const addNoteButton =
+    document.getElementById("addNoteButton");
+
+addNoteButton?.addEventListener("click", () => {
+    openEntryModal({
+        type: "note",
+        title: "Add Note",
+        subtitle:
+            "Add a note for your business dashboard.",
+        placeholder:
+            "Type your note here..."
+    });
+});
 
 function addNote(value) {
     if (!value?.trim()) return;
+
     notes.push(value.trim());
+
     saveNotes();
 }
 
 function saveNotes() {
-    localStorage.setItem("notes", JSON.stringify(notes));
+    localStorage.setItem(
+        "notes",
+        JSON.stringify(notes)
+    );
+
     loadNotes();
 }
 
@@ -220,39 +277,65 @@ function loadNotes() {
     notesList.innerHTML = "";
 
     notes.forEach((note, index) => {
-        const li = document.createElement("li");
+        const li =
+            document.createElement("li");
 
         li.innerHTML = `
             <span></span>
+
             <div>
-                <button class="editButton" title="Edit">✏️</button>
-                <button class="deleteButton" title="Delete">🗑️</button>
+                <button
+                    class="editButton"
+                    title="Edit">
+                    ✏️
+                </button>
+
+                <button
+                    class="deleteButton"
+                    title="Delete">
+                    🗑️
+                </button>
             </div>
         `;
 
-        li.querySelector("span").textContent = note;
+        li.querySelector("span")
+            .textContent = note;
 
-        li.querySelector(".editButton").addEventListener("click", () => {
+        li.querySelector(
+            ".editButton"
+        ).addEventListener("click", () => {
+
             openEntryModal({
                 type: "edit-note",
                 title: "Edit Note",
-                subtitle: "Update your note below.",
-                placeholder: "Type your note here...",
+                subtitle:
+                    "Update your note below.",
+                placeholder:
+                    "Type your note here...",
                 value: notes[index],
+
                 onSave: (updated) => {
                     if (!updated.trim()) {
                         notes.splice(index, 1);
                     } else {
-                        notes[index] = updated.trim();
+                        notes[index] =
+                            updated.trim();
                     }
+
                     saveNotes();
                 }
             });
         });
 
-        li.querySelector(".deleteButton").addEventListener("click", () => {
-            if (!confirm("Delete this note?")) return;
+        li.querySelector(
+            ".deleteButton"
+        ).addEventListener("click", () => {
+
+            if (!confirm("Delete this note?"))
+                return;
+
             notes.splice(index, 1);
+
             saveNotes();
         });
 
@@ -266,57 +349,115 @@ loadNotes();
 // COLLAPSIBLE CARDS
 // ======================================
 
-document.querySelectorAll(".toggleButton").forEach((button) => {
-    const card = button.closest(".dashboardCard");
-    const content = card?.querySelector(".cardContent");
-    if (!content) return;
+document
+    .querySelectorAll(".toggleButton")
+    .forEach((button) => {
 
-    // Start collapsed every time the dashboard opens.
-    content.style.display = "none";
-    button.textContent = "▶";
+        const card =
+            button.closest(".dashboardCard");
 
-    button.addEventListener("click", () => {
-        const closed = content.style.display === "none";
+        const content =
+            card?.querySelector(".cardContent");
 
-        content.style.display = closed ? "block" : "none";
-        button.textContent = closed ? "▼" : "▶";
+        if (!content) return;
+
+        content.style.display = "none";
+
+        button.textContent = "▶";
+
+        button.addEventListener(
+            "click",
+            (event) => {
+
+                event.preventDefault();
+
+                const closed =
+                    content.style.display ===
+                    "none";
+
+                if (closed) {
+                    content.style.display =
+                        "block";
+
+                    button.textContent = "▼";
+                } else {
+                    content.style.display =
+                        "none";
+
+                    button.textContent = "▶";
+                }
+            }
+        );
     });
-});
 
 // ======================================
 // DASHBOARD
 // ======================================
 
 function updateDashboard() {
+
     updateStats();
+
     calculateDueDates();
+
     loadNextOrder();
+
     loadOutstandingPayments();
+
     calculateRevenue();
 }
 
-function updateStats() {
-    const totalOrders = document.getElementById("totalOrders");
-    const pendingOrders = document.getElementById("pendingOrders");
+// ======================================
+// STATS
+// ======================================
 
+function updateStats() {
+
+    const totalOrders =
+        document.getElementById(
+            "totalOrders"
+        );
+
+    const pendingOrders =
+        document.getElementById(
+            "pendingOrders"
+        );
+
+    // TOTAL ORDERS
     if (totalOrders) {
-        totalOrders.textContent = orders.length;
+        totalOrders.textContent =
+            orders.length;
     }
 
-    const pending = orders.filter(order => {
-        // Supabase uses order_status
-        const status = String(
-            order.order_status ||
-            order.orderStatus ||
-            ""
-        ).trim().toLowerCase();
+    // PENDING ORDERS
+    //
+    // IMPORTANT:
+    // Supabase uses order_status.
+    //
+    // Completed = NOT pending
+    // Cancelled = NOT pending
+    //
+    const pending =
+        orders.filter(order => {
 
-        // Completed and cancelled orders are NOT pending
-        return status !== "completed" && status !== "cancelled";
-    });
+            const status =
+                String(
+                    order.order_status ||
+                    order.orderStatus ||
+                    ""
+                )
+                .trim()
+                .toLowerCase();
+
+            return (
+                status !== "completed" &&
+                status !== "cancelled"
+            );
+        });
 
     if (pendingOrders) {
-        pendingOrders.textContent = pending.length;
+        pendingOrders.textContent =
+            pending.length;
     }
 }
 
@@ -325,89 +466,212 @@ function updateStats() {
 // ======================================
 
 function parseDate(value) {
+
     if (!value) return null;
 
-    const date = new Date(value);
-    if (Number.isNaN(date.getTime())) return null;
+    const date =
+        new Date(value);
+
+    if (
+        Number.isNaN(
+            date.getTime()
+        )
+    ) {
+        return null;
+    }
 
     return date;
 }
 
 function startOfDay(date) {
-    const d = new Date(date);
-    d.setHours(0, 0, 0, 0);
+
+    const d =
+        new Date(date);
+
+    d.setHours(
+        0,
+        0,
+        0,
+        0
+    );
+
     return d;
 }
 
 function startOfWeek(date) {
-    const d = startOfDay(date);
-    const day = d.getDay(); // Sunday = 0
-    const diff = day === 0 ? -6 : 1 - day; // Monday start
-    d.setDate(d.getDate() + diff);
+
+    const d =
+        startOfDay(date);
+
+    const day =
+        d.getDay();
+
+    const diff =
+        day === 0
+            ? -6
+            : 1 - day;
+
+    d.setDate(
+        d.getDate() + diff
+    );
+
     return d;
 }
 
 function startOfMonth(date) {
-    const d = startOfDay(date);
+
+    const d =
+        startOfDay(date);
+
     d.setDate(1);
+
     return d;
 }
 
+// ======================================
+// DATE NEEDED
+// ======================================
+
 function getDateNeeded(order) {
+
     return parseDate(
-        order.dateNeeded ||
+
         order.date_needed ||
+
+        order.dateNeeded ||
+
         order.neededBy ||
+
         order.date_needed_by
+
     );
 }
 
+// ======================================
+// ORDER TOTAL
+// ======================================
+
 function getOrderTotal(order) {
+
     const value =
-        order.orderTotal ??
+
         order.order_total ??
+
+        order.orderTotal ??
+
         order.total ??
+
         order.totalAmount ??
+
         order.total_amount ??
+
         order.price ??
+
         0;
 
-    const number = Number(String(value).replace(/[£,]/g, ""));
-    return Number.isFinite(number) ? number : 0;
+    const number =
+        Number(
+            String(value)
+                .replace(/[£,]/g, "")
+        );
+
+    return Number.isFinite(number)
+        ? number
+        : 0;
 }
+
+// ======================================
+// TOTAL PAID
+// ======================================
 
 function getDeposit(order) {
+
     const value =
+
+        order.total_paid ??
+
+        order.totalPaid ??
+
         order.deposit ??
+
         order.depositAmount ??
+
         order.deposit_amount ??
+
         0;
 
-    const number = Number(String(value).replace(/[£,]/g, ""));
-    return Number.isFinite(number) ? number : 0;
+    const number =
+        Number(
+            String(value)
+                .replace(/[£,]/g, "")
+        );
+
+    return Number.isFinite(number)
+        ? number
+        : 0;
 }
+
+// ======================================
+// BALANCE
+// ======================================
 
 function getBalance(order) {
-    const explicit =
-        order.balance ??
-        order.remainingBalance ??
-        order.remaining_balance;
 
-    if (explicit !== undefined && explicit !== null && explicit !== "") {
-        const number = Number(String(explicit).replace(/[£,]/g, ""));
-        if (Number.isFinite(number)) return Math.max(0, number);
+    const explicit =
+
+        order.remaining_balance ??
+
+        order.remainingBalance ??
+
+        order.balance;
+
+    if (
+        explicit !== undefined &&
+        explicit !== null &&
+        explicit !== ""
+    ) {
+
+        const number =
+            Number(
+                String(explicit)
+                    .replace(/[£,]/g, "")
+            );
+
+        if (
+            Number.isFinite(number)
+        ) {
+            return Math.max(
+                0,
+                number
+            );
+        }
     }
 
-    return Math.max(0, getOrderTotal(order) - getDeposit(order));
+    return Math.max(
+        0,
+        getOrderTotal(order) -
+        getDeposit(order)
+    );
 }
 
+// ======================================
+// ORDER DATE
+// ======================================
+
 function getOrderDate(order) {
+
     return parseDate(
-        order.createdAt ||
-        order.created_at ||
-        order.orderDate ||
+
         order.order_date ||
+
+        order.orderDate ||
+
+        order.created_at ||
+
+        order.createdAt ||
+
         order.date
+
     );
 }
 
@@ -416,36 +680,109 @@ function getOrderDate(order) {
 // ======================================
 
 function calculateDueDates() {
-    const today = startOfDay(new Date());
-    const weekEnd = new Date(today);
-    weekEnd.setDate(weekEnd.getDate() + 7);
+
+    const today =
+        startOfDay(
+            new Date()
+        );
+
+    /*
+     * Monday → Sunday
+     *
+     * This is the important bit:
+     * "Due This Week" only includes
+     * orders whose date_needed is
+     * actually inside THIS calendar week.
+     */
+
+    const weekStart =
+        startOfWeek(today);
+
+    const weekEnd =
+        new Date(weekStart);
+
+    weekEnd.setDate(
+        weekEnd.getDate() + 7
+    );
+
+    const monthStart =
+        startOfMonth(today);
+
+    const monthEnd =
+        new Date(monthStart);
+
+    monthEnd.setMonth(
+        monthEnd.getMonth() + 1
+    );
 
     let week = 0;
+
     let month = 0;
 
     orders.forEach(order => {
-        const due = getDateNeeded(order);
+
+        const due =
+            getDateNeeded(order);
+
         if (!due) return;
 
-        const status = String(order.orderStatus || "").toLowerCase();
-        if (status === "completed" || status === "cancelled") return;
+        const status =
+            String(
+                order.order_status ||
+                order.orderStatus ||
+                ""
+            )
+            .trim()
+            .toLowerCase();
 
-        const dueDay = startOfDay(due);
+        // Completed and cancelled orders
+        // should not appear as due.
+        if (
+            status === "completed" ||
+            status === "cancelled"
+        ) {
+            return;
+        }
 
-        if (dueDay >= today && dueDay <= weekEnd) {
+        const dueDay =
+            startOfDay(due);
+
+        // THIS WEEK
+        if (
+            dueDay >= weekStart &&
+            dueDay < weekEnd
+        ) {
             week++;
         }
 
+        // THIS MONTH
         if (
-            dueDay.getMonth() === today.getMonth() &&
-            dueDay.getFullYear() === today.getFullYear()
+            dueDay >= monthStart &&
+            dueDay < monthEnd
         ) {
             month++;
         }
     });
 
-    document.getElementById("dueWeek").textContent = week;
-    document.getElementById("dueMonth").textContent = month;
+    const dueWeek =
+        document.getElementById(
+            "dueWeek"
+        );
+
+    const dueMonth =
+        document.getElementById(
+            "dueMonth"
+        );
+
+    if (dueWeek) {
+        dueWeek.textContent =
+            week;
+    }
+
+    if (dueMonth) {
+        dueMonth.textContent =
+            month;
+    }
 }
 
 // ======================================
@@ -453,54 +790,144 @@ function calculateDueDates() {
 // ======================================
 
 function loadNextOrder() {
-    const nextOrderCard = document.getElementById("nextOrderCard");
+
+    const nextOrderCard =
+        document.getElementById(
+            "nextOrderCard"
+        );
+
     if (!nextOrderCard) return;
 
-    const activeOrders = orders
-        .map(order => ({ order, due: getDateNeeded(order) }))
-        .filter(({ order, due }) => {
-            const status = String(order.orderStatus || "").toLowerCase();
-            return due && status !== "completed" && status !== "cancelled";
-        })
-        .sort((a, b) => a.due - b.due);
+    const today =
+        startOfDay(
+            new Date()
+        );
 
-    if (activeOrders.length === 0) {
-        nextOrderCard.innerHTML = "<p>No upcoming orders.</p>";
+    const activeOrders = orders
+
+        .map(order => ({
+            order,
+            due:
+                getDateNeeded(order)
+        }))
+
+        .filter(({ order, due }) => {
+
+            if (!due) return false;
+
+            const status =
+                String(
+                    order.order_status ||
+                    order.orderStatus ||
+                    ""
+                )
+                .trim()
+                .toLowerCase();
+
+            return (
+                status !== "completed" &&
+                status !== "cancelled"
+            );
+        })
+
+        .sort(
+            (a, b) =>
+                a.due - b.due
+        );
+
+    if (
+        activeOrders.length === 0
+    ) {
+
+        nextOrderCard.innerHTML =
+            "<p>No upcoming orders.</p>";
+
         return;
     }
 
-    const next = activeOrders[0].order;
-    const due = activeOrders[0].due;
-    const today = startOfDay(new Date());
-    const dueDay = startOfDay(due);
-    const days = Math.round((dueDay - today) / 86400000);
+    const next =
+        activeOrders[0].order;
+
+    const due =
+        activeOrders[0].due;
+
+    const dueDay =
+        startOfDay(due);
+
+    const days =
+        Math.round(
+            (
+                dueDay - today
+            ) / 86400000
+        );
 
     let dueText = "";
 
     if (days < 0) {
-        dueText = `⚠️ ${Math.abs(days)} day(s) overdue`;
+
+        dueText =
+            `⚠️ ${Math.abs(days)} day(s) overdue`;
+
     } else if (days === 0) {
+
         dueText = "Today";
+
     } else {
-        dueText = `${days} day(s) remaining`;
+
+        dueText =
+            `${days} day(s) remaining`;
     }
 
-    const orderNumber = next.orderNumber || next.order_number || "Order";
-    const customerName = next.customerName || next.customer_name || "Customer";
-    const status = next.orderStatus || next.order_status || "Unknown";
+    const orderNumber =
+        next.order_number ||
+        next.orderNumber ||
+        "Order";
+
+    const customerName =
+        next.customer_name ||
+        next.customerName ||
+        "Customer";
+
+    const status =
+        next.order_status ||
+        next.orderStatus ||
+        "Unknown";
 
     nextOrderCard.innerHTML = `
         <h3></h3>
-        <p><strong></strong></p>
-        <p>📅 ${due.toLocaleDateString("en-GB")}</p>
+
+        <p>
+            <strong></strong>
+        </p>
+
+        <p>
+            📅 ${due.toLocaleDateString("en-GB")}
+        </p>
+
         <p></p>
+
         <p>✨ </p>
     `;
 
-    nextOrderCard.querySelector("h3").textContent = orderNumber;
-    nextOrderCard.querySelector("strong").textContent = customerName;
-    nextOrderCard.querySelectorAll("p")[2].textContent = dueText;
-    nextOrderCard.querySelectorAll("p")[3].textContent = `✨ ${status}`;
+    nextOrderCard
+        .querySelector("h3")
+        .textContent =
+        orderNumber;
+
+    nextOrderCard
+        .querySelector("strong")
+        .textContent =
+        customerName;
+
+    nextOrderCard
+        .querySelectorAll("p")[2]
+        .textContent =
+        dueText;
+
+    nextOrderCard
+        .querySelectorAll("p")[3]
+        .textContent =
+        `✨ ${status}`;
 }
 
 // ======================================
@@ -508,41 +935,97 @@ function loadNextOrder() {
 // ======================================
 
 function loadOutstandingPayments() {
-    const paymentList = document.getElementById("paymentList");
+
+    const paymentList =
+        document.getElementById(
+            "paymentList"
+        );
+
     if (!paymentList) return;
 
-    const outstanding = orders
-        .map(order => ({
-            order,
-            balance: getBalance(order)
-        }))
-        .filter(item => item.balance > 0);
+    const outstanding =
+        orders
 
-    if (outstanding.length === 0) {
-        paymentList.innerHTML = "<p>No outstanding payments.</p>";
+            .map(order => ({
+                order,
+
+                balance:
+                    getBalance(order)
+            }))
+
+            .filter(
+                item =>
+                    item.balance > 0
+            );
+
+    if (
+        outstanding.length === 0
+    ) {
+
+        paymentList.innerHTML =
+            "<p>No outstanding payments.</p>";
+
         return;
     }
 
     paymentList.innerHTML = "";
 
     outstanding
-        .sort((a, b) => b.balance - a.balance)
-        .forEach(({ order, balance }) => {
-            const row = document.createElement("div");
-            row.style.padding = "10px 0";
-            row.style.borderBottom = "1px solid #f3e5ec";
 
-            const orderNumber = order.orderNumber || order.order_number || "Order";
-            const customerName = order.customerName || order.customer_name || "Customer";
+        .sort(
+            (a, b) =>
+                b.balance -
+                a.balance
+        )
 
-            row.innerHTML = `
-                <strong></strong>
-                <span style="display:block;margin-top:4px;">£${balance.toFixed(2)} outstanding</span>
-            `;
+        .forEach(
+            ({ order, balance }) => {
 
-            row.querySelector("strong").textContent = `${orderNumber} — ${customerName}`;
-            paymentList.appendChild(row);
-        });
+                const row =
+                    document.createElement(
+                        "div"
+                    );
+
+                row.style.padding =
+                    "10px 0";
+
+                row.style.borderBottom =
+                    "1px solid #f3e5ec";
+
+                const orderNumber =
+                    order.order_number ||
+                    order.orderNumber ||
+                    "Order";
+
+                const customerName =
+                    order.customer_name ||
+                    order.customerName ||
+                    "Customer";
+
+                row.innerHTML = `
+                    <strong></strong>
+
+                    <span
+                        style="
+                            display:block;
+                            margin-top:4px;
+                        "
+                    >
+                        £${balance.toFixed(2)}
+                        outstanding
+                    </span>
+                `;
+
+                row.querySelector(
+                    "strong"
+                ).textContent =
+                    `${orderNumber} — ${customerName}`;
+
+                paymentList.appendChild(
+                    row
+                );
+            }
+        );
 }
 
 // ======================================
@@ -550,132 +1033,324 @@ function loadOutstandingPayments() {
 // ======================================
 
 function calculateRevenue() {
-    const now = new Date();
-    const todayStart = startOfDay(now);
-    const tomorrow = new Date(todayStart);
-    tomorrow.setDate(tomorrow.getDate() + 1);
 
-    const weekStart = startOfWeek(now);
-    const nextWeek = new Date(weekStart);
-    nextWeek.setDate(nextWeek.getDate() + 7);
+    const now =
+        new Date();
 
-    const monthStart = startOfMonth(now);
-    const nextMonth = new Date(monthStart);
-    nextMonth.setMonth(nextMonth.getMonth() + 1);
+    const todayStart =
+        startOfDay(now);
+
+    const tomorrow =
+        new Date(
+            todayStart
+        );
+
+    tomorrow.setDate(
+        tomorrow.getDate() + 1
+    );
+
+    const weekStart =
+        startOfWeek(now);
+
+    const nextWeek =
+        new Date(
+            weekStart
+        );
+
+    nextWeek.setDate(
+        nextWeek.getDate() + 7
+    );
+
+    const monthStart =
+        startOfMonth(now);
+
+    const nextMonth =
+        new Date(
+            monthStart
+        );
+
+    nextMonth.setMonth(
+        nextMonth.getMonth() + 1
+    );
 
     let today = 0;
+
     let week = 0;
+
     let month = 0;
+
     let total = 0;
 
     orders.forEach(order => {
-        const amount = getOrderTotal(order);
-        const orderDate = getOrderDate(order);
+
+        const amount =
+            getOrderTotal(order);
+
+        const orderDate =
+            getOrderDate(order);
 
         total += amount;
 
         if (!orderDate) return;
 
-        if (orderDate >= todayStart && orderDate < tomorrow) {
+        if (
+            orderDate >= todayStart &&
+            orderDate < tomorrow
+        ) {
             today += amount;
         }
 
-        if (orderDate >= weekStart && orderDate < nextWeek) {
+        if (
+            orderDate >= weekStart &&
+            orderDate < nextWeek
+        ) {
             week += amount;
         }
 
-        if (orderDate >= monthStart && orderDate < nextMonth) {
+        if (
+            orderDate >= monthStart &&
+            orderDate < nextMonth
+        ) {
             month += amount;
         }
     });
 
-    document.getElementById("todayRevenue").textContent = `£${today.toFixed(2)}`;
-    document.getElementById("weekRevenue").textContent = `£${week.toFixed(2)}`;
-    document.getElementById("monthRevenue").textContent = `£${month.toFixed(2)}`;
-    document.getElementById("totalRevenue").textContent = `£${total.toFixed(2)}`;
+    const todayRevenue =
+        document.getElementById(
+            "todayRevenue"
+        );
+
+    const weekRevenue =
+        document.getElementById(
+            "weekRevenue"
+        );
+
+    const monthRevenue =
+        document.getElementById(
+            "monthRevenue"
+        );
+
+    const totalRevenue =
+        document.getElementById(
+            "totalRevenue"
+        );
+
+    if (todayRevenue) {
+        todayRevenue.textContent =
+            `£${today.toFixed(2)}`;
+    }
+
+    if (weekRevenue) {
+        weekRevenue.textContent =
+            `£${week.toFixed(2)}`;
+    }
+
+    if (monthRevenue) {
+        monthRevenue.textContent =
+            `£${month.toFixed(2)}`;
+    }
+
+    if (totalRevenue) {
+        totalRevenue.textContent =
+            `£${total.toFixed(2)}`;
+    }
 }
 
 // ======================================
-// LARGE ADD / EDIT MODAL
+// ENTRY MODAL
 // ======================================
 
-const entryModal = document.getElementById("entryModal");
-const entryModalInput = document.getElementById("entryModalInput");
-const entryModalTitle = document.getElementById("entryModalTitle");
-const entryModalSubtitle = document.getElementById("entryModalSubtitle");
-const saveEntryModal = document.getElementById("saveEntryModal");
-const closeEntryModal = document.getElementById("closeEntryModal");
-const cancelEntryModal = document.getElementById("cancelEntryModal");
-const entryModalBackdrop = document.querySelector(".entryModalBackdrop");
+const entryModal =
+    document.getElementById(
+        "entryModal"
+    );
+
+const entryModalInput =
+    document.getElementById(
+        "entryModalInput"
+    );
+
+const entryModalTitle =
+    document.getElementById(
+        "entryModalTitle"
+    );
+
+const entryModalSubtitle =
+    document.getElementById(
+        "entryModalSubtitle"
+    );
+
+const saveEntryModal =
+    document.getElementById(
+        "saveEntryModal"
+    );
+
+const closeEntryModal =
+    document.getElementById(
+        "closeEntryModal"
+    );
+
+const cancelEntryModal =
+    document.getElementById(
+        "cancelEntryModal"
+    );
+
+const entryModalBackdrop =
+    document.querySelector(
+        ".entryModalBackdrop"
+    );
 
 let currentModalSave = null;
 
-function openEntryModal({ type, title, subtitle, placeholder, value = "", onSave = null }) {
+function openEntryModal({
+    type,
+    title,
+    subtitle,
+    placeholder,
+    value = "",
+    onSave = null
+}) {
+
     if (!entryModal) return;
 
-    entryModalTitle.textContent = title;
-    entryModalSubtitle.textContent = subtitle;
-    entryModalInput.placeholder = placeholder;
-    entryModalInput.value = value;
-    currentModalSave = onSave || ((text) => {
-        if (type === "job") addJob(text);
-        if (type === "note") addNote(text);
-    });
+    entryModalTitle.textContent =
+        title;
 
-    entryModal.classList.add("active");
-    entryModal.setAttribute("aria-hidden", "false");
+    entryModalSubtitle.textContent =
+        subtitle;
+
+    entryModalInput.placeholder =
+        placeholder;
+
+    entryModalInput.value =
+        value;
+
+    currentModalSave =
+        onSave ||
+        ((text) => {
+
+            if (type === "job") {
+                addJob(text);
+            }
+
+            if (type === "note") {
+                addNote(text);
+            }
+        });
+
+    entryModal.classList.add(
+        "active"
+    );
+
+    entryModal.setAttribute(
+        "aria-hidden",
+        "false"
+    );
 
     setTimeout(() => {
+
         entryModalInput.focus();
+
         entryModalInput.setSelectionRange(
             entryModalInput.value.length,
             entryModalInput.value.length
         );
+
     }, 50);
 }
 
 function closeEntryModalWindow() {
+
     if (!entryModal) return;
-    entryModal.classList.remove("active");
-    entryModal.setAttribute("aria-hidden", "true");
+
+    entryModal.classList.remove(
+        "active"
+    );
+
+    entryModal.setAttribute(
+        "aria-hidden",
+        "true"
+    );
+
     entryModalInput.value = "";
+
     currentModalSave = null;
 }
 
-saveEntryModal?.addEventListener("click", () => {
-    const value = entryModalInput.value.trim();
+saveEntryModal?.addEventListener(
+    "click",
+    () => {
 
-    if (!value) {
-        entryModalInput.focus();
-        return;
+        const value =
+            entryModalInput.value.trim();
+
+        if (!value) {
+
+            entryModalInput.focus();
+
+            return;
+        }
+
+        if (currentModalSave) {
+            currentModalSave(value);
+        }
+
+        closeEntryModalWindow();
     }
+);
 
-    if (currentModalSave) currentModalSave(value);
-    closeEntryModalWindow();
-});
+closeEntryModal?.addEventListener(
+    "click",
+    closeEntryModalWindow
+);
 
-closeEntryModal?.addEventListener("click", closeEntryModalWindow);
-cancelEntryModal?.addEventListener("click", closeEntryModalWindow);
-entryModalBackdrop?.addEventListener("click", closeEntryModalWindow);
+cancelEntryModal?.addEventListener(
+    "click",
+    closeEntryModalWindow
+);
 
-entryModalInput?.addEventListener("keydown", (event) => {
-    if ((event.ctrlKey || event.metaKey) && event.key === "Enter") {
-        saveEntryModal.click();
+entryModalBackdrop?.addEventListener(
+    "click",
+    closeEntryModalWindow
+);
+
+entryModalInput?.addEventListener(
+    "keydown",
+    (event) => {
+
+        if (
+            (event.ctrlKey ||
+                event.metaKey) &&
+            event.key === "Enter"
+        ) {
+            saveEntryModal.click();
+        }
     }
-});
+);
 
-document.addEventListener("keydown", (event) => {
-    if (event.key === "Escape") closeEntryModalWindow();
-});
+document.addEventListener(
+    "keydown",
+    (event) => {
+
+        if (event.key === "Escape") {
+            closeEntryModalWindow();
+        }
+    }
+);
 
 // ======================================
-// START
+// START DASHBOARD
 // ======================================
 
 (async function startDashboard() {
-    const loggedIn = await checkLogin();
+
+    const loggedIn =
+        await checkLogin();
+
     if (!loggedIn) return;
 
     await loadOrders();
+
     subscribeToOrders();
+
 })();
