@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Customers | Me To You Designs</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#faf5f8;color:#4a3a43;font-family:Poppins,sans-serif}
+.page{max-width:850px;margin:auto;padding:10px 12px 45px}
+.top{text-align:center;background:#fff;margin:-10px -12px 15px;padding:12px;border-bottom:1px solid #efd8e3}
+.logo{width:78px;height:78px;object-fit:contain;border-radius:50%}
+.back{display:inline-block;color:#bd7398;text-decoration:none;font-weight:700;margin:3px 0 12px}
+.hero,.customerCard,.customerDetails{background:#fff;border:1px solid #efd8e3;border-radius:22px;padding:17px;box-shadow:0 4px 15px rgba(0,0,0,.06)}
+.hero h1{margin:0;font-size:30px}
+.hero p{margin:4px 0 15px;color:#8d7c85}
+.search{width:100%;border:1.5px solid #e6cad6;border-radius:13px;padding:12px;background:#fff;font:inherit;font-size:14px;outline:none}
+.summary{color:#8d7c85;font-size:13px;margin:13px 3px 8px}
+.customerCard{margin-bottom:12px}
+.customerTop{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+.customerName{font-size:19px;font-weight:700;color:#59434d}
+.contact{font-size:13px;color:#7d6a72;margin-top:4px;word-break:break-word}
+.orderCount{background:#f7e5ec;color:#a85e7f;border-radius:18px;padding:7px 11px;font-size:11px;font-weight:700;white-space:nowrap}
+.ordersTitle{margin:13px 0 7px;font-size:12px;font-weight:700;color:#8c6b79}
+.orderNumbers{display:flex;flex-wrap:wrap;gap:7px}
+.orderNumber{display:inline-block;background:#faf3f6;border:1px solid #eadbe1;color:#8f5773;border-radius:10px;padding:7px 10px;font-size:12px;font-weight:700}
+.viewButton{width:100%;margin-top:13px;border:0;border-radius:12px;padding:11px;background:#c978a0;color:#fff;font:700 13px Poppins;cursor:pointer}
+.loading,.empty{text-align:center;color:#8d7c85;padding:40px 15px}
+.empty{background:#fff;border:1px solid #efd8e3;border-radius:20px}
+.detailsBackdrop{position:fixed;inset:0;background:rgba(62,43,56,.48);z-index:100;display:flex;align-items:flex-end;justify-content:center}
+.detailsBox{width:min(700px,100%);max-height:90vh;overflow:auto;background:#faf5f8;border-radius:25px 25px 0 0;padding:15px 12px 30px}
+.detailsHead{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:2px 3px 12px}
+.detailsHead h2{margin:0;color:#62465a;font-size:22px}
+.close{border:0;background:#fff;width:42px;height:42px;border-radius:50%;font-size:25px;color:#62465a;cursor:pointer}
+.detailCard{background:#fff;border-radius:18px;padding:15px;margin:10px 0;box-shadow:0 3px 12px rgba(0,0,0,.05)}
+.detailCard h3{margin:0 0 10px;color:#b86c8d;font-size:17px}
+.orderRow{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:11px 0;border-bottom:1px solid #eee0e6}
+.orderRow:last-child{border-bottom:0}
+.orderRow strong{color:#8f5773}
+.orderRow span{font-size:12px;color:#7d6a72;text-align:right}
+.noOrders{color:#8d7c85;font-size:13px}
+@media(max-width:500px){.customerTop{align-items:flex-start}.customerName{font-size:17px}}
+</style>
+</head>
+<body>
+
+<div class="page">
+<header class="top">
+<img src="logo.PNG" class="logo" alt="Me To You Designs">
+</header>
+
+<a class="back" href="dashboard.html">← Back to Dashboard</a>
+
+<section class="hero">
+<h1>👥 Customers</h1>
+<p>Your customers and their order numbers</p>
+<input id="search" class="search" type="search" placeholder="🔍 Search customer or contact...">
+</section>
+
+<div id="summary" class="summary">Loading customers…</div>
+<div id="customers">
+<div class="loading">Loading customers…</div>
+</div>
+</div>
+
+<div id="detailsRoot"></div>
+
+<script type="module">
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+
+const SUPABASE_URL = "https://critutqwakaepgxgpkml.supabase.co";
+const SUPABASE_KEY = "sb_publishable_KtXAtIRgtZADPODLn7inRw_vC6rBPFb";
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+const $ = id => document.getElementById(id);
+
+let orders = [];
+let customers = [];
+
+function esc(value) {
+    return String(value ?? "").replace(/[&<>"']/g, char => ({
+        "&":"&amp;",
+        "<":"&lt;",
+        ">":"&gt;",
+        '"':"&quot;",
+        "'":"&#039;"
+    }[char]));
+}
+
+async function checkLogin() {
+    const { data, error } = await supabase.auth.getSession();
+
+    if (error || !data.session) {
+        window.location.href = "index.html";
+        return false;
+    }
+
+    return true;
+}
+
+function customerKey(name) {
+    return String(name || "")
+        .trim()
+        .toLowerCase();
+}
+
+function buildCustomers() {
+    const map = new Map();
+
+    orders.forEach(order => {
+        const name = String(
+            order.customer_name ||
+            order.customerName ||
+            ""
+        ).trim();
+
+        if (!name) return;
+
+        const key = customerKey(name);
+
+        if (!map.has(key)) {
+            map.set(key, {
+                name,
+                contact: String(
+                    order.customer_contact ||
+                    order.customerContact ||
+                    ""
+                ).trim(),
+                orders: []
+            });
+        }
+
+        const customer = map.get(key);
+
+        // Keep contact details if a later order has them
+        if (!customer.contact) {
+            customer.contact = String(
+                order.customer_contact ||
+                order.customerContact ||
+                ""
+            ).trim();
+        }
+
+        customer.orders.push(order);
+    });
+
+    customers = Array.from(map.values()).sort((a, b) =>
+        a.name.localeCompare(b.name)
+    );
+}
+
+function renderCustomers() {
+    const query = $("search").value.trim().toLowerCase();
+
+    const filtered = customers.filter(customer => {
+        if (!query) return true;
+
+        const orderNumbers = customer.orders
+            .map(order =>
+                order.order_number ||
+                order.orderNumber ||
+                ""
+            )
+            .join(" ");
+
+        return (
+            customer.name.toLowerCase().includes(query) ||
+            customer.contact.toLowerCase().includes(query) ||
+            orderNumbers.toLowerCase().includes(query)
+        );
+    });
+
+    $("summary").textContent =
+        `${filtered.length} customer${filtered.length === 1 ? "" : "s"}`;
+
+    if (!filtered.length) {
+        $("customers").innerHTML = `
+            <div class="empty">
+                👥<br>
+                <strong>No customers found</strong>
+            </div>
+        `;
+        return;
+    }
+
+    $("customers").innerHTML = filtered.map((customer, index) => {
+        const numbers = customer.orders
+            .map(order =>
+                order.order_number ||
+                order.orderNumber ||
+                "Order"
+            );
+
+        return `
+            <article class="customerCard">
+                <div class="customerTop">
+                    <div>
+                        <div class="customerName">
+                            ${esc(customer.name)}
+                        </div>
+
+                        ${
+                            customer.contact
+                            ? `<div class="contact">📞 ${esc(customer.contact)}</div>`
+                            : `<div class="contact">No contact details saved</div>`
+                        }
+                    </div>
+
+                    <div class="orderCount">
+                        ${numbers.length}
+                        order${numbers.length === 1 ? "" : "s"}
+                    </div>
+                </div>
+
+                <div class="ordersTitle">
+                    ORDER NUMBERS
+                </div>
+
+                <div class="orderNumbers">
+                    ${
+                        numbers.map(number =>
+                            `<span class="orderNumber">${esc(number)}</span>`
+                        ).join("")
+                    }
+                </div>
+
+                <button
+                    class="viewButton"
+                    data-index="${index}"
+                >
+                    👁 View Customer
+                </button>
+            </article>
+        `;
+    }).join("");
+
+    // Use the filtered customer objects for the buttons
+    document.querySelectorAll(".viewButton").forEach(button => {
+        button.addEventListener("click", () => {
+            openCustomer(filtered[Number(button.dataset.index)]);
+        });
+    });
+}
+
+function statusClass(status) {
+    return String(status || "")
+        .toLowerCase()
+        .replace(/\s+/g, "-");
+}
+
+function openCustomer(customer) {
+    const orderRows = customer.orders
+        .map(order => {
+            const number =
+                order.order_number ||
+                order.orderNumber ||
+                "Order";
+
+            const status =
+                order.order_status ||
+                order.orderStatus ||
+                "New Order";
+
+            const due =
+                order.date_needed ||
+                order.dateNeeded;
+
+            const dueText = due
+                ? new Date(
+                    String(due).length === 10
+                        ? due + "T00:00:00"
+                        : due
+                  ).toLocaleDateString("en-GB")
+                : "No due date";
+
+            return `
+                <div class="orderRow">
+                    <strong>${esc(number)}</strong>
+
+                    <span>
+                        ${esc(status)}
+                        <br>
+                        Due: ${esc(dueText)}
+                    </span>
+                </div>
+            `;
+        })
+        .join("");
+
+    $("detailsRoot").innerHTML = `
+        <div class="detailsBackdrop">
+            <div class="detailsBox">
+
+                <div class="detailsHead">
+                    <h2>👤 ${esc(customer.name)}</h2>
+
+                    <button
+                        class="close"
+                        id="closeDetails"
+                    >
+                        ×
+                    </button>
+                </div>
+
+                <div class="detailCard">
+                    <h3>Customer Details</h3>
+
+                    ${
+                        customer.contact
+                        ? `<div>📞 ${esc(customer.contact)}</div>`
+                        : `<div class="noOrders">No contact details saved.</div>`
+                    }
+                </div>
+
+                <div class="detailCard">
+                    <h3>📦 Order Numbers</h3>
+
+                    ${
+                        orderRows ||
+                        `<div class="noOrders">No orders found.</div>`
+                    }
+                </div>
+
+            </div>
+        </div>
+    `;
+
+    $("closeDetails").onclick = () => {
+        $("detailsRoot").innerHTML = "";
+    };
+}
+
+async function loadCustomers() {
+    $("customers").innerHTML =
+        `<div class="loading">Loading customers…</div>`;
+
+    const { data, error } = await supabase
+        .from("orders")
+        .select("*");
+
+    if (error) {
+        console.error(error);
+
+        $("summary").textContent =
+            "Customers could not be loaded";
+
+        $("customers").innerHTML = `
+            <div class="empty">
+                <strong>Unable to load customers.</strong>
+                <br><br>
+                ${esc(error.message)}
+            </div>
+        `;
+
+        return;
+    }
+
+    orders = data || [];
+
+    buildCustomers();
+    renderCustomers();
+}
+
+$("search").addEventListener(
+    "input",
+    renderCustomers
+);
+
+document.addEventListener(
+    "keydown",
+    event => {
+        if (event.key === "Escape") {
+            $("detailsRoot").innerHTML = "";
+        }
+    }
+);
+
+(async function start() {
+    const loggedIn = await checkLogin();
+
+    if (!loggedIn) return;
+
+    await loadCustomers();
+
+    // Keep the customer list current when orders change
+    supabase
+        .channel("customers-orders")
+        .on(
+            "postgres_changes",
+            {
+                event: "*",
+                schema: "public",
+                table: "orders"
+            },
+            () => loadCustomers()
+        )
+        .subscribe();
+
+    // Fallback refresh
+    setInterval(loadCustomers, 10000);
+})();
+</script>
+
+<footer style="position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #efd8e3;display:flex;justify-content:center;gap:40px;padding:9px;z-index:20">
+<a href="customers.html" style="text-decoration:none;color:#b86c8d;font-size:11px;font-weight:700;text-align:center">👥<br>Customers</a>
+<a href="create-order.html" style="text-decoration:none;color:#b86c8d;font-size:11px;font-weight:700;text-align:center">＋<br>Add Order</a>
+<a href="orders.html" style="text-decoration:none;color:#b86c8d;font-size:11px;font-weight:700;text-align:center">📦<br>Orders</a>
+</footer>
+
+</body>
+</html>
