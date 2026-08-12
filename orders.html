@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Orders | Me To You Designs</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}body{margin:0;background:#faf5f8;color:#4a3a43;font-family:Poppins,sans-serif}
+.page{max-width:900px;margin:auto;padding:10px 12px 45px}.top{text-align:center;background:#fff;margin:-10px -12px 15px;padding:12px;border-bottom:1px solid #efd8e3}.logo{width:78px;height:78px;object-fit:contain;border-radius:50%}
+.back{display:inline-block;color:#bd7398;text-decoration:none;font-weight:700;margin:3px 0 12px}.hero,.orderCard{background:#fff;border:1px solid #efd8e3;border-radius:22px;padding:17px;box-shadow:0 4px 15px rgba(0,0,0,.06)}
+.hero h1{margin:0;font-size:30px;color:#4a3a43}.hero p{margin:4px 0 15px;color:#8d7c85;font-size:14px}
+.search{width:100%;border:1.5px solid #e6cad6;border-radius:13px;padding:12px;background:#fff;font:inherit;font-size:14px;outline:none;color:#4a3a43}.filters{display:flex;gap:8px;overflow-x:auto;white-space:nowrap;margin-top:12px;padding-bottom:2px;scrollbar-width:none}.filters::-webkit-scrollbar{display:none}
+.filter{border:1.5px solid #e6cad6;background:#fff;color:#62465a;border-radius:22px;padding:10px 18px;font:600 13px Poppins;cursor:pointer;flex:0 0 auto}.filter.active{background:#c978a0;border-color:#c978a0;color:#fff}
+.summary{color:#8d7c85;font-size:13px;margin:13px 3px 8px}.orderCard{margin-bottom:12px}.orderTop{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}.orderNo{font-size:21px;font-weight:700}.customer{font-size:18px;font-weight:700;margin-top:1px}.status{padding:7px 11px;border-radius:17px;font-size:11px;font-weight:700;background:#f6e9ef;color:#8d6877;white-space:nowrap}.status.making{background:#fff0cf;color:#92701f}.status.ready{background:#e1f4e8;color:#3d8156}.status.completed{background:#dff3e4;color:#34734a}.status.mock-up{background:#eadfff;color:#7255a2}
+.meta{margin-top:9px;color:#75656d;font-size:13px;line-height:1.65}.actions{display:flex;gap:8px;margin-top:13px}.actions button{flex:1;border:0;border-radius:12px;padding:11px 7px;font:700 13px Poppins;cursor:pointer}.view{background:#f7e5ec;color:#a85e7f}.edit{background:#c978a0;color:#fff}.delete{background:#f3ecef;color:#8a6877}
+.loading,.empty{text-align:center;color:#8d7c85;padding:40px 15px}.empty{background:#fff;border:1px solid #efd8e3;border-radius:20px}
+.backdrop{position:fixed;inset:0;background:rgba(62,43,56,.48);z-index:100;display:flex;align-items:flex-end;justify-content:center}.editor{width:min(900px,100%);max-height:94vh;overflow:auto;background:#faf5f8;border-radius:25px 25px 0 0;padding:15px 12px 30px}.editorHead{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:2px 3px 12px}.editorHead h2{margin:0;color:#62465a;font-size:23px}.close{border:0;background:#fff;width:42px;height:42px;border-radius:50%;font-size:25px;color:#62465a;cursor:pointer}
+.editCard{background:#fff;border-radius:18px;padding:15px;margin:10px 0;box-shadow:0 3px 12px rgba(0,0,0,.05)}.editCard h3{margin:0 0 11px;color:#b86c8d;font-size:18px}label{display:block;font-weight:600;font-size:12px;margin:9px 0 4px;color:#6f5963}input,select,textarea{width:100%;border:1.5px solid #e6cad6;border-radius:12px;padding:10px 11px;background:#fff;font:inherit;font-size:14px;color:#3e3439;outline:none}textarea{min-height:85px;resize:vertical}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.full{grid-column:1/-1}.itemCard{border:1px solid #eadbe1;border-radius:15px;padding:13px;margin-bottom:10px;background:#fffafb}.itemTitle{font-weight:700;color:#8f5773;margin-bottom:8px}.itemGrid{display:grid;grid-template-columns:1.5fr .6fr .8fr;gap:8px}.removeItem{margin-top:9px;border:0;border-radius:10px;padding:9px 12px;background:#f2e7eb;color:#8d6877;font-weight:600}.addItem{width:100%;border:0;border-radius:12px;padding:12px;background:#d287a5;color:#fff;font-weight:700}.personalisationBox{display:none}.paymentRow{padding:9px 0;border-bottom:1px solid #eee0e6;font-size:12px}.totals{background:#faf3f6;border-radius:13px;padding:12px;margin-top:10px;font-weight:600;color:#7d6170}.editorActions{display:flex;gap:9px}.editorActions button{flex:1;border:0;border-radius:13px;padding:14px;font:700 14px Poppins;cursor:pointer}.save{background:#b96d8d;color:#fff}.cancel{background:#f2e7eb;color:#765968}.danger{background:#fff0f2;color:#a05275}.msg{display:none;padding:11px;border-radius:12px;background:#fff0f0;color:#9b4b4b;margin-top:10px;font-size:13px}
+@media(max-width:560px){.grid{grid-template-columns:1fr}.full{grid-column:auto}.itemGrid{grid-template-columns:1fr 1fr}.itemGrid .wide{grid-column:1/-1}.editorActions{flex-direction:column}}
+</style>
+</head>
+<body>
+<div class="page">
+<header class="top"><img src="logo.PNG" class="logo" alt="Me To You Designs"></header>
+<a class="back" href="dashboard.html">← Back to Dashboard</a>
+<section class="hero">
+<h1>📦 Orders</h1><p>View and manage your customer orders</p>
+<input id="search" class="search" type="search" placeholder="🔍 Search customer, order number or product...">
+<div class="filters">
+<button class="filter active" data-filter="all">All</button>
+<button class="filter" data-filter="New Order">New</button>
+<button class="filter" data-filter="Designing">Mock Up</button>
+<button class="filter" data-filter="Making">Making</button>
+<button class="filter" data-filter="Ready">Ready</button>
+<button class="filter" data-filter="Completed">Completed</button>
+</div>
+</section>
+<div id="summary" class="summary">Loading orders…</div>
+<div id="orders"><div class="loading">Loading orders…</div></div>
+</div>
+
+<div id="editorRoot"></div>
+
+<script type="module">
+import {createClient} from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+const supabase=createClient("https://critutqwakaepgxgpkml.supabase.co","sb_publishable_KtXAtIRgtZADPODLn7inRw_vC6rBPFb");
+const $=id=>document.getElementById(id);
+const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
+const money=v=>"£"+(Number(v)||0).toFixed(2);
+let orders=[],filter="all",editing=null,payments=[];
+
+function items(o){return Array.isArray(o?.items)?o.items:[]}
+function total(o){return Number(o?.orderTotal)||items(o).reduce((s,i)=>s+(Number(i.itemTotal)||((Number(i.quantity)||1)*(Number(i.unitPrice)||0))),0)}
+function paid(o){return Number(o?.totalPaid)||0}
+function balance(o){return Math.max(0,total(o)-paid(o))}
+function fmtDate(v){if(!v)return"No due date";const d=new Date(String(v).length===10?v+"T00:00:00":v);return isNaN(d)?"No due date":d.toLocaleDateString("en-GB")}
+function cls(s){return String(s||"").toLowerCase().replace(/\s+/g,"-")}
+
+async function login(){
+ const {data,error}=await supabase.auth.getSession();
+ if(error||!data.session){location.href="index.html";return false} return true;
+}
+async function load(){
+ $("orders").innerHTML='<div class="loading">Loading orders…</div>';
+ try{
+  const {data,error}=await supabase.from("orders").select("*");
+  if(error)throw error;
+  orders=(data||[]).sort((a,b)=>new Date(b.orderDate||0)-new Date(a.orderDate||0));
+  render();
+ }catch(e){
+  $("summary").textContent="Orders could not be loaded";
+  $("orders").innerHTML=`<div class="empty"><strong>Unable to load orders.</strong><br>${esc(e.message)}</div>`;
+ }
+}
+function render(){
+ const q=$("search").value.toLowerCase().trim();
+ const list=orders.filter(o=>{
+  if(filter!=="all"&&String(o.orderStatus||"New Order")!==filter)return false;
+  if(!q)return true;
+  const text=[o.orderNumber,o.customerName,o.orderContact,o.customerContact,o.orderSource,o.orderNotes,...items(o).flatMap(i=>[i.product,i.size,i.colour,i.personalisation])].join(" ").toLowerCase();
+  return text.includes(q);
+ });
+ $("summary").textContent=`${list.length} order${list.length===1?"":"s"}`;
+ if(!list.length){$("orders").innerHTML='<div class="empty">📦<br><strong>No orders found</strong></div>';return}
+ $("orders").innerHTML=list.map(o=>{
+  const st=o.orderStatus||"New Order";
+  const products=items(o).map(i=>i.product).filter(Boolean).join(", ")||"No product";
+  return `<article class="orderCard">
+   <div class="orderTop"><div><div class="orderNo">${esc(o.orderNumber||"MTYD-????")}</div><div class="customer">${esc(o.customerName||"Unnamed customer")}</div></div><span class="status ${cls(st)}">${esc(st)}</span></div>
+   <div class="meta">📅 ${esc(fmtDate(o.dateNeeded))} · 🛍️ ${esc(products)}<br>💷 Total ${money(total(o))} · 💳 Paid ${money(paid(o))} · 💰 Balance ${money(balance(o))}</div>
+   <div class="actions"><button class="view" data-act="view" data-id="${esc(o.id)}">👁 View</button><button class="edit" data-act="edit" data-id="${esc(o.id)}">✏️ Edit</button><button class="delete" data-act="delete" data-id="${esc(o.id)}">🗑 Delete</button></div>
+  </article>`;
+ }).join("");
+}
+
+function itemEditor(i={},n){
+ const yes=String(i.personalised||"No")==="Yes";
+ return `<div class="itemCard" data-n="${n}">
+  <div class="itemTitle">📦 Item ${n+1}</div>
+  <div class="itemGrid">
+   <div class="full"><label>Product</label><input class="ep" value="${esc(i.product)}"></div>
+   <div><label>Quantity</label><input class="eq" type="number" min="1" value="${Number(i.quantity)||1}"></div>
+   <div><label>Unit Price (£)</label><input class="eprice" type="number" step="0.01" value="${Number(i.unitPrice)||0}"></div>
+   <div><label>Item Total (£)</label><input class="etotal" readonly value="${money(Number(i.itemTotal)||((Number(i.quantity)||1)*(Number(i.unitPrice)||0))).replace("£","")}"></div>
+   <div><label>Size</label><input class="esize" value="${esc(i.size)}"></div>
+   <div><label>Colour / Theme</label><input class="ecolour" value="${esc(i.colour)}"></div>
+   <div><label>Personalised?</label><select class="eyes"><option>No</option><option>Yes</option></select></div>
+   <div class="full pbox" style="display:${yes?"block":"none"}"><label>What personalisation?</label><textarea class="epersonal">${esc(i.personalisation)}</textarea></div>
+  </div>
+  <button type="button" class="removeItem">🗑 Remove Item</button>
+ </div>`;
+}
+
+function openEditor(o){
+ editing=structuredClone(o); if(!Array.isArray(editing.items)||!editing.items.length)editing.items=[{product:"",quantity:1,unitPrice:0,itemTotal:0,size:"",colour:"",personalised:"No",personalisation:""}];
+ payments=Array.isArray(editing.payments)?structuredClone(editing.payments):[];
+ $("editorRoot").innerHTML=`<div class="backdrop"><div class="editor">
+ <div class="editorHead"><h2>✏️ Edit Order ${esc(editing.orderNumber||"")}</h2><button class="close" id="closeEdit">×</button></div>
+ <section class="editCard"><h3>👤 Customer Details</h3><div class="grid">
+  <div><label>Customer Name</label><input id="eName" value="${esc(editing.customerName)}"></div>
+  <div><label>Customer Contact</label><input id="eContact" value="${esc(editing.customerContact)}"></div>
+  <div><label>Where Ordered From</label><select id="eSource"><option>Facebook</option><option>Instagram</option><option>Snapchat</option><option>TikTok</option><option>Website</option><option>Other</option></select></div>
+  <div><label>Social Username</label><input id="eSocial" value="${esc(editing.socialUsername)}"></div>
+ </div></section>
+ <section class="editCard"><h3>📦 Items Ordered</h3><div id="editItems">${editing.items.map(itemEditor).join("")}</div><button class="addItem" id="addItem">➕ Add Another Item</button></section>
+ <section class="editCard"><h3>📝 Order Details</h3><div class="grid">
+  <div><label>Order Number</label><input value="${esc(editing.orderNumber)}" readonly></div>
+  <div><label>Order Date</label><input id="eOrderDate" type="date" value="${esc(String(editing.orderDate||"").slice(0,10))}"></div>
+  <div><label>Date Needed By</label><input id="eNeeded" type="date" value="${esc(String(editing.dateNeeded||"").slice(0,10))}"></div>
+  <div class="full"><label>Order Notes</label><textarea id="eNotes">${esc(editing.orderNotes)}</textarea></div>
+ </div></section>
+ <section class="editCard"><h3>💷 Payment</h3><div class="grid">
+  <div><label>Total Paid (£)</label><input id="ePaid" type="number" step="0.01" value="${Number(editing.totalPaid)||0}"></div>
+  <div><label>Payment Status</label><select id="ePayStatus"><option>Not Paid</option><option>Deposit Paid</option><option>Paid in Full</option></select></div>
+ </div><div id="totals" class="totals"></div><div id="paymentHistory">${paymentHtml()}</div>
+ <button class="addItem" id="addPayment">💗 + Add Payment</button>
+ <div id="paymentForm" style="display:none"><div class="grid"><div><label>Date</label><input id="pDate" type="date" value="${new Date().toISOString().slice(0,10)}"></div><div><label>Amount (£)</label><input id="pAmount" type="number" step="0.01"></div><div><label>Method</label><select id="pMethod"><option>Cash</option><option>Bank Transfer</option><option>Card</option><option>PayPal</option><option>Other</option></select></div><div><label>Notes</label><input id="pNotes"></div></div><button class="addItem" id="savePayment">Save Payment</button></div>
+ </section>
+ <section class="editCard"><h3>🚚 Collection / Delivery</h3><div class="grid">
+  <div><label>Delivery Method</label><select id="eDelivery"><option>Collection</option><option>Local Delivery</option><option>Royal Mail</option><option>Evri</option><option>InPost</option></select></div>
+  <div><label>Tracking Number</label><input id="eTracking" value="${esc(editing.trackingNumber)}"></div>
+  <div><label>Address Line 1</label><input id="eA1" value="${esc(editing.address1)}"></div><div><label>Address Line 2</label><input id="eA2" value="${esc(editing.address2)}"></div>
+  <div><label>Town / City</label><input id="eTown" value="${esc(editing.town)}"></div><div><label>County</label><input id="eCounty" value="${esc(editing.county)}"></div><div><label>Postcode</label><input id="ePost" value="${esc(editing.postcode)}"></div>
+ </div></section>
+ <section class="editCard"><h3>✨ Order Progress</h3><div class="grid">
+  <div><label>Order Status</label><select id="eStatus"><option>New Order</option><option>Designing</option><option>Making</option><option>Ready</option><option>Completed</option></select></div>
+ </div></section>
+ <div id="editMsg" class="msg"></div>
+ <div class="editorActions"><button class="cancel" id="cancelEdit">Cancel</button><button class="save" id="saveEdit">💗 Save Changes</button></div>
+ </div></div>`;
+ $("eSource").value=editing.orderSource||"Facebook";$("eDelivery").value=editing.deliveryMethod||"Collection";$("eStatus").value=editing.orderStatus||"New Order";$("ePayStatus").value=editing.paymentStatus||"Not Paid";
+ wireItems();recalcEdit();
+ $("closeEdit").onclick=closeEditor;$("cancelEdit").onclick=closeEditor;
+ $("addItem").onclick=()=>{editing.items.push({product:"",quantity:1,unitPrice:0,itemTotal:0,size:"",colour:"",personalised:"No",personalisation:""});renderEditItems()};
+ $("ePaid").addEventListener("input",recalcEdit);
+ $("addPayment").onclick=()=>{$("paymentForm").style.display=$("paymentForm").style.display==="none"?"block":"none"};
+ $("savePayment").onclick=()=>{
+  const amount=Number($("pAmount").value)||0;if(amount<=0){alert("Enter a payment amount.");return}
+  payments.push({date:$("pDate").value,amount,method:$("pMethod").value,notes:$("pNotes").value});$("pAmount").value="";$("pNotes").value="";$("paymentForm").style.display="none";$("paymentHistory").innerHTML=paymentHtml();recalcEdit();
+ };
+ $("saveEdit").onclick=saveEdit;
+}
+function paymentHtml(){return payments.length?payments.map(p=>`<div class="paymentRow"><strong>${money(p.amount)}</strong> · ${esc(p.method)} · ${esc(p.date)}${p.notes?" · "+esc(p.notes):""}</div>`).join(""):'<div class="paymentRow">No payments recorded yet.</div>'}
+function renderEditItems(){
+ $("editItems").innerHTML=editing.items.map(itemEditor).join("");wireItems();recalcEdit();
+}
+function wireItems(){
+ document.querySelectorAll("#editItems .itemCard").forEach((card,n)=>{
+  const sel=card.querySelector(".eyes");sel.value=editing.items[n]?.personalised||"No";
+  sel.onchange=()=>card.querySelector(".pbox").style.display=sel.value==="Yes"?"block":"none";
+  const calc=()=>{const q=Number(card.querySelector(".eq").value)||0,p=Number(card.querySelector(".eprice").value)||0;card.querySelector(".etotal").value=(q*p).toFixed(2);recalcEdit()};
+  card.querySelector(".eq").oninput=calc;card.querySelector(".eprice").oninput=calc;
+  card.querySelector(".removeItem").onclick=()=>{if(editing.items.length<=1){alert("You must have at least one item.");return}editing.items.splice(n,1);renderEditItems()};
+ });
+}
+function collectItems(){
+ return [...document.querySelectorAll("#editItems .itemCard")].map(card=>{
+  const q=Number(card.querySelector(".eq").value)||0,p=Number(card.querySelector(".eprice").value)||0,yes=card.querySelector(".eyes").value;
+  return {product:card.querySelector(".ep").value.trim(),quantity:q,unitPrice:p,itemTotal:q*p,size:card.querySelector(".esize").value.trim(),colour:card.querySelector(".ecolour").value.trim(),personalised:yes,personalisation:yes==="Yes"?card.querySelector(".epersonal").value.trim():""};
+ });
+}
+function recalcEdit(){
+ const its=collectItems(),t=its.reduce((s,i)=>s+i.itemTotal,0),p=Number($("ePaid")?.value)||0,b=Math.max(0,t-p);
+ $("totals").textContent=`Total: ${money(t)} · Paid: ${money(p)} · Balance: ${money(b)}`;
+ if($("ePayStatus"))$("ePayStatus").value=p<=0?"Not Paid":p>=t?"Paid in Full":"Deposit Paid";
+}
+function closeEditor(){$("editorRoot").innerHTML="";editing=null;payments=[]}
+async function saveEdit(){
+ const btn=$("saveEdit"),msg=$("editMsg");btn.disabled=true;btn.textContent="Saving…";msg.style.display="none";
+ try{
+  const its=collectItems(),t=its.reduce((s,i)=>s+i.itemTotal,0),p=Number($("ePaid").value)||0,b=Math.max(0,t-p);
+  const patch={customerName:$("eName").value.trim(),customerContact:$("eContact").value.trim(),orderSource:$("eSource").value,socialUsername:$("eSocial").value.trim(),items:its,orderDate:$("eOrderDate").value,dateNeeded:$("eNeeded").value,orderNotes:$("eNotes").value,orderTotal:t,totalPaid:p,remainingBalance:b,paymentStatus:p<=0?"Not Paid":p>=t?"Paid in Full":"Deposit Paid",payments,deliveryMethod:$("eDelivery").value,trackingNumber:$("eTracking").value.trim(),address1:$("eA1").value.trim(),address2:$("eA2").value.trim(),town:$("eTown").value.trim(),county:$("eCounty").value.trim(),postcode:$("ePost").value.trim(),orderStatus:$("eStatus").value,completed:$("eStatus").value==="Completed"};
+  const {error}=await supabase.from("orders").update(patch).eq("id",editing.id);if(error)throw error;
+  closeEditor();await load();
+ }catch(e){msg.textContent="Could not save the order: "+e.message;msg.style.display="block";btn.disabled=false;btn.textContent="💗 Save Changes"}
+}
+async function deleteOrder(o){
+ if(!confirm(`Delete ${o.orderNumber||"this order"}?\n\nThis will permanently remove the order.`))return;
+ const {error}=await supabase.from("orders").delete().eq("id",o.id);if(error){alert("Could not delete the order.\n\n"+error.message);return}
+ await renumber();await load();
+}
+async function renumber(){
+ const {data,error}=await supabase.from("orders").select("id,orderNumber,orderDate");if(error||!data?.length)return;
+ data.sort((a,b)=>new Date(a.orderDate||0)-new Date(b.orderDate||0));
+ for(const r of data){const {error:e}=await supabase.from("orders").update({orderNumber:"TEMP-"+r.id}).eq("id",r.id);if(e)return}
+ for(let i=0;i<data.length;i++)await supabase.from("orders").update({orderNumber:"MTYD-"+String(i+1).padStart(4,"0")}).eq("id",data[i].id);
+}
+function viewOrder(o){
+ const its=items(o);
+ $("editorRoot").innerHTML=`<div class="backdrop"><div class="editor"><div class="editorHead"><h2>📦 ${esc(o.orderNumber)} — ${esc(o.customerName)}</h2><button class="close" id="closeView">×</button></div>
+ <div class="editCard"><h3>👤 Customer</h3><div>${esc(o.customerContact||"—")} · ${esc(o.orderSource||"—")}</div></div>
+ <div class="editCard"><h3>📦 Items</h3>${its.map((i,n)=>`<div class="itemCard"><div class="itemTitle">📦 Item ${n+1}: ${esc(i.product||"")}</div><div>Quantity: ${esc(i.quantity||1)} · ${money(i.itemTotal||0)}</div>${i.size?`<div>Size: ${esc(i.size)}</div>`:""}${i.colour?`<div>Colour / Theme: ${esc(i.colour)}</div>`:""}<div><strong>Personalised: ${esc(i.personalised||"No")}</strong></div>${i.personalised==="Yes"?`<div>What personalisation: ${esc(i.personalisation||"—")}</div>`:""}</div>`).join("")}</div>
+ <div class="editCard"><h3>💷 Payment</h3><div>Total ${money(total(o))} · Paid ${money(paid(o))} · Balance ${money(balance(o))}</div>${paymentHtml()}</div>
+ <div class="editCard"><h3>🚚 Delivery</h3><div>${esc(o.deliveryMethod||"—")}</div>${o.trackingNumber?`<div>Tracking: ${esc(o.trackingNumber)}</div>`:""}</div>
+ <div class="editCard"><h3>✨ Status</h3><div>${esc(o.orderStatus||"New Order")}</div></div>
+ <div class="editCard"><h3>📝 Notes</h3><div>${esc(o.orderNotes||"No notes.")}</div></div>
+ <div class="editorActions"><button class="edit" id="viewEdit">✏️ Edit This Order</button><button class="delete" id="viewDelete">🗑 Delete Order</button></div>
+ </div></div>`;
+ $("closeView").onclick=()=>{$("editorRoot").innerHTML=""};
+ $("viewEdit").onclick=()=>openEditor(o);
+ $("viewDelete").onclick=async()=>{ $("editorRoot").innerHTML="";await deleteOrder(o)};
+}
+$("search").addEventListener("input",render);
+document.querySelectorAll(".filter").forEach(b=>b.onclick=()=>{document.querySelectorAll(".filter").forEach(x=>x.classList.remove("active"));b.classList.add("active");filter=b.dataset.filter;render()});
+$("orders").addEventListener("click",async e=>{
+ const b=e.target.closest("button[data-act]");if(!b)return;const o=orders.find(x=>String(x.id)===String(b.dataset.id));if(!o)return;
+ if(b.dataset.act==="view")viewOrder(o);if(b.dataset.act==="edit")openEditor(o);if(b.dataset.act==="delete")await deleteOrder(o);
+});
+(async()=>{if(await login())load()})();
+</script>
+</body>
+</html>
