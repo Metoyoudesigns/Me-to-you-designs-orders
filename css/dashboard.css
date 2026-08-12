@@ -1,0 +1,621 @@
+/* ==========================================
+   ME TO YOU DESIGNS
+   DASHBOARD
+========================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Dancing+Script:wght@700&display=swap');
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+
+    font-family:'Poppins',sans-serif;
+
+    background:linear-gradient(
+        180deg,
+        #fff7fb 0%,
+        #fdeef5 45%,
+        #f9e4ef 100%
+    );
+
+    min-height:100vh;
+
+    color:#5b4752;
+
+    overflow-x:hidden;
+
+}
+
+/* Watermark */
+
+body::before{
+
+    content:"";
+
+    position:fixed;
+
+    inset:0;
+
+    background:url("../logo.PNG") center center no-repeat;
+
+    background-size:260px;
+
+    opacity:.03;
+
+    pointer-events:none;
+
+    z-index:-1;
+
+}
+
+/* APP */
+
+#app{
+
+    max-width:430px;
+
+    margin:auto;
+
+    padding:18px 18px 120px;
+
+}
+
+/* MENU */
+
+#sideMenu{
+
+    position:fixed;
+
+    top:0;
+
+    left:-300px;
+
+    width:280px;
+
+    height:100vh;
+
+    background:white;
+
+    transition:.35s;
+
+    z-index:1000;
+
+    box-shadow:
+    5px 0 25px rgba(0,0,0,.18);
+
+}
+
+#sideMenu.active{
+
+    left:0;
+
+}
+
+#overlay{
+
+    position:fixed;
+
+    inset:0;
+
+    background:rgba(0,0,0,.25);
+
+    display:none;
+
+    z-index:999;
+
+}
+
+#overlay.active{
+
+    display:block;
+
+}
+
+.menuHeader{
+
+    padding:30px 20px;
+
+    text-align:center;
+
+    background:#fdebf3;
+
+}
+
+.menuLogo{
+
+    width:90px;
+
+    margin-bottom:10px;
+
+}
+
+.menuHeader h2{
+
+    font-family:'Dancing Script',cursive;
+
+    font-size:34px;
+
+    color:#b46488;
+
+}
+
+.menuLinks a{
+
+    display:block;
+
+    padding:16px 22px;
+
+    color:#6f5865;
+
+    text-decoration:none;
+
+    border-bottom:1px solid #f3e5ec;
+
+    transition:.2s;
+
+}
+
+.menuLinks a:hover{
+
+    background:#fff5f9;
+
+    color:#c96f97;
+
+}
+
+/* TOP BAR */
+
+.topBar{
+
+    display:flex;
+
+    align-items:center;
+
+    margin-bottom:15px;
+
+}
+
+#menuButton{
+
+    width:48px;
+
+    height:48px;
+
+    border:none;
+
+    border-radius:16px;
+
+    background:white;
+
+    font-size:24px;
+
+    color:#c86f95;
+
+    cursor:pointer;
+
+    box-shadow:
+    0 10px 25px rgba(201,111,149,.18);
+
+}
+/* ==========================================
+   WELCOME
+========================================== */
+
+.welcomeSection{
+
+    text-align:center;
+
+    margin-bottom:22px;
+
+}
+
+.topLogo{
+
+    width:90px;
+
+    margin-bottom:8px;
+
+}
+
+.welcomeSection h1{
+
+    font-family:'Dancing Script',cursive;
+
+    font-size:42px;
+
+    color:#b46488;
+
+    margin-bottom:4px;
+
+}
+
+.heartDivider{
+
+    color:#d88ead;
+
+    font-size:22px;
+
+    margin-bottom:8px;
+
+}
+
+#todayDate{
+
+    color:#8d7280;
+
+    font-size:15px;
+
+}
+
+/* ==========================================
+   STATS
+========================================== */
+
+.statsGrid{
+
+    display:grid;
+
+    grid-template-columns:repeat(2,1fr);
+
+    gap:14px;
+
+    margin-bottom:20px;
+
+}
+
+.statCard{
+
+    background:white;
+
+    border-radius:24px;
+
+    padding:18px;
+
+    text-align:center;
+
+    box-shadow:
+    0 12px 30px rgba(212,143,174,.18);
+
+}
+
+.statIcon{
+
+    font-size:24px;
+
+    margin-bottom:8px;
+
+}
+
+.statCard h3{
+
+    font-size:14px;
+
+    font-weight:500;
+
+    color:#826674;
+
+}
+
+.statCard h2{
+
+    font-size:30px;
+
+    color:#cf7ea2;
+
+    margin-top:8px;
+
+}
+
+/* ==========================================
+   DASHBOARD CARDS
+========================================== */
+
+.dashboardCard{
+
+    background:white;
+
+    border-radius:24px;
+
+    margin-bottom:18px;
+
+    overflow:hidden;
+
+    box-shadow:
+    0 12px 30px rgba(212,143,174,.15);
+
+}
+
+.cardHeader{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    padding:18px 20px;
+
+    font-family:'Dancing Script',cursive;
+
+    font-size:28px;
+
+    color:#b46488;
+
+}
+
+.cardContent{
+
+    padding:0 20px 20px;
+
+}
+
+.toggleButton{
+
+    border:none;
+
+    background:none;
+
+    cursor:pointer;
+
+    color:#cf7ea2;
+
+    font-size:18px;
+
+}
+
+/* ==========================================
+   BUTTONS
+========================================== */
+
+.addButton{
+
+    width:100%;
+
+    border:none;
+
+    border-radius:18px;
+
+    padding:14px;
+
+    background:#cf7ea2;
+
+    color:white;
+
+    font-size:15px;
+
+    font-weight:600;
+
+    cursor:pointer;
+
+    transition:.25s;
+
+    margin-bottom:15px;
+
+}
+
+.addButton:hover{
+
+    background:#bb688c;
+
+    transform:translateY(-2px);
+
+}
+/* ==========================================
+   LISTS
+========================================== */
+
+#jobsList,
+#notesList{
+
+    list-style:none;
+
+}
+
+#jobsList li,
+#notesList li{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    background:#fff6fa;
+
+    border-radius:18px;
+
+    padding:14px;
+
+    margin-bottom:12px;
+
+    box-shadow:
+    0 4px 12px rgba(212,143,174,.10);
+
+}
+
+/* ==========================================
+   REVENUE
+========================================== */
+
+.revenueGrid{
+
+    display:grid;
+
+    grid-template-columns:repeat(2,1fr);
+
+    gap:12px;
+
+}
+
+.revenueCard{
+
+    background:#fff7fb;
+
+    border-radius:18px;
+
+    padding:15px;
+
+    text-align:center;
+
+}
+
+.revenueCard h4{
+
+    font-size:14px;
+
+    color:#8a6b79;
+
+    margin-bottom:6px;
+
+}
+
+.revenueCard p{
+
+    font-size:22px;
+
+    font-weight:700;
+
+    color:#cf7ea2;
+
+}
+
+/* ==========================================
+   ACTION BUTTONS
+========================================== */
+
+.completeButton,
+.deleteButton,
+.editButton{
+
+    border:none;
+
+    background:none;
+
+    cursor:pointer;
+
+    font-size:18px;
+
+    margin-left:8px;
+
+    transition:.2s;
+
+}
+
+.completeButton{
+
+    color:#58b26b;
+
+}
+
+.editButton{
+
+    color:#4b8de0;
+
+}
+
+.deleteButton{
+
+    color:#d66b8c;
+
+}
+
+.completeButton:hover,
+.editButton:hover,
+.deleteButton:hover{
+
+    transform:scale(1.15);
+
+}
+
+/* ==========================================
+   BOTTOM NAV
+========================================== */
+
+.bottomNav{
+
+    position:fixed;
+
+    bottom:15px;
+
+    left:50%;
+
+    transform:translateX(-50%);
+
+    width:90%;
+
+    max-width:400px;
+
+    background:white;
+
+    border-radius:26px;
+
+    display:flex;
+
+    justify-content:space-around;
+
+    padding:12px 0;
+
+    box-shadow:
+    0 10px 30px rgba(0,0,0,.15);
+
+}
+
+.bottomButton{
+
+    text-decoration:none;
+
+    color:#866875;
+
+    display:flex;
+
+    flex-direction:column;
+
+    align-items:center;
+
+    font-size:13px;
+
+}
+
+.bottomButton span{
+
+    margin-top:4px;
+
+}
+
+.addOrder{
+
+    color:#cf7ea2;
+
+    font-weight:bold;
+
+}
+
+/* ==========================================
+   MOBILE
+========================================== */
+
+@media(max-width:430px){
+
+    #app{
+
+        padding:15px 15px 120px;
+
+    }
+
+    .welcomeSection h1{
+
+        font-size:38px;
+
+    }
+
+    .cardHeader{
+
+        font-size:26px;
+
+    }
+
+}
