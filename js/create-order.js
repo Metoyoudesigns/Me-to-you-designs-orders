@@ -48,6 +48,11 @@ const paymentForm = document.getElementById("paymentForm");
 const customerImages = document.getElementById("customerImages");
 const mockupImages = document.getElementById("mockupImages");
 
+const addressSection = document.getElementById("addressSection");
+
+const paymentHistory = document.getElementById("paymentHistory");
+const savePaymentButton = document.getElementById("savePaymentButton");
+
 let payments = [];
 
 // =====================================
@@ -68,29 +73,54 @@ async function checkLogin() {
 // =====================================
 // ORDER NUMBER
 // =====================================
+// Generates:
+// MTYD-0001
+// MTYD-0002
+// MTYD-0003
+// etc.
+//
+// IMPORTANT:
+// There is NO MTYD-NEW fallback.
+// If Supabase cannot be checked, saving stops
+// rather than creating an incorrect order number.
+// =====================================
 
 async function generateOrderNumber() {
+
     const { data, error } = await supabase
         .from("orders")
-        .select("orderNumber")
-        .order("orderNumber", { ascending: false })
-        .limit(1);
+        .select("order_number");
 
     if (error) {
-        console.error(error);
+        console.error("Order number error:", error);
         throw new Error(
-            "I couldn't check the existing order numbers. Make sure your Supabase orders table is set up."
+            "I couldn't check the existing order numbers in Supabase."
         );
     }
 
-    let lastNumber = 0;
+    let highestNumber = 0;
 
-    if (data && data.length) {
-        const match = String(data[0].orderNumber || "").match(/MTYD-(\d+)/i);
-        if (match) lastNumber = Number(match[1]) || 0;
+    if (Array.isArray(data)) {
+
+        data.forEach(order => {
+
+            const value = String(order.order_number || "");
+
+            const match = value.match(/^MTYD-(\d+)$/i);
+
+            if (match) {
+                const number = parseInt(match[1], 10);
+
+                if (!isNaN(number) && number > highestNumber) {
+                    highestNumber = number;
+                }
+            }
+        });
     }
 
-    return "MTYD-" + String(lastNumber + 1).padStart(4, "0");
+    const nextNumber = highestNumber + 1;
+
+    return `MTYD-${String(nextNumber).padStart(4, "0")}`;
 }
 
 // =====================================
@@ -98,17 +128,38 @@ async function generateOrderNumber() {
 // =====================================
 
 async function initialisePage() {
-    orderDate.value = new Date().toISOString().split("T")[0];
 
-    paymentStatus.value = "Not Paid";
-    totalPaid.value = "0.00";
-    remainingBalance.value = "0.00";
+    if (orderDate) {
+        orderDate.value = new Date().toISOString().split("T")[0];
+    }
 
-    try {
-        orderNumber.value = await generateOrderNumber();
-    } catch (error) {
-        console.error(error);
-        orderNumber.value = "MTYD-NEW";
+    if (paymentStatus) {
+        paymentStatus.value = "Not Paid";
+    }
+
+    if (totalPaid) {
+        totalPaid.value = "0.00";
+    }
+
+    if (remainingBalance) {
+        remainingBalance.value = "0.00";
+    }
+
+    // Generate a REAL order number.
+    // Never display MTYD-NEW.
+    if (orderNumber) {
+        try {
+            orderNumber.value = await generateOrderNumber();
+        } catch (error) {
+            console.error(error);
+
+            orderNumber.value = "";
+
+            alert(
+                "I couldn't generate your order number.\n\n" +
+                "Please check your Supabase connection before saving the order."
+            );
+        }
     }
 }
 
@@ -118,53 +169,97 @@ async function initialisePage() {
 
 document.querySelectorAll(".itemCard").forEach(setupItem);
 
-addItemButton.addEventListener("click", addNewItem);
+if (addItemButton) {
+    addItemButton.addEventListener("click", addNewItem);
+}
 
 function addNewItem() {
+
     const firstCard = document.querySelector(".itemCard");
+
+    if (!firstCard) {
+        return;
+    }
+
     const newCard = firstCard.cloneNode(true);
 
-    newCard.querySelector(".itemProduct").value = "";
-    newCard.querySelector(".itemQuantity").value = 1;
-    newCard.querySelector(".itemPrice").value = "0.00";
-    newCard.querySelector(".itemTotal").value = "0.00";
-    newCard.querySelector(".itemSize").value = "";
-    newCard.querySelector(".itemColour").value = "";
-    newCard.querySelector(".itemPersonalised").value = "No";
-    newCard.querySelector(".itemPersonalisation").value = "";
-    newCard.querySelector(".personalisationBox").style.display = "none";
+    const product = newCard.querySelector(".itemProduct");
+    const quantity = newCard.querySelector(".itemQuantity");
+    const price = newCard.querySelector(".itemPrice");
+    const total = newCard.querySelector(".itemTotal");
+    const size = newCard.querySelector(".itemSize");
+    const colour = newCard.querySelector(".itemColour");
+    const personalised = newCard.querySelector(".itemPersonalised");
+    const personalisation = newCard.querySelector(".itemPersonalisation");
+    const personalisationBox = newCard.querySelector(".personalisationBox");
+
+    if (product) product.value = "";
+    if (quantity) quantity.value = 1;
+    if (price) price.value = "0.00";
+    if (total) total.value = "0.00";
+    if (size) size.value = "";
+    if (colour) colour.value = "";
+    if (personalised) personalised.value = "No";
+    if (personalisation) personalisation.value = "";
+
+    if (personalisationBox) {
+        personalisationBox.style.display = "none";
+    }
 
     itemsContainer.appendChild(newCard);
+
     setupItem(newCard);
     calculateTotal();
 }
 
 function setupItem(card) {
+
     const qty = card.querySelector(".itemQuantity");
     const price = card.querySelector(".itemPrice");
     const personalised = card.querySelector(".itemPersonalised");
     const personalisationBox = card.querySelector(".personalisationBox");
+    const removeButton = card.querySelector(".removeItemButton");
 
-    qty.addEventListener("input", calculateTotal);
-    price.addEventListener("input", calculateTotal);
+    if (qty) {
+        qty.addEventListener("input", calculateTotal);
+    }
 
-    personalised.addEventListener("change", () => {
+    if (price) {
+        price.addEventListener("input", calculateTotal);
+    }
+
+    if (personalised && personalisationBox) {
+
+        personalised.addEventListener("change", () => {
+
+            personalisationBox.style.display =
+                personalised.value === "Yes"
+                    ? "block"
+                    : "none";
+        });
+
         personalisationBox.style.display =
-            personalised.value === "Yes" ? "block" : "none";
-    });
+            personalised.value === "Yes"
+                ? "block"
+                : "none";
+    }
 
-    personalisationBox.style.display =
-        personalised.value === "Yes" ? "block" : "none";
+    if (removeButton) {
 
-    card.querySelector(".removeItemButton").addEventListener("click", () => {
-        if (document.querySelectorAll(".itemCard").length === 1) {
-            alert("You must have at least one item.");
-            return;
-        }
+        removeButton.addEventListener("click", () => {
 
-        card.remove();
-        calculateTotal();
-    });
+            const cards =
+                document.querySelectorAll(".itemCard");
+
+            if (cards.length === 1) {
+                alert("You must have at least one item.");
+                return;
+            }
+
+            card.remove();
+            calculateTotal();
+        });
+    }
 }
 
 // =====================================
@@ -172,23 +267,42 @@ function setupItem(card) {
 // =====================================
 
 function calculateTotal() {
+
     let grandTotal = 0;
 
     document.querySelectorAll(".itemCard").forEach(card => {
-        const qty = Number(card.querySelector(".itemQuantity").value) || 0;
-        const price = Number(card.querySelector(".itemPrice").value) || 0;
+
+        const qty =
+            Number(card.querySelector(".itemQuantity")?.value) || 0;
+
+        const price =
+            Number(card.querySelector(".itemPrice")?.value) || 0;
+
         const total = qty * price;
 
-        card.querySelector(".itemTotal").value = total.toFixed(2);
+        const totalInput =
+            card.querySelector(".itemTotal");
+
+        if (totalInput) {
+            totalInput.value = total.toFixed(2);
+        }
+
         grandTotal += total;
     });
 
-    orderTotal.value = grandTotal.toFixed(2);
+    if (orderTotal) {
+        orderTotal.value = grandTotal.toFixed(2);
+    }
 
-    remainingBalance.value = Math.max(
-        0,
-        grandTotal - Number(totalPaid.value || 0)
-    ).toFixed(2);
+    if (remainingBalance) {
+
+        remainingBalance.value =
+            Math.max(
+                0,
+                grandTotal -
+                Number(totalPaid?.value || 0)
+            ).toFixed(2);
+    }
 }
 
 calculateTotal();
@@ -197,94 +311,175 @@ calculateTotal();
 // DELIVERY
 // =====================================
 
-const addressSection = document.getElementById("addressSection");
-
 function updateDelivery() {
+
+    if (!addressSection || !deliveryMethod) {
+        return;
+    }
+
     addressSection.style.display =
-        deliveryMethod.value === "Collection" ? "none" : "block";
+        deliveryMethod.value === "Collection"
+            ? "none"
+            : "block";
 }
 
-deliveryMethod.addEventListener("change", updateDelivery);
+if (deliveryMethod) {
+    deliveryMethod.addEventListener(
+        "change",
+        updateDelivery
+    );
+}
+
 updateDelivery();
 
 // =====================================
 // PAYMENTS
 // =====================================
 
-const paymentHistory = document.getElementById("paymentHistory");
-const savePaymentButton = document.getElementById("savePaymentButton");
+if (addPaymentButton) {
 
-addPaymentButton.addEventListener("click", () => {
-    paymentForm.style.display = "block";
-});
+    addPaymentButton.addEventListener("click", () => {
 
-savePaymentButton.addEventListener("click", savePayment);
+        if (paymentForm) {
+            paymentForm.style.display = "block";
+        }
+    });
+}
+
+if (savePaymentButton) {
+    savePaymentButton.addEventListener(
+        "click",
+        savePayment
+    );
+}
 
 function savePayment() {
+
+    const paymentDate =
+        document.getElementById("paymentDate");
+
+    const paymentAmount =
+        document.getElementById("paymentAmount");
+
+    const paymentMethod =
+        document.getElementById("paymentMethod");
+
+    const paymentNotes =
+        document.getElementById("paymentNotes");
+
     const payment = {
-        date: document.getElementById("paymentDate").value ||
+
+        date:
+            paymentDate?.value ||
             new Date().toISOString().split("T")[0],
-        amount: Number(document.getElementById("paymentAmount").value) || 0,
-        method: document.getElementById("paymentMethod").value,
-        notes: document.getElementById("paymentNotes").value
+
+        amount:
+            Number(paymentAmount?.value) || 0,
+
+        method:
+            paymentMethod?.value || "",
+
+        notes:
+            paymentNotes?.value || ""
     };
 
     if (payment.amount <= 0) {
+
         alert("Enter a payment amount.");
         return;
     }
 
     payments.push(payment);
+
     updatePayments();
 
-    document.getElementById("paymentAmount").value = "";
-    document.getElementById("paymentNotes").value = "";
-    paymentForm.style.display = "none";
+    if (paymentAmount) {
+        paymentAmount.value = "";
+    }
+
+    if (paymentNotes) {
+        paymentNotes.value = "";
+    }
+
+    if (paymentForm) {
+        paymentForm.style.display = "none";
+    }
 }
 
 function updatePayments() {
+
     let paid = 0;
-    paymentHistory.innerHTML = "";
+
+    if (paymentHistory) {
+        paymentHistory.innerHTML = "";
+    }
 
     payments.forEach(payment => {
+
         paid += payment.amount;
 
-        const entry = document.createElement("div");
+        if (!paymentHistory) {
+            return;
+        }
+
+        const entry =
+            document.createElement("div");
+
         entry.className = "paymentEntry";
 
-        const amount = document.createElement("strong");
-        amount.textContent = `£${payment.amount.toFixed(2)}`;
-
-        entry.appendChild(amount);
-        entry.appendChild(document.createElement("br"));
-        entry.appendChild(document.createTextNode(payment.method));
-        entry.appendChild(document.createElement("br"));
-        entry.appendChild(document.createTextNode(payment.date));
-
-        if (payment.notes) {
-            entry.appendChild(document.createElement("br"));
-            entry.appendChild(document.createTextNode(payment.notes));
-        }
+        entry.innerHTML = `
+            <strong>£${payment.amount.toFixed(2)}</strong>
+            <br>
+            ${payment.method}
+            <br>
+            ${payment.date}
+            ${
+                payment.notes
+                    ? `<br>${payment.notes}`
+                    : ""
+            }
+        `;
 
         paymentHistory.appendChild(entry);
     });
 
-    if (payments.length === 0) {
-        paymentHistory.innerHTML = "<p>No payments recorded yet.</p>";
+    if (
+        paymentHistory &&
+        payments.length === 0
+    ) {
+        paymentHistory.innerHTML =
+            "<p>No payments recorded yet.</p>";
     }
 
-    totalPaid.value = paid.toFixed(2);
-    remainingBalance.value = Math.max(
-        0,
-        Number(orderTotal.value) - paid
-    ).toFixed(2);
+    if (totalPaid) {
+        totalPaid.value = paid.toFixed(2);
+    }
 
-    if (paid <= 0) {
-        paymentStatus.value = "Not Paid";
-    } else if (paid >= Number(orderTotal.value)) {
-        paymentStatus.value = "Paid in Full";
-    } else {
-        paymentStatus.value = "Deposit Paid";
+    if (remainingBalance) {
+
+        remainingBalance.value =
+            Math.max(
+                0,
+                Number(orderTotal?.value || 0) - paid
+            ).toFixed(2);
+    }
+
+    if (paymentStatus) {
+
+        if (paid <= 0) {
+
+            paymentStatus.value = "Not Paid";
+
+        } else if (
+            paid >= Number(orderTotal?.value || 0)
+        ) {
+
+            paymentStatus.value = "Paid in Full";
+
+        } else {
+
+            paymentStatus.value = "Deposit Paid";
+        }
     }
 }
 
@@ -292,153 +487,389 @@ function updatePayments() {
 // MULTIPLE IMAGE UPLOADS
 // =====================================
 
-async function uploadFiles(files, orderNo, folder) {
+async function uploadFiles(
+    files,
+    orderNo,
+    folder
+) {
+
     const urls = [];
 
-    for (const file of Array.from(files || [])) {
-        const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
-        const path = `${orderNo}/${folder}/${Date.now()}-${safeName}`;
+    if (!files || files.length === 0) {
+        return urls;
+    }
 
-        const { error } = await supabase.storage
-            .from("order-files")
-            .upload(path, file, {
-                upsert: false,
-                contentType: file.type || undefined
-            });
+    for (const file of Array.from(files)) {
+
+        const safeName =
+            file.name.replace(
+                /[^a-zA-Z0-9._-]/g,
+                "_"
+            );
+
+        const path =
+            `${orderNo}/${folder}/${Date.now()}-${safeName}`;
+
+        const { error } =
+            await supabase.storage
+                .from("order-files")
+                .upload(
+                    path,
+                    file,
+                    {
+                        upsert: false,
+                        contentType:
+                            file.type || undefined
+                    }
+                );
 
         if (error) {
+
+            console.error(
+                "Storage upload error:",
+                error
+            );
+
             throw new Error(
-                `Could not upload "${file.name}". Make sure the Supabase "order-files" storage bucket exists and signed-in users can upload.`
+                `Could not upload "${file.name}". ` +
+                `Check that your Supabase "order-files" bucket exists ` +
+                `and allows signed-in users to upload.`
             );
         }
 
-        const { data } = supabase.storage
-            .from("order-files")
-            .getPublicUrl(path);
+        const { data } =
+            supabase.storage
+                .from("order-files")
+                .getPublicUrl(path);
 
-        urls.push(data.publicUrl);
+        if (data?.publicUrl) {
+            urls.push(data.publicUrl);
+        }
     }
 
     return urls;
 }
 
 // =====================================
-// SAVE ORDER
+// COLLECT ITEMS
 // =====================================
 
-saveOrderButton.addEventListener("click", saveOrder);
+function collectItems() {
 
-async function saveOrder() {
-    if (saveOrderButton.disabled) return;
+    const items = [];
 
-    if (!customerName.value.trim()) {
-        alert("Please enter the customer name.");
-        customerName.focus();
-        return;
-    }
+    document.querySelectorAll(".itemCard")
+        .forEach(card => {
 
-    const { data: sessionData } = await supabase.auth.getSession();
-
-    if (!sessionData.session) {
-        window.location.href = "index.html";
-        return;
-    }
-
-    saveOrderButton.disabled = true;
-    saveOrderButton.textContent = "Saving Order...";
-
-    try {
-        const newOrderNumber = await generateOrderNumber();
-        orderNumber.value = newOrderNumber;
-
-        const items = [];
-
-        document.querySelectorAll(".itemCard").forEach(card => {
             items.push({
-                product: card.querySelector(".itemProduct").value,
-                quantity: Number(card.querySelector(".itemQuantity").value) || 0,
-                unitPrice: Number(card.querySelector(".itemPrice").value) || 0,
-                itemTotal: Number(card.querySelector(".itemTotal").value) || 0,
-                size: card.querySelector(".itemSize").value,
-                colour: card.querySelector(".itemColour").value,
-                personalised: card.querySelector(".itemPersonalised").value,
-                personalisation: card.querySelector(".itemPersonalisation").value
+
+                product:
+                    card.querySelector(
+                        ".itemProduct"
+                    )?.value || "",
+
+                quantity:
+                    Number(
+                        card.querySelector(
+                            ".itemQuantity"
+                        )?.value
+                    ) || 0,
+
+                unitPrice:
+                    Number(
+                        card.querySelector(
+                            ".itemPrice"
+                        )?.value
+                    ) || 0,
+
+                itemTotal:
+                    Number(
+                        card.querySelector(
+                            ".itemTotal"
+                        )?.value
+                    ) || 0,
+
+                size:
+                    card.querySelector(
+                        ".itemSize"
+                    )?.value || "",
+
+                colour:
+                    card.querySelector(
+                        ".itemColour"
+                    )?.value || "",
+
+                personalised:
+                    card.querySelector(
+                        ".itemPersonalised"
+                    )?.value || "No",
+
+                personalisation:
+                    card.querySelector(
+                        ".itemPersonalisation"
+                    )?.value || ""
             });
         });
 
-        // IMPORTANT: both inputs support multiple files.
-        const customerPhotoUrls = await uploadFiles(
-            customerImages.files,
-            newOrderNumber,
-            "customer"
-        );
+    return items;
+}
 
-        const mockupPhotoUrls = await uploadFiles(
-            mockupImages.files,
-            newOrderNumber,
-            "mockups"
-        );
+// =====================================
+// SAVE ORDER
+// =====================================
 
-        const order = {
-            orderNumber: newOrderNumber,
+if (saveOrderButton) {
 
-            customerName: customerName.value.trim(),
-            customerContact: customerContact.value.trim(),
-            orderSource: orderSource.value,
-            socialUsername: socialUsername.value.trim(),
+    saveOrderButton.addEventListener(
+        "click",
+        saveOrder
+    );
+}
 
-            orderDate: orderDate.value,
-            dateNeeded: dateNeeded.value,
-            orderNotes: orderNotes.value,
+async function saveOrder() {
 
-            orderTotal: Number(orderTotal.value) || 0,
-            paymentStatus: paymentStatus.value,
-            totalPaid: Number(totalPaid.value) || 0,
-            remainingBalance: Number(remainingBalance.value) || 0,
+    if (saveOrderButton?.disabled) {
+        return;
+    }
 
-            deliveryMethod: deliveryMethod.value,
-            address1: address1.value,
-            address2: address2.value,
-            town: town.value,
-            county: county.value,
-            postcode: postcode.value,
+    if (!customerName?.value.trim()) {
 
-            orderStatus: orderStatus.value,
+        alert("Please enter the customer name.");
 
-            items,
-            payments,
+        customerName?.focus();
 
-            customerPhotos: customerPhotoUrls,
-            mockupPhotos: mockupPhotoUrls,
+        return;
+    }
 
-            trackingNumber: "",
-            invoiceNumber: "",
+    const {
+        data: sessionData,
+        error: sessionError
+    } = await supabase.auth.getSession();
 
-            archived: false,
-            completed: false,
+    if (
+        sessionError ||
+        !sessionData?.session
+    ) {
 
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString()
-        };
+        window.location.href =
+            "index.html";
 
-        const { error } = await supabase
-            .from("orders")
-            .insert(order);
+        return;
+    }
 
-        if (error) {
-            console.error("Supabase order error:", error);
-            throw new Error(error.message);
+    if (saveOrderButton) {
+
+        saveOrderButton.disabled = true;
+
+        saveOrderButton.textContent =
+            "Saving Order...";
+    }
+
+    try {
+
+        // =================================
+        // GENERATE REAL ORDER NUMBER
+        // =================================
+
+        const newOrderNumber =
+            await generateOrderNumber();
+
+        if (
+            !newOrderNumber ||
+            !/^MTYD-\d{4,}$/i.test(
+                newOrderNumber
+            )
+        ) {
+
+            throw new Error(
+                "A valid MTYD order number could not be generated."
+            );
         }
 
-        alert("✅ Order saved successfully!");
-        window.location.href = "dashboard.html";
+        if (orderNumber) {
+            orderNumber.value =
+                newOrderNumber;
+        }
+
+        // =================================
+        // ITEMS
+        // =================================
+
+        const items = collectItems();
+
+        // =================================
+        // IMAGES
+        // =================================
+
+        const customerPhotoUrls =
+            await uploadFiles(
+                customerImages?.files,
+                newOrderNumber,
+                "customer"
+            );
+
+        const mockupPhotoUrls =
+            await uploadFiles(
+                mockupImages?.files,
+                newOrderNumber,
+                "mockups"
+            );
+
+        // =================================
+        // ORDER OBJECT
+        // =================================
+        // These names MATCH the Supabase
+        // snake_case columns.
+        // =================================
+
+        const order = {
+
+            order_number:
+                newOrderNumber,
+
+            customer_name:
+                customerName.value.trim(),
+
+            customer_contact:
+                customerContact?.value.trim() || "",
+
+            order_source:
+                orderSource?.value || "",
+
+            social_username:
+                socialUsername?.value.trim() || "",
+
+            order_date:
+                orderDate?.value || null,
+
+            date_needed:
+                dateNeeded?.value || null,
+
+            order_notes:
+                orderNotes?.value || "",
+
+            order_total:
+                Number(orderTotal?.value) || 0,
+
+            payment_status:
+                paymentStatus?.value || "Not Paid",
+
+            total_paid:
+                Number(totalPaid?.value) || 0,
+
+            remaining_balance:
+                Number(
+                    remainingBalance?.value
+                ) || 0,
+
+            delivery_method:
+                deliveryMethod?.value || "Collection",
+
+            address1:
+                address1?.value || "",
+
+            address2:
+                address2?.value || "",
+
+            town:
+                town?.value || "",
+
+            county:
+                county?.value || "",
+
+            postcode:
+                postcode?.value || "",
+
+            order_status:
+                orderStatus?.value ||
+                "New Order",
+
+            items: items,
+
+            payments: payments,
+
+            customer_photos:
+                customerPhotoUrls,
+
+            mockup_photos:
+                mockupPhotoUrls,
+
+            tracking_number:
+                "",
+
+            invoice_number:
+                "",
+
+            archived:
+                false,
+
+            completed:
+                false,
+
+            created_at:
+                new Date().toISOString(),
+
+            updated_at:
+                new Date().toISOString()
+        };
+
+        // =================================
+        // INSERT INTO SUPABASE
+        // =================================
+
+        const {
+            data,
+            error
+        } = await supabase
+            .from("orders")
+            .insert(order)
+            .select()
+            .single();
+
+        if (error) {
+
+            console.error(
+                "Supabase order error:",
+                error
+            );
+
+            throw new Error(
+                error.message
+            );
+        }
+
+        console.log(
+            "Order saved:",
+            data
+        );
+
+        alert(
+            `✅ Order ${newOrderNumber} saved successfully!`
+        );
+
+        window.location.href =
+            "dashboard.html";
 
     } catch (error) {
-        console.error("Save order error:", error);
-        alert(`Could not save the order.\n\n${error.message}`);
+
+        console.error(
+            "Save order error:",
+            error
+        );
+
+        alert(
+            `Could not save the order.\n\n${error.message}`
+        );
+
     } finally {
-        saveOrderButton.disabled = false;
-        saveOrderButton.textContent = "💗 Save Order";
+
+        if (saveOrderButton) {
+
+            saveOrderButton.disabled = false;
+
+            saveOrderButton.textContent =
+                "💗 Save Order";
+        }
     }
 }
 
@@ -446,32 +877,69 @@ async function saveOrder() {
 // CLICKABLE ORDER PROGRESS
 // =====================================
 
-const progressSteps = document.querySelectorAll(".progressStep");
+const progressSteps =
+    document.querySelectorAll(
+        ".progressStep"
+    );
 
 function updateProgressDisplay() {
-    const current = orderStatus.value;
+
+    const current =
+        orderStatus?.value || "New Order";
+
     progressSteps.forEach(step => {
-        step.classList.toggle("active", step.dataset.status === current);
+
+        step.classList.toggle(
+            "active",
+            step.dataset.status === current
+        );
     });
 }
 
 progressSteps.forEach(step => {
+
     const chooseStatus = () => {
-        orderStatus.value = step.dataset.status;
+
+        if (!orderStatus) {
+            return;
+        }
+
+        orderStatus.value =
+            step.dataset.status;
+
         updateProgressDisplay();
     };
 
-    step.addEventListener("click", chooseStatus);
+    step.addEventListener(
+        "click",
+        chooseStatus
+    );
 
-    step.addEventListener("keydown", event => {
-        if (event.key === "Enter" || event.key === " ") {
-            event.preventDefault();
-            chooseStatus();
+    step.addEventListener(
+        "keydown",
+        event => {
+
+            if (
+                event.key === "Enter" ||
+                event.key === " "
+            ) {
+
+                event.preventDefault();
+
+                chooseStatus();
+            }
         }
-    });
+    );
 });
 
-orderStatus.addEventListener("change", updateProgressDisplay);
+if (orderStatus) {
+
+    orderStatus.addEventListener(
+        "change",
+        updateProgressDisplay
+    );
+}
+
 updateProgressDisplay();
 
 // =====================================
@@ -479,8 +947,14 @@ updateProgressDisplay();
 // =====================================
 
 (async function start() {
-    const loggedIn = await checkLogin();
-    if (!loggedIn) return;
+
+    const loggedIn =
+        await checkLogin();
+
+    if (!loggedIn) {
+        return;
+    }
 
     await initialisePage();
+
 })();
