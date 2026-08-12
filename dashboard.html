@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard | Me To You Designs</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/dashboard.css">
+</head>
+
+<body>
+
+<div id="overlay"></div>
+
+<nav id="sideMenu">
+    <div class="menuHeader">
+        <img src="logo.PNG" class="menuLogo" alt="Logo">
+        <h2>Me To You Designs</h2>
+    </div>
+
+    <div class="menuLinks">
+        <a href="dashboard.html">🏠 Dashboard</a>
+        <a href="orders.html">📦 Orders</a>
+        <a href="customers.html">👥 Customers</a>
+        <a href="calendar.html">📅 Calendar</a>
+        <a href="payments.html">💷 Payments</a>
+        <a href="invoices.html">🧾 Invoices</a>
+        <a href="settings.html">⚙️ Settings</a>
+        <a href="#" id="logoutButton">🚪 Log Out</a>
+    </div>
+</nav>
+
+<div id="app">
+
+    <header class="topBar">
+        <button id="menuButton" aria-label="Open menu">☰</button>
+    </header>
+
+    <section class="welcomeSection">
+        <img src="logo.PNG" class="topLogo" alt="Logo">
+        <h1>Welcome Back Charlie</h1>
+        <div class="heartDivider">♡</div>
+        <p id="todayDate"></p>
+    </section>
+
+    <section class="statsGrid">
+        <div class="statCard">
+            <div class="statIcon">📦</div>
+            <h3>Total Orders</h3>
+            <h2 id="totalOrders">0</h2>
+        </div>
+
+        <div class="statCard">
+            <div class="statIcon">⏳</div>
+            <h3>Pending</h3>
+            <h2 id="pendingOrders">0</h2>
+        </div>
+
+        <div class="statCard">
+            <div class="statIcon">📅</div>
+            <h3>Due This Week</h3>
+            <h2 id="dueWeek">0</h2>
+        </div>
+
+        <div class="statCard">
+            <div class="statIcon">📆</div>
+            <h3>Due This Month</h3>
+            <h2 id="dueMonth">0</h2>
+        </div>
+    </section>
+
+    <section class="dashboardCard">
+        <div class="cardHeader">
+            <span>📅 Due Next</span>
+            <button class="toggleButton">▼</button>
+        </div>
+        <div class="cardContent" id="nextOrderContent">
+            <div id="nextOrderCard">
+                <p>No upcoming orders.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="dashboardCard">
+        <div class="cardHeader">
+            <span>📋 Today's Jobs</span>
+            <button class="toggleButton">▼</button>
+        </div>
+        <div class="cardContent" id="jobsContent">
+            <button class="addButton" id="addJobButton">+ Add Job</button>
+            <ul id="jobsList"></ul>
+        </div>
+    </section>
+
+    <section class="dashboardCard">
+        <div class="cardHeader">
+            <span>💷 Outstanding Payments</span>
+            <button class="toggleButton">▼</button>
+        </div>
+        <div class="cardContent" id="paymentsContent">
+            <div id="paymentList">
+                <p>No outstanding payments.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="dashboardCard">
+        <div class="cardHeader">
+            <span>📈 Revenue</span>
+            <button class="toggleButton">▼</button>
+        </div>
+        <div class="cardContent" id="revenueContent">
+            <div class="revenueGrid">
+                <div class="revenueCard"><h4>Today</h4><p id="todayRevenue">£0.00</p></div>
+                <div class="revenueCard"><h4>This Week</h4><p id="weekRevenue">£0.00</p></div>
+                <div class="revenueCard"><h4>This Month</h4><p id="monthRevenue">£0.00</p></div>
+                <div class="revenueCard"><h4>Total</h4><p id="totalRevenue">£0.00</p></div>
+            </div>
+        </div>
+    </section>
+
+    <section class="dashboardCard">
+        <div class="cardHeader">
+            <span>📝 Notes</span>
+            <button class="toggleButton">▼</button>
+        </div>
+        <div class="cardContent" id="notesContent">
+            <button class="addButton" id="addNoteButton">+ Add Note</button>
+            <ul id="notesList"></ul>
+        </div>
+    </section>
+
+    <section class="dashboardCard">
+        <div class="cardHeader">
+            <span>⚡ Quick Actions</span>
+        </div>
+        <div class="cardContent">
+            <button class="addButton" id="createOrderButton">➕ Create New Order</button>
+            <br><br>
+            <button class="addButton" id="viewOrdersButton">📦 View Orders</button>
+        </div>
+    </section>
+
+</div>
+
+<footer class="bottomNav">
+    <a href="customers.html" class="bottomButton">👥<span>Customers</span></a>
+    <a href="create-order.html" class="bottomButton addOrder">＋<span>Add Order</span></a>
+    <a href="orders.html" class="bottomButton">📦<span>Orders</span></a>
+</footer>
+
+<script type="module" src="js/dashboard.js"></script>
+</body>
+</html>
