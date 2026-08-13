@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Business Planner | Me To You Designs</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#fbf6f9;color:#4d3b45;font-family:Poppins,sans-serif;padding-bottom:85px}
+button,input,select,textarea{font:inherit}button{cursor:pointer}
+#app{max-width:430px;margin:auto;padding:18px 18px 120px}
+.topBar{display:flex;align-items:center;margin-bottom:15px}
+#menuButton{
+    width:48px;
+    height:48px;
+    border:none;
+    border-radius:16px;
+    background:white;
+    font-size:24px;
+    color:#c86f95;
+    cursor:pointer;
+    box-shadow:0 10px 25px rgba(201,111,149,.18);
+}
+#sideMenu{position:fixed;left:-290px;top:0;bottom:0;width:280px;background:#fff;z-index:100;box-shadow:5px 0 25px #0002;transition:.25s;padding:22px}
+#sideMenu.open{left:0}#overlay{display:none;position:fixed;inset:0;background:#0005;z-index:90}#overlay.open{display:block}
+.menuHeader{text-align:center;border-bottom:1px solid #eee2e7;padding-bottom:18px}.menuLogo{width:70px;height:70px;object-fit:contain;border-radius:50%}.menuHeader h2{font-size:17px;margin:7px 0}
+.menuLinks{display:flex;flex-direction:column;gap:3px;margin-top:15px}.menuLinks a{padding:12px;border-radius:11px;text-decoration:none;color:#66545d}.menuLinks a.active{background:#f7e8ef;color:#a85e7d}
+.pageIntro{display:flex;justify-content:space-between;align-items:center;gap:15px;padding:10px 0 18px}.identity{display:flex;align-items:center;gap:13px}.logo{width:64px;height:64px;object-fit:contain;border-radius:50%}.pageIntro h1{margin:0;font-size:38px;font-family:'Dancing Script',cursive;font-weight:700;color:#b86c8d;line-height:1.05}.pageIntro p{margin:2px 0;color:#98848e;font-size:11px}
+.actions{display:flex;gap:7px;flex-wrap:wrap}.actions button,.outline{border:1px solid #e4ccd7;background:#fff;color:#9d5e79;border-radius:10px;padding:9px 11px;font-size:10px;font-weight:700}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px}.stat{background:#fff;border:1px solid #eee0e7;border-radius:13px;padding:11px}.stat b{display:block;color:#b76889;font-size:18px}.stat span{font-size:9px;color:#97838c}
+.calendar{background:#fff;border:1px solid #eee0e7;border-radius:18px;padding:14px}.calHead{display:grid;grid-template-columns:160px 1fr 160px;align-items:center}.month{text-align:center}.month h2{margin:0;font-size:21px;color:#765a67;text-transform:uppercase;letter-spacing:1px}.month small{color:#9b8790;font-size:9px}.controls{display:flex;gap:5px}.controls button{border:0;background:#f7e8ef;color:#a65f7e;border-radius:9px;height:36px}.arrow{width:36px;font-size:22px}.todayBtn{padding:0 12px;font-size:10px;font-weight:700}.view{text-align:right;color:#b26b88;font-size:9px;font-weight:700;letter-spacing:1px}
+.legend{display:flex;justify-content:center;gap:13px;flex-wrap:wrap;margin:12px 0;color:#907d86;font-size:9px}.legend span{display:flex;align-items:center;gap:4px}.dot{width:7px;height:7px;border-radius:50%}.customer{background:#c87999}.task{background:#9c7d8c}.seasonal{background:#d49a61}.deadline{background:#d76870}
+.week,.grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}.week div{text-align:center;font-size:9px;color:#9b8790;font-weight:700;padding:5px}.day{min-height:104px;border:1px solid #eee2e8;border-radius:9px;padding:6px;background:#fff;overflow:hidden}.day.other{opacity:.38}.day.selected{border:2px solid #bd7090;background:#fff9fb}.num{width:23px;height:23px;display:flex;align-items:center;justify-content:center;border-radius:50%;font-size:10px;font-weight:700;margin-bottom:3px}.day.today .num{background:#b96889;color:#fff}
+.ev{display:block;width:100%;border:0;border-radius:5px;padding:3px 4px;margin:2px 0;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:7px;color:#604c56;background:#f0e8ec}.ev.customer{background:#f6e1ea}.ev.seasonal{background:#f8eddf}.ev.deadline{background:#f7dfe1}.ev.task{background:#eee8ec}.more{font-size:7px;color:#9c8991}
+.panel{background:#fff;border:1px solid #eee0e7;border-radius:18px;margin-top:12px;padding:15px}.panelHead{display:flex;justify-content:space-between;align-items:center;gap:10px}.kicker{font-size:8px;color:#b26b88;letter-spacing:1.5px;font-weight:700}.panel h2{margin:2px 0;font-size:20px;color:#705665}.add{border:0;background:#b96d8d;color:#fff;border-radius:10px;padding:10px 13px;font-size:10px;font-weight:700}
+.columns{display:grid;grid-template-columns:1fr 1fr 1.35fr;gap:9px;margin-top:12px}.block{border:1px solid #eee2e8;border-radius:11px;padding:11px;min-height:145px}.block h3{font-size:12px;margin:0 0 8px;color:#765a67}.empty{font-size:10px;color:#9c8991;padding:8px 0}.item{background:#fbf3f7;border-radius:8px;padding:8px;margin-bottom:6px;font-size:9px}.item strong{display:block}.item small{color:#97848d}.taskrow{display:flex;gap:5px;align-items:center}.taskrow span{flex:1}.trash{border:0;background:none;font-size:11px}
+textarea,input,select{width:100%;border:1px solid #e2cdd6;border-radius:10px;padding:9px;background:#fff;color:#4b3942;font-size:11px;outline:none}textarea{resize:vertical}.journal label{font-size:9px;color:#938089;display:block;margin-bottom:4px}.journal textarea{min-height:90px}.save{border:0;background:#f1e3e9;color:#995d77;border-radius:9px;padding:9px 11px;margin-top:6px;font-size:10px;font-weight:700}
+.upcoming{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.up{border:1px solid #eee2e7;border-radius:9px;padding:9px}.up strong{font-size:9px;display:block}.up small{font-size:8px;color:#97838c}
+.seasons{display:grid;grid-template-columns:1fr 1fr;gap:9px}.season{border:1px solid #eee2e7;border-radius:12px;padding:12px;background:#fffaf7}.season.christmas{background:#fbf9fa}.seasonTitle{display:flex;gap:8px;align-items:center}.seasonTitle b{font-size:26px}.seasonTitle h3{margin:0;font-size:15px}.seasonTitle small{color:#97838c;font-size:8px}.checks{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-top:10px}.checks label{font-size:9px}.checks input{width:auto;accent-color:#b96d8d}.journalArchive{display:flex;flex-direction:column;gap:7px}.journalEntry{border:1px solid #eee2e7;border-radius:10px;padding:9px}.journalEntry header{display:flex;justify-content:space-between}.journalEntry strong{font-size:9px}.journalEntry p{font-size:10px;white-space:pre-wrap;margin:6px 0}.delete{border:0;background:none;color:#a55e7b;font-size:8px}.search{max-width:250px}
+.modal{display:none;position:fixed;inset:0;z-index:200;align-items:center;justify-content:center;padding:14px}.modal.open{display:flex}.backdrop{position:absolute;inset:0;background:#2d1e266b}.box{position:relative;background:#fff;border-radius:17px;padding:19px;width:min(520px,100%);max-height:90vh;overflow:auto;box-shadow:0 15px 45px #0003}.close{position:absolute;right:10px;top:5px;border:0;background:none;font-size:27px;color:#917783}.box h2{margin:3px 0;font-size:20px}.box p{font-size:10px;color:#95818a;margin:0 0 10px}.box label{display:block;font-size:9px;font-weight:700;margin:8px 0 4px}.two{display:grid;grid-template-columns:1fr 1fr;gap:8px}.modalBtns{display:flex;justify-content:flex-end;gap:7px;margin-top:12px}.cancel{border:0;background:#f1e5ea;color:#8f6877;border-radius:9px;padding:9px 12px;font-size:10px;font-weight:700}
+.bottom{
+    position:fixed;
+    bottom:15px;
+    left:50%;
+    transform:translateX(-50%);
+    width:90%;
+    max-width:400px;
+    background:white;
+    border-radius:26px;
+    display:flex;
+    justify-content:space-around;
+    padding:12px 0;
+    box-shadow:0 10px 30px rgba(0,0,0,.15);
+    z-index:80;
+}
+.bottom a{
+    text-decoration:none;
+    color:#866875;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    font-size:13px;
+}
+.bottom span{margin-top:4px;font-size:13px}
+.bottom .addorder{color:#cf7ea2;font-weight:bold;font-size:13px}
+.bottom .addorder span{color:#cf7ea2;font-weight:bold;font-size:13px}
+@media(max-width:800px){#app{padding:0 10px}.pageIntro h1{font-size:34px}.pageIntro{flex-direction:column;align-items:flex-start}.calHead{grid-template-columns:1fr}.month{order:-1;margin-bottom:8px}.view{display:none}.columns{grid-template-columns:1fr 1fr}.journal{grid-column:1/-1}.upcoming{grid-template-columns:1fr 1fr}}
+}
+</style>
+<style id="dashboard-nav-exact">
+#menuButton{
+ width:48px!important;height:48px!important;border:none!important;border-radius:16px!important;
+ background:white!important;font-size:24px!important;color:#c86f95!important;cursor:pointer!important;
+ box-shadow:0 10px 25px rgba(201,111,149,.18)!important;position:relative!important;
+}
+#menuButton:before,#menuButton:after{display:none!important;content:none!important;}
+.topBar{display:flex!important;align-items:center!important;margin-bottom:15px!important;height:auto!important;min-height:0!important;padding:0!important;}
+.bottom{
+ position:fixed!important;bottom:15px!important;left:50%!important;transform:translateX(-50%)!important;
+ width:90%!important;max-width:400px!important;background:white!important;border-radius:26px!important;
+ display:flex!important;justify-content:space-around!important;padding:12px 0!important;
+ box-shadow:0 10px 30px rgba(0,0,0,.15)!important;z-index:80!important;
+}
+.bottom a{ text-decoration:none!important;color:#866875!important;display:flex!important;flex-direction:column!important;
+ align-items:center!important;font-size:13px!important;min-width:0!important;height:auto!important;gap:0!important;}
+.bottom span{margin-top:4px!important;font-size:13px!important;color:inherit!important;}
+.bottom .addorder,.bottom .addorder span{color:#cf7ea2!important;font-weight:bold!important;}
+</style></head>
+<body>
+<div id="overlay"></div>
+<nav id="sideMenu">
+  <div class="menuHeader"><img src="logo.PNG" class="menuLogo" alt="Logo"><h2>Me To You Designs</h2></div>
+  <div class="menuLinks">
+    <a href="dashboard.html">🏠 Dashboard</a><a href="orders.html">📦 Orders</a><a href="customers.html">👥 Customers</a>
+    <a href="calendar.html" class="active">📅 Business Planner</a><a href="payments.html">💷 Payments</a><a href="invoices.html">🧾 Invoices</a>
+    <a href="settings.html">⚙️ Settings</a><a href="#" id="logout">🚪 Log Out</a>
+  </div>
+</nav>
+
+<main id="app">
+<header class="topBar"><button id="menu" type="button">☰</button></header>
+
+<section class="pageIntro">
+  <div class="identity"><img src="logo.PNG" class="logo" alt="Me To You Designs"><div><h1>Business Planner</h1><p id="dateText"></p></div></div>
+  <div class="actions"><button id="quickTask" type="button">＋ Task</button><button id="quickJournal" type="button">📝 Journal</button><button id="quickSeason" type="button">🎃 Seasonal</button></div>
+</section>
+
+<section class="stats">
+  <div class="stat"><b id="ordersStat">0</b><span>Orders coming up</span></div>
+  <div class="stat"><b id="receivedStat">£0.00</b><span>Received this month</span></div>
+  <div class="stat"><b id="tasksStat">0</b><span>Open tasks</span></div>
+  <div class="stat"><b id="importantStat">0</b><span>Important items</span></div>
+</section>
+
+<section class="calendar">
+  <div class="calHead">
+    <div class="controls"><button id="prev" class="arrow" type="button">‹</button><button id="today" class="todayBtn" type="button">Today</button><button id="next" class="arrow" type="button">›</button></div>
+    <div class="month"><h2 id="monthTitle"></h2><small>Tap a date to plan your day</small></div>
+    <div class="view">MONTH VIEW</div>
+  </div>
+  <div class="legend"><span><i class="dot customer"></i>Customer</span><span><i class="dot task"></i>Task</span><span><i class="dot seasonal"></i>Seasonal</span><span><i class="dot deadline"></i>Deadline</span></div>
+  <div class="week"><div>MON</div><div>TUE</div><div>WED</div><div>THU</div><div>FRI</div><div>SAT</div><div>SUN</div></div>
+  <div id="grid" class="grid"></div>
+</section>
+
+<section class="panel">
+  <div class="panelHead"><div><span class="kicker">SELECTED DAY</span><h2 id="selectedTitle"></h2></div><button id="addDay" class="add" type="button">＋ Add to day</button></div>
+  <div class="columns">
+    <div class="block"><h3>📦 Customer Orders</h3><div id="dayOrders"></div></div>
+    <div class="block"><h3>☑️ Tasks</h3><div id="dayTasks"></div></div>
+    <div class="block journal"><h3>📝 Business Journal</h3><label for="journal">Notes, ideas, wins or things to remember</label><textarea id="journal" placeholder="Write today's business notes here..."></textarea><button id="saveJournal" class="save" type="button">Save Journal Entry</button></div>
+  </div>
+</section>
+
+<section class="panel">
+  <div class="panelHead"><div><span class="kicker">PLAN AHEAD</span><h2>Upcoming Business</h2></div><span>Next 12</span></div>
+  <div id="upcoming" class="upcoming"></div>
+</section>
+
+<section class="panel">
+  <div class="panelHead"><div><span class="kicker">SEASONAL WORK</span><h2>🎃 Seasonal Planner</h2></div><button id="addSeason" class="outline" type="button">＋ Add season plan</button></div>
+  <div class="seasons" style="margin-top:12px">
+    <article class="season"><div class="seasonTitle"><b>🎃</b><div><h3>Halloween</h3><small id="halloween"></small></div></div><div class="checks"><label><input type="checkbox"> Decide products</label><label><input type="checkbox"> Order stock</label><label><input type="checkbox"> Make samples</label><label><input type="checkbox"> Photos</label><label><input type="checkbox"> Marketing</label><label><input type="checkbox"> Launch</label></div></article>
+    <article class="season christmas"><div class="seasonTitle"><b>🎄</b><div><h3>Christmas</h3><small id="christmas"></small></div></div><div class="checks"><label><input type="checkbox"> Decide products</label><label><input type="checkbox"> Order stock</label><label><input type="checkbox"> Designs</label><label><input type="checkbox"> Samples</label><label><input type="checkbox"> Photos</label><label><input type="checkbox"> Final order date</label></div></article>
+  </div>
+  <div id="customSeasons"></div>
+</section>
+
+<section class="panel">
+  <div class="panelHead"><div><span class="kicker">LOOK BACK</span><h2>📔 Business Journal</h2></div><input id="search" class="search" type="search" placeholder="Search journal..."></div>
+  <div id="archive" class="journalArchive" style="margin-top:10px"></div>
+</section>
+</main>
+
+<footer class="bottom"><a href="customers.html">👥<span>Customers</span></a><a href="create-order.html" class="addorder">＋<span>Add Order</span></a><a href="orders.html">📦<span>Orders</span></a></footer>
+
+<div id="entryModal" class="modal"><div class="backdrop"></div><div class="box">
+<button class="close" id="closeEntry" type="button">×</button><span class="kicker">BUSINESS PLANNER</span><h2>Add to your day</h2><p>Create a task, production job, reminder or deadline.</p>
+<label for="entryTitle">Title</label><input id="entryTitle" type="text" placeholder="e.g. Order Christmas PJ stock">
+<div class="two"><div><label for="entryDate">Date</label><input id="entryDate" type="date"></div><div><label for="entryTime">Time</label><input id="entryTime" type="time"></div></div>
+<div class="two"><div><label for="entryCategory">Category</label><select id="entryCategory"><option value="task">☑️ Business Task</option><option value="customer">📦 Customer</option><option value="production">🛠️ Production</option><option value="content">📸 Content</option><option value="social">📱 Social Media</option><option value="stock">📦 Stock / Supplier</option><option value="seasonal">🎃 Seasonal</option><option value="deadline">🔴 Deadline</option><option value="admin">🧾 Admin</option></select></div><div><label for="entryPriority">Priority</label><select id="entryPriority"><option value="normal">Normal</option><option value="important">⭐ Important</option><option value="urgent">🔴 Urgent</option></select></div></div>
+<label for="entryNotes">Notes</label><textarea id="entryNotes" placeholder="Details, supplies needed, ideas..."></textarea>
+<div class="modalBtns"><button id="cancelEntry" class="cancel" type="button">Cancel</button><button id="saveEntry" class="add" type="button">Save entry</button></div>
+</div></div>
+
+<div id="seasonModal" class="modal"><div class="backdrop"></div><div class="box">
+<button class="close" id="closeSeason" type="button">×</button><span class="kicker">SEASONAL PLANNER</span><h2>Create a seasonal plan</h2><p>Keep all the prep in one place.</p>
+<label for="seasonName">Season</label><select id="seasonName"><option>🎃 Halloween</option><option>🎄 Christmas</option><option>💕 Valentine's Day</option><option>🐣 Easter</option><option>🎓 Back to School</option><option>🎂 Birthday Season</option><option>✨ Other</option></select>
+<label for="seasonGoal">Main goal</label><input id="seasonGoal" type="text" placeholder="e.g. Launch Christmas PJ range">
+<label for="seasonDate">Target date</label><input id="seasonDate" type="date">
+<label for="seasonNotes">Planning notes</label><textarea id="seasonNotes" placeholder="Stock, designs, samples, photos, marketing..."></textarea>
+<div class="modalBtns"><button id="cancelSeason" class="cancel" type="button">Cancel</button><button id="saveSeason" class="add" type="button">Save plan</button></div>
+</div></div>
+
+<script>
+(() => {
+"use strict";
+
+const SUPABASE_URL="https://critutqwakaepgxgpkml.supabase.co";
+const SUPABASE_KEY="sb_publishable_KtXAtIRgtZADPODLn7inRw_vC6rBPFb";
+const $=id=>document.getElementById(id);
+const pad=n=>String(n).padStart(2,"0");
+const key=d=>d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());
+const parse=s=>{const [y,m,d]=s.split("-").map(Number);return new Date(y,m-1,d)};
+const fmt=d=>d.toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long",year:"numeric"});
+const short=d=>d.toLocaleDateString("en-GB",{day:"numeric",month:"short"});
+const money=n=>"£"+(Number(n)||0).toFixed(2);
+const esc=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
+
+let current=new Date(), selected=new Date(), orders=[];
+let entries=JSON.parse(localStorage.getItem("mtyd_entries")||"[]");
+let journals=JSON.parse(localStorage.getItem("mtyd_journals")||"[]");
+let seasons=JSON.parse(localStorage.getItem("mtyd_seasons")||"[]");
+
+function persist(){
+ localStorage.setItem("mtyd_entries",JSON.stringify(entries));
+ localStorage.setItem("mtyd_journals",JSON.stringify(journals));
+ localStorage.setItem("mtyd_seasons",JSON.stringify(seasons));
+}
+
+function id(){
+ return "id-"+Date.now()+"-"+Math.random().toString(36).slice(2);
+}
+
+function openModal(el){$(el).classList.add("open")}
+function closeModal(el){$(el).classList.remove("open")}
+
+function due(o){
+ const v=o.date_needed||o.dateNeeded||o.neededBy;
+ return v&&/^\d{4}-\d{2}-\d{2}/.test(String(v))?parse(String(v).slice(0,10)):null;
+}
+
+function orderName(o){return (o.order_number||"Order")+" — "+(o.customer_name||"Customer")}
+
+function dayEvents(k){
+ const a=entries.filter(e=>e.date===k).map(e=>({...e,kind:"entry"}));
+ orders.forEach(o=>{const d=due(o);if(d&&key(d)===k)a.push({id:"o"+(o.id||o.order_number),title:orderName(o),category:"customer",kind:"order",time:""})});
+ return a;
+}
+
+function renderCalendar(){
+ $("monthTitle").textContent=current.toLocaleDateString("en-GB",{month:"long",year:"numeric"}).toUpperCase();
+ const g=$("grid");g.innerHTML="";
+ const y=current.getFullYear(),m=current.getMonth(),first=new Date(y,m,1),offset=(first.getDay()+6)%7,days=new Date(y,m+1,0).getDate();
+ for(let i=0;i<42;i++){
+   const d=i<offset?new Date(y,m-1,new Date(y,m,0).getDate()-offset+i+1):i>=offset+days?new Date(y,m+1,i-offset-days+1):new Date(y,m,i-offset+1);
+   const c=document.createElement("div");c.className="day";
+   if(d.getMonth()!==m)c.classList.add("other");
+   if(key(d)===key(new Date()))c.classList.add("today");
+   if(key(d)===key(selected))c.classList.add("selected");
+   const n=document.createElement("div");n.className="num";n.textContent=d.getDate();c.appendChild(n);
+   const ev=dayEvents(key(d));
+   ev.slice(0,3).forEach(e=>{
+     const b=document.createElement("button");b.type="button";b.className="ev "+(e.kind==="order"?"customer":e.category==="deadline"||e.priority==="urgent"?"deadline":e.category==="seasonal"?"seasonal":"task");b.textContent=(e.time?e.time+" ":"")+e.title;
+     b.addEventListener("click",x=>{x.stopPropagation();selected=new Date(d);renderAll()});c.appendChild(b);
+   });
+   if(ev.length>3){const more=document.createElement("div");more.className="more";more.textContent="+"+(ev.length-3)+" more";c.appendChild(more)}
+   c.addEventListener("click",()=>{selected=new Date(d);if(d.getMonth()!==current.getMonth())current=new Date(d.getFullYear(),d.getMonth(),1);renderAll()});
+   g.appendChild(c);
+ }
+}
+
+function renderSelected(){
+ const k=key(selected);$("selectedTitle").textContent=fmt(selected);
+ const os=orders.filter(o=>{const d=due(o);return d&&key(d)===k});
+ $("dayOrders").innerHTML=os.length?os.map(o=>`<div class="item"><strong>${esc(orderName(o))}</strong><small>${esc(o.order_status||"")} ${o.order_total?"• "+money(o.order_total):""}</small></div>`).join(""):`<div class="empty">No customer orders due on this date.</div>`;
+ const es=entries.filter(e=>e.date===k);
+ $("dayTasks").innerHTML=es.length?es.map(e=>`<div class="item taskrow"><span><strong>${esc(e.title)}</strong><small>${esc(e.time||"")} ${e.priority==="important"?"⭐ Important":e.priority==="urgent"?"🔴 Urgent":""}</small></span><button class="trash" type="button" data-del="${e.id}">🗑️</button></div>`).join(""):`<div class="empty">No tasks planned for this date.</div>`;
+ document.querySelectorAll("[data-del]").forEach(b=>b.addEventListener("click",()=>{entries=entries.filter(e=>e.id!==b.dataset.del);persist();renderAll()}));
+ const j=journals.find(x=>x.date===k);$("journal").value=j?j.text:"";
+}
+
+function renderUpcoming(){
+ const today=key(new Date()), a=[];
+ entries.filter(e=>e.date>=today).forEach(e=>a.push({date:parse(e.date),title:e.title,source:"Business task"}));
+ orders.forEach(o=>{const d=due(o);if(d&&key(d)>=today)a.push({date:d,title:orderName(o),source:"Customer order"})});
+ a.sort((x,y)=>x.date-y.date);
+ $("upcoming").innerHTML=a.slice(0,12).map(x=>`<div class="up"><strong>${esc(x.title)}</strong><small>${short(x.date)} • ${esc(x.source)}</small></div>`).join("")||`<div class="empty">Nothing upcoming yet.</div>`;
+}
+
+function renderSeasons(){
+ $("halloween").textContent=countdown(9,31);
+ $("christmas").textContent=countdown(11,25);
+ $("customSeasons").innerHTML=seasons.map(s=>`<div class="item" style="margin-top:8px"><strong>${esc(s.season)}</strong><small>${s.date?short(parse(s.date)):"No target date"} • ${esc(s.goal)}</small>${s.notes?`<small>${esc(s.notes)}</small>`:""}</div>`).join("");
+}
+
+function countdown(month,day){
+ const n=new Date();let t=new Date(n.getFullYear(),month,day);if(t<n)t=new Date(n.getFullYear()+1,month,day);
+ return Math.ceil((new Date(t.getFullYear(),t.getMonth(),t.getDate())-new Date(n.getFullYear(),n.getMonth(),n.getDate()))/86400000)+" days to go";
+}
+
+function renderArchive(){
+ const q=$("search").value.toLowerCase().trim();
+ const a=journals.filter(j=>!q||(`${j.date} ${j.text}`).toLowerCase().includes(q)).sort((x,y)=>y.date.localeCompare(x.date));
+ $("archive").innerHTML=a.map(j=>`<div class="journalEntry"><header><strong>${fmt(parse(j.date))}</strong><button class="delete" type="button" data-j="${j.id}">Delete</button></header><p>${esc(j.text)}</p></div>`).join("")||`<div class="empty">No journal entries yet.</div>`;
+ document.querySelectorAll("[data-j]").forEach(b=>b.addEventListener("click",()=>{journals=journals.filter(j=>j.id!==b.dataset.j);persist();renderArchive()}));
+}
+
+function renderStats(){
+ const t=key(new Date()), upcoming=orders.filter(o=>{const d=due(o);return d&&key(d)>=t}).length;
+ const n=new Date(), start=new Date(n.getFullYear(),n.getMonth(),1), end=new Date(n.getFullYear(),n.getMonth()+1,1);
+ let received=0;orders.forEach(o=>{if(o.created_at){const d=new Date(o.created_at);if(d>=start&&d<end)received+=Number(o.total_paid)||0}});
+ $("ordersStat").textContent=upcoming;$("receivedStat").textContent=money(received);$("tasksStat").textContent=entries.filter(e=>e.date>=t).length;$("importantStat").textContent=entries.filter(e=>e.priority==="important"||e.priority==="urgent").length;
+}
+
+function renderAll(){renderCalendar();renderSelected();renderUpcoming();renderSeasons();renderArchive();renderStats()}
+
+async function loadOrders(){
+ try{
+   const mod=await import("https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm");
+   const client=mod.createClient(SUPABASE_URL,SUPABASE_KEY);
+   const session=await client.auth.getSession();
+   if(!session.data.session){return;}
+   const res=await client.from("orders").select("*");
+   if(!res.error)orders=res.data||[];
+ }catch(e){console.warn("Orders could not be loaded. Planner still works:",e)}
+}
+
+function setup(){
+ $("dateText").textContent=fmt(new Date());
+ $("menu").addEventListener("click",()=>{$("sideMenu").classList.add("open");$("overlay").classList.add("open")});
+ $("overlay").addEventListener("click",()=>{$("sideMenu").classList.remove("open");$("overlay").classList.remove("open")});
+ $("logout").addEventListener("click",async e=>{e.preventDefault();try{const m=await import("https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm");const c=m.createClient(SUPABASE_URL,SUPABASE_KEY);await c.auth.signOut()}catch(_){}location.href="index.html"});
+ $("prev").addEventListener("click",()=>{current=new Date(current.getFullYear(),current.getMonth()-1,1);renderCalendar()});
+ $("next").addEventListener("click",()=>{current=new Date(current.getFullYear(),current.getMonth()+1,1);renderCalendar()});
+ $("today").addEventListener("click",()=>{current=new Date();selected=new Date();renderAll()});
+ const startEntry=()=>{$("entryTitle").value="";$("entryDate").value=key(selected);$("entryTime").value="";$("entryCategory").value="task";$("entryPriority").value="normal";$("entryNotes").value="";openModal("entryModal")};
+ $("addDay").addEventListener("click",startEntry);$("quickTask").addEventListener("click",startEntry);
+ $("quickJournal").addEventListener("click",()=>{selected=new Date();current=new Date();renderAll();$("journal").focus()});
+ $("quickSeason").addEventListener("click",()=>openModal("seasonModal"));$("addSeason").addEventListener("click",()=>openModal("seasonModal"));
+ $("closeEntry").addEventListener("click",()=>closeModal("entryModal"));$("cancelEntry").addEventListener("click",()=>closeModal("entryModal"));
+ $("closeSeason").addEventListener("click",()=>closeModal("seasonModal"));$("cancelSeason").addEventListener("click",()=>closeModal("seasonModal"));
+ document.querySelectorAll(".backdrop").forEach(b=>b.addEventListener("click",()=>b.parentElement.classList.remove("open")));
+ $("saveEntry").addEventListener("click",()=>{const title=$("entryTitle").value.trim(),date=$("entryDate").value;if(!title||!date){alert("Please enter a title and date.");return}entries.push({id:id(),title,date,time:$("entryTime").value,category:$("entryCategory").value,priority:$("entryPriority").value,notes:$("entryNotes").value.trim()});persist();closeModal("entryModal");renderAll()});
+ $("saveJournal").addEventListener("click",()=>{const k=key(selected),text=$("journal").value.trim();if(!text){$("journal").focus();return}journals=journals.filter(j=>j.date!==k);journals.push({id:id(),date:k,text});persist();$("journal").value="";renderAll();alert("Journal entry saved.")});
+ $("saveSeason").addEventListener("click",()=>{const goal=$("seasonGoal").value.trim();if(!goal){alert("Please enter a main goal.");return}seasons.push({id:id(),season:$("seasonName").value,goal,date:$("seasonDate").value,notes:$("seasonNotes").value.trim()});persist();$("seasonGoal").value="";$("seasonDate").value="";$("seasonNotes").value="";closeModal("seasonModal");renderAll()});
+ $("search").addEventListener("input",renderArchive);
+ renderAll();
+}
+
+setup();
+loadOrders().then(renderAll);
+setInterval(()=>loadOrders().then(renderAll),30000);
+})();
+</script>
+</body>
+</html>
