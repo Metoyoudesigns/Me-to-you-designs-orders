@@ -7,7 +7,10 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 "use strict";
 
+// =====================================================
 // MENU
+// =====================================================
+
 const menuButton = document.getElementById("menuButton");
 const sideMenu = document.getElementById("sideMenu");
 const overlay = document.getElementById("overlay");
@@ -25,7 +28,10 @@ function closeMenu(){
 menuButton?.addEventListener("click", openMenu);
 overlay?.addEventListener("click", closeMenu);
 
+// =====================================================
 // DATE
+// =====================================================
+
 const todayDate = document.getElementById("todayDate");
 
 if(todayDate){
@@ -37,40 +43,72 @@ if(todayDate){
     });
 }
 
+// =====================================================
 // AUTH
+// =====================================================
+
 document.getElementById("logoutButton")?.addEventListener("click", async e => {
+
     e.preventDefault();
+
     await supabase.auth.signOut();
+
     location.href = "index.html";
 });
 
 async function checkLogin(){
-    const {data,error} = await supabase.auth.getSession();
+
+    const {data,error} =
+        await supabase.auth.getSession();
 
     if(error || !data.session){
+
         location.href = "index.html";
+
         return false;
     }
 
     return true;
 }
 
-// LOCAL DASHBOARD DATA
-let orders = [];
-let jobs = JSON.parse(localStorage.getItem("todayJobs")) || [];
-let notes = JSON.parse(localStorage.getItem("notes")) || [];
+// =====================================================
+// DATA
+// =====================================================
 
+let orders = [];
+
+let jobs =
+    JSON.parse(
+        localStorage.getItem("todayJobs")
+    ) || [];
+
+let notes =
+    JSON.parse(
+        localStorage.getItem("notes")
+    ) || [];
+
+// =====================================================
 // LOAD ORDERS
+// =====================================================
+
 async function loadOrders(){
 
-    const {data,error} = await supabase
-        .from("orders")
-        .select("*");
+    const {data,error} =
+        await supabase
+            .from("orders")
+            .select("*");
 
     if(error){
-        console.error("Could not load orders:", error);
+
+        console.error(
+            "Could not load orders:",
+            error
+        );
+
         orders = [];
+
         updateDashboard();
+
         return;
     }
 
@@ -79,7 +117,10 @@ async function loadOrders(){
     updateDashboard();
 }
 
-// REALTIME + FALLBACK
+// =====================================================
+// REALTIME
+// =====================================================
+
 function subscribeToOrders(){
 
     supabase
@@ -94,32 +135,60 @@ function subscribeToOrders(){
             () => loadOrders()
         )
         .subscribe(status => {
-            console.log("Order realtime status:", status);
+
+            console.log(
+                "Order realtime status:",
+                status
+            );
+
         });
 }
 
-setInterval(loadOrders,10000);
+setInterval(
+    loadOrders,
+    10000
+);
 
+// =====================================================
 // JOBS
-const jobsList = document.getElementById("jobsList");
-const addJobButton = document.getElementById("addJobButton");
+// =====================================================
 
-addJobButton?.addEventListener("click",() => openEntryModal({
-    type:"job",
-    title:"Add Today's Job",
-    subtitle:"Add a job you need to complete today.",
-    placeholder:"e.g. Finish McKenzie's pyjamas"
-}));
+const jobsList =
+    document.getElementById("jobsList");
 
-function addJob(v){
-    if(!v?.trim()) return;
+const addJobButton =
+    document.getElementById("addJobButton");
 
-    jobs.push(v.trim());
+addJobButton?.addEventListener(
+    "click",
+    () => openEntryModal({
+        type:"job",
+        title:"Add Today's Job",
+        subtitle:
+            "Add a job you need to complete today.",
+        placeholder:
+            "e.g. Finish McKenzie's pyjamas"
+    })
+);
+
+function addJob(value){
+
+    if(!value?.trim()) return;
+
+    jobs.push(
+        value.trim()
+    );
+
     saveJobs();
 }
 
 function saveJobs(){
-    localStorage.setItem("todayJobs",JSON.stringify(jobs));
+
+    localStorage.setItem(
+        "todayJobs",
+        JSON.stringify(jobs)
+    );
+
     loadJobs();
 }
 
@@ -129,62 +198,110 @@ function loadJobs(){
 
     jobsList.innerHTML = "";
 
-    jobs.forEach((job,index) => {
+    jobs.forEach(
+        (job,index) => {
 
-        const li = document.createElement("li");
+            const li =
+                document.createElement("li");
 
-        li.innerHTML = `
-            <span></span>
-            <div>
-                <button class="completeButton" title="Complete">✅</button>
-                <button class="deleteButton" title="Delete">🗑️</button>
-            </div>
-        `;
+            li.innerHTML = `
+                <span></span>
+                <div>
+                    <button
+                        class="completeButton"
+                        title="Complete"
+                    >✅</button>
 
-        li.querySelector("span").textContent = job;
+                    <button
+                        class="deleteButton"
+                        title="Delete"
+                    >🗑️</button>
+                </div>
+            `;
 
-        li.querySelector(".completeButton").onclick = () => {
-            jobs.splice(index,1);
-            saveJobs();
-        };
+            li.querySelector(
+                "span"
+            ).textContent = job;
 
-        li.querySelector(".deleteButton").onclick = () => {
+            li.querySelector(
+                ".completeButton"
+            ).onclick = () => {
 
-            if(confirm("Delete this job?")){
-                jobs.splice(index,1);
+                jobs.splice(
+                    index,
+                    1
+                );
+
                 saveJobs();
-            }
+            };
 
-        };
+            li.querySelector(
+                ".deleteButton"
+            ).onclick = () => {
 
-        jobsList.appendChild(li);
-    });
+                if(
+                    confirm(
+                        "Delete this job?"
+                    )
+                ){
+
+                    jobs.splice(
+                        index,
+                        1
+                    );
+
+                    saveJobs();
+                }
+
+            };
+
+            jobsList.appendChild(li);
+        }
+    );
 }
 
 loadJobs();
 
+// =====================================================
 // NOTES
-const notesList = document.getElementById("notesList");
-const addNoteButton = document.getElementById("addNoteButton");
+// =====================================================
 
-addNoteButton?.addEventListener("click",() => openEntryModal({
-    type:"note",
-    title:"Add Note",
-    subtitle:"Add a note for your business dashboard.",
-    placeholder:"Type your note here..."
-}));
+const notesList =
+    document.getElementById("notesList");
 
-function addNote(v){
+const addNoteButton =
+    document.getElementById("addNoteButton");
 
-    if(!v?.trim()) return;
+addNoteButton?.addEventListener(
+    "click",
+    () => openEntryModal({
+        type:"note",
+        title:"Add Note",
+        subtitle:
+            "Add a note for your business dashboard.",
+        placeholder:
+            "Type your note here..."
+    })
+);
 
-    notes.push(v.trim());
+function addNote(value){
+
+    if(!value?.trim()) return;
+
+    notes.push(
+        value.trim()
+    );
+
     saveNotes();
 }
 
 function saveNotes(){
 
-    localStorage.setItem("notes",JSON.stringify(notes));
+    localStorage.setItem(
+        "notes",
+        JSON.stringify(notes)
+    );
+
     loadNotes();
 }
 
@@ -194,93 +311,175 @@ function loadNotes(){
 
     notesList.innerHTML = "";
 
-    notes.forEach((note,index) => {
+    notes.forEach(
+        (note,index) => {
 
-        const li = document.createElement("li");
+            const li =
+                document.createElement("li");
 
-        li.innerHTML = `
-            <span></span>
-            <div>
-                <button class="editButton" title="Edit">✏️</button>
-                <button class="deleteButton" title="Delete">🗑️</button>
-            </div>
-        `;
+            li.innerHTML = `
+                <span></span>
+                <div>
+                    <button
+                        class="editButton"
+                        title="Edit"
+                    >✏️</button>
 
-        li.querySelector("span").textContent = note;
+                    <button
+                        class="deleteButton"
+                        title="Delete"
+                    >🗑️</button>
+                </div>
+            `;
 
-        li.querySelector(".editButton").onclick = () => openEntryModal({
-            type:"edit-note",
-            title:"Edit Note",
-            subtitle:"Update your note below.",
-            placeholder:"Type your note here...",
-            value:notes[index],
-            onSave:updated => {
+            li.querySelector(
+                "span"
+            ).textContent = note;
 
-                if(!updated.trim()){
-                    notes.splice(index,1);
-                }else{
-                    notes[index] = updated.trim();
+            li.querySelector(
+                ".editButton"
+            ).onclick = () => {
+
+                openEntryModal({
+                    type:"edit-note",
+                    title:"Edit Note",
+                    subtitle:
+                        "Update your note below.",
+                    placeholder:
+                        "Type your note here...",
+                    value:notes[index],
+
+                    onSave:updated => {
+
+                        if(
+                            !updated.trim()
+                        ){
+
+                            notes.splice(
+                                index,
+                                1
+                            );
+
+                        }else{
+
+                            notes[index] =
+                                updated.trim();
+                        }
+
+                        saveNotes();
+                    }
+                });
+
+            };
+
+            li.querySelector(
+                ".deleteButton"
+            ).onclick = () => {
+
+                if(
+                    confirm(
+                        "Delete this note?"
+                    )
+                ){
+
+                    notes.splice(
+                        index,
+                        1
+                    );
+
+                    saveNotes();
                 }
 
-                saveNotes();
-            }
-        });
+            };
 
-        li.querySelector(".deleteButton").onclick = () => {
-
-            if(confirm("Delete this note?")){
-                notes.splice(index,1);
-                saveNotes();
-            }
-
-        };
-
-        notesList.appendChild(li);
-    });
+            notesList.appendChild(li);
+        }
+    );
 }
 
 loadNotes();
 
+// =====================================================
 // COLLAPSIBLE CARDS
-document.querySelectorAll(".toggleButton").forEach(button => {
+// =====================================================
 
-    const card = button.closest(".dashboardCard");
-    const content = card?.querySelector(".cardContent");
+document
+    .querySelectorAll(".toggleButton")
+    .forEach(button => {
 
-    if(!content) return;
+        const card =
+            button.closest(
+                ".dashboardCard"
+            );
 
-    content.style.display = "none";
-    button.textContent = "▶";
+        const content =
+            card?.querySelector(
+                ".cardContent"
+            );
 
-    button.onclick = () => {
+        if(!content) return;
 
-        const closed = content.style.display === "none";
+        content.style.display =
+            "none";
 
-        content.style.display = closed ? "block" : "none";
-        button.textContent = closed ? "▼" : "▶";
-    };
-});
+        button.textContent =
+            "▶";
 
-// ======================================================
-// DATE HELPERS
-// ======================================================
+        button.onclick = () => {
+
+            const closed =
+                content.style.display ===
+                "none";
+
+            content.style.display =
+                closed
+                    ? "block"
+                    : "none";
+
+            button.textContent =
+                closed
+                    ? "▼"
+                    : "▶";
+        };
+
+    });
+
+// =====================================================
+// DATE FUNCTIONS
+// =====================================================
 
 function parseDate(value){
 
     if(!value) return null;
 
     if(value instanceof Date){
-        return Number.isNaN(value.getTime()) ? null : value;
+
+        return Number.isNaN(
+            value.getTime()
+        )
+            ? null
+            : value;
     }
 
-    if(typeof value === "string"){
+    if(
+        typeof value ===
+        "string"
+    ){
 
-        // Exact date from <input type="date">
-        // Example: 2026-08-13
-        if(/^\d{4}-\d{2}-\d{2}$/.test(value)){
+        // YYYY-MM-DD
+        if(
+            /^\d{4}-\d{2}-\d{2}$/
+                .test(value)
+        ){
 
-            const [year,month,day] =
-                value.split("-").map(Number);
+            const [
+                year,
+                month,
+                day
+            ] =
+                value
+                    .split("-")
+                    .map(Number);
 
             return new Date(
                 year,
@@ -290,10 +489,19 @@ function parseDate(value){
         }
 
         // DD/MM/YYYY
-        if(/^\d{2}\/\d{2}\/\d{4}$/.test(value)){
+        if(
+            /^\d{2}\/\d{2}\/\d{4}$/
+                .test(value)
+        ){
 
-            const [day,month,year] =
-                value.split("/").map(Number);
+            const [
+                day,
+                month,
+                year
+            ] =
+                value
+                    .split("/")
+                    .map(Number);
 
             return new Date(
                 year,
@@ -303,31 +511,47 @@ function parseDate(value){
         }
     }
 
-    const d = new Date(value);
+    const d =
+        new Date(value);
 
-    return Number.isNaN(d.getTime())
+    return Number.isNaN(
+        d.getTime()
+    )
         ? null
         : d;
 }
 
 function startOfDay(date){
 
-    const d = new Date(date);
+    const d =
+        new Date(date);
 
-    d.setHours(0,0,0,0);
+    d.setHours(
+        0,
+        0,
+        0,
+        0
+    );
 
     return d;
 }
 
 function startOfWeek(date){
 
-    const d = startOfDay(date);
+    const d =
+        startOfDay(date);
 
-    const day = d.getDay();
+    const day =
+        d.getDay();
+
+    const difference =
+        day === 0
+            ? -6
+            : 1 - day;
 
     d.setDate(
         d.getDate() +
-        (day === 0 ? -6 : 1 - day)
+        difference
     );
 
     return d;
@@ -335,16 +559,17 @@ function startOfWeek(date){
 
 function startOfMonth(date){
 
-    const d = startOfDay(date);
+    const d =
+        startOfDay(date);
 
     d.setDate(1);
 
     return d;
 }
 
-// ======================================================
-// ORDER DATE
-// ======================================================
+// =====================================================
+// ORDER DATES
+// =====================================================
 
 function getDateNeeded(order){
 
@@ -356,42 +581,43 @@ function getDateNeeded(order){
     );
 }
 
-// THIS IS THE IMPORTANT PART.
-// Add Order saves the date as "order_date".
+// EXACTLY WHAT CREATE-ORDER.HTML SAVES
 function getOrderDate(order){
 
     return parseDate(
-        order.order_date ??
-        order.orderDate ??
-        order.created_at ??
-        order.createdAt ??
-        order.date
+        order.order_date
     );
 }
 
-// ======================================================
+// =====================================================
 // ORDER TOTAL
-// ======================================================
+// =====================================================
 
 function getOrderTotal(order){
 
     const value =
-        order.order_total ??
-        order.orderTotal ??
-        order.total ??
-        order.total_amount ??
-        0;
+        order.order_total;
 
-    const number =
+    const amount =
         Number(
-            String(value)
-                .replace(/[£,\s]/g,"")
+            String(
+                value ?? 0
+            ).replace(
+                /[£,\s]/g,
+                ""
+            )
         );
 
-    return Number.isFinite(number)
-        ? number
+    return Number.isFinite(
+        amount
+    )
+        ? amount
         : 0;
 }
+
+// =====================================================
+// DEPOSIT / BALANCE
+// =====================================================
 
 function getDeposit(order){
 
@@ -401,14 +627,19 @@ function getDeposit(order){
         order.depositAmount ??
         0;
 
-    const number =
+    const amount =
         Number(
             String(value)
-                .replace(/[£,\s]/g,"")
+                .replace(
+                    /[£,\s]/g,
+                    ""
+                )
         );
 
-    return Number.isFinite(number)
-        ? number
+    return Number.isFinite(
+        amount
+    )
+        ? amount
         : 0;
 }
 
@@ -425,14 +656,25 @@ function getBalance(order){
         explicit !== ""
     ){
 
-        const number =
+        const amount =
             Number(
                 String(explicit)
-                    .replace(/[£,\s]/g,"")
+                    .replace(
+                        /[£,\s]/g,
+                        ""
+                    )
             );
 
-        if(Number.isFinite(number)){
-            return Math.max(0,number);
+        if(
+            Number.isFinite(
+                amount
+            )
+        ){
+
+            return Math.max(
+                0,
+                amount
+            );
         }
     }
 
@@ -443,15 +685,14 @@ function getBalance(order){
     );
 }
 
-// ======================================================
+// =====================================================
 // DASHBOARD
-// ======================================================
+// =====================================================
 
 function updateDashboard(){
 
     updateStats();
 
-    // DO NOT ALTER DUE DATE CALCULATIONS
     calculateDueDates();
 
     loadNextOrder();
@@ -460,6 +701,10 @@ function updateDashboard(){
 
     calculateRevenue();
 }
+
+// =====================================================
+// STATS
+// =====================================================
 
 function isActive(order){
 
@@ -479,45 +724,64 @@ function isActive(order){
 function updateStats(){
 
     const total =
-        document.getElementById("totalOrders");
+        document.getElementById(
+            "totalOrders"
+        );
 
     const pending =
-        document.getElementById("pendingOrders");
+        document.getElementById(
+            "pendingOrders"
+        );
 
     if(total){
-        total.textContent = orders.length;
+
+        total.textContent =
+            orders.length;
     }
 
     if(pending){
+
         pending.textContent =
-            orders.filter(isActive).length;
+            orders.filter(
+                isActive
+            ).length;
     }
 }
 
-// ======================================================
-// DUE DATES
-// ======================================================
+// =====================================================
+// DUE THIS WEEK / MONTH
+// =====================================================
 
 function calculateDueDates(){
 
     const today =
-        startOfDay(new Date());
+        startOfDay(
+            new Date()
+        );
 
     const weekStart =
-        startOfWeek(today);
+        startOfWeek(
+            today
+        );
 
     const weekEnd =
-        new Date(weekStart);
+        new Date(
+            weekStart
+        );
 
     weekEnd.setDate(
         weekEnd.getDate() + 7
     );
 
     const monthStart =
-        startOfMonth(today);
+        startOfMonth(
+            today
+        );
 
     const monthEnd =
-        new Date(monthStart);
+        new Date(
+            monthStart
+        );
 
     monthEnd.setMonth(
         monthEnd.getMonth() + 1
@@ -526,71 +790,100 @@ function calculateDueDates(){
     let week = 0;
     let month = 0;
 
-    orders.forEach(order => {
+    orders.forEach(
+        order => {
 
-        if(!isActive(order)) return;
+            if(
+                !isActive(order)
+            ) return;
 
-        const due =
-            getDateNeeded(order);
+            const due =
+                getDateNeeded(
+                    order
+                );
 
-        if(!due) return;
+            if(!due) return;
 
-        const d =
-            startOfDay(due);
+            const date =
+                startOfDay(
+                    due
+                );
 
-        if(
-            d >= weekStart &&
-            d < weekEnd
-        ){
-            week++;
+            if(
+                date >= weekStart &&
+                date < weekEnd
+            ){
+
+                week++;
+            }
+
+            if(
+                date >= monthStart &&
+                date < monthEnd
+            ){
+
+                month++;
+            }
         }
-
-        if(
-            d >= monthStart &&
-            d < monthEnd
-        ){
-            month++;
-        }
-    });
+    );
 
     const dueWeek =
-        document.getElementById("dueWeek");
+        document.getElementById(
+            "dueWeek"
+        );
 
     const dueMonth =
-        document.getElementById("dueMonth");
+        document.getElementById(
+            "dueMonth"
+        );
 
     if(dueWeek){
-        dueWeek.textContent = week;
+
+        dueWeek.textContent =
+            week;
     }
 
     if(dueMonth){
-        dueMonth.textContent = month;
+
+        dueMonth.textContent =
+            month;
     }
 }
 
-// ======================================================
+// =====================================================
 // NEXT ORDER
-// ======================================================
+// =====================================================
 
 function loadNextOrder(){
 
     const box =
-        document.getElementById("nextOrderCard");
+        document.getElementById(
+            "nextOrderCard"
+        );
 
     if(!box) return;
 
     const active =
         orders
-            .map(order => ({
-                order,
-                due:getDateNeeded(order)
-            }))
-            .filter(x =>
-                x.due &&
-                isActive(x.order)
+            .map(
+                order => ({
+                    order,
+                    due:
+                        getDateNeeded(
+                            order
+                        )
+                })
             )
-            .sort((a,b) =>
-                a.due - b.due
+            .filter(
+                x =>
+                    x.due &&
+                    isActive(
+                        x.order
+                    )
+            )
+            .sort(
+                (a,b) =>
+                    a.due - b.due
             );
 
     if(!active.length){
@@ -601,27 +894,48 @@ function loadNextOrder(){
         return;
     }
 
-    const {order,due} =
+    const {
+        order,
+        due
+    } =
         active[0];
 
     const today =
-        startOfDay(new Date());
+        startOfDay(
+            new Date()
+        );
 
     const dueDay =
-        startOfDay(due);
+        startOfDay(
+            due
+        );
 
     const days =
         Math.round(
-            (dueDay - today) /
+            (
+                dueDay -
+                today
+            ) /
             86400000
         );
 
-    let dueText =
-        days < 0
-            ? `⚠️ ${Math.abs(days)} day(s) overdue`
-            : days === 0
-                ? "Today"
-                : `${days} day(s) remaining`;
+    let dueText;
+
+    if(days < 0){
+
+        dueText =
+            `⚠️ ${Math.abs(days)} day(s) overdue`;
+
+    }else if(days === 0){
+
+        dueText =
+            "Today";
+
+    }else{
+
+        dueText =
+            `${days} day(s) remaining`;
+    }
 
     const orderNumber =
         order.order_number ||
@@ -643,38 +957,54 @@ function loadNextOrder(){
         <p>✨ </p>
     `;
 
-    box.querySelector("h3")
-        .textContent = orderNumber;
+    box.querySelector(
+        "h3"
+    ).textContent =
+        orderNumber;
 
-    box.querySelector("strong")
-        .textContent = customerName;
+    box.querySelector(
+        "strong"
+    ).textContent =
+        customerName;
 
-    box.querySelectorAll("p")[2]
-        .textContent = dueText;
+    box.querySelectorAll(
+        "p"
+    )[2].textContent =
+        dueText;
 
-    box.querySelectorAll("p")[3]
-        .textContent = `✨ ${status}`;
+    box.querySelectorAll(
+        "p"
+    )[3].textContent =
+        `✨ ${status}`;
 }
 
-// ======================================================
+// =====================================================
 // OUTSTANDING PAYMENTS
-// ======================================================
+// =====================================================
 
 function loadOutstandingPayments(){
 
     const list =
-        document.getElementById("paymentList");
+        document.getElementById(
+            "paymentList"
+        );
 
     if(!list) return;
 
     const rows =
         orders
-            .map(order => ({
-                order,
-                balance:getBalance(order)
-            }))
-            .filter(x =>
-                x.balance > 0
+            .map(
+                order => ({
+                    order,
+                    balance:
+                        getBalance(
+                            order
+                        )
+                })
+            )
+            .filter(
+                x =>
+                    x.balance > 0
             );
 
     if(!rows.length){
@@ -688,200 +1018,354 @@ function loadOutstandingPayments(){
     list.innerHTML = "";
 
     rows
-        .sort((a,b) =>
-            b.balance - a.balance
+        .sort(
+            (a,b) =>
+                b.balance -
+                a.balance
         )
-        .forEach(({order,balance}) => {
+        .forEach(
+            ({
+                order,
+                balance
+            }) => {
 
-            const row =
-                document.createElement("div");
+                const row =
+                    document.createElement(
+                        "div"
+                    );
 
-            row.style.padding =
-                "10px 0";
+                row.style.padding =
+                    "10px 0";
 
-            row.style.borderBottom =
-                "1px solid #f3e5ec";
+                row.style.borderBottom =
+                    "1px solid #f3e5ec";
 
-            row.innerHTML = `
-                <strong></strong>
-                <span style="display:block;margin-top:4px;"></span>
-            `;
+                row.innerHTML = `
+                    <strong></strong>
+                    <span style="display:block;margin-top:4px;"></span>
+                `;
 
-            row.querySelector("strong")
-                .textContent =
-                `${order.order_number || "Order"} — ${order.customer_name || "Customer"}`;
+                row.querySelector(
+                    "strong"
+                ).textContent =
+                    `${order.order_number || "Order"} — ${order.customer_name || "Customer"}`;
 
-            row.querySelector("span")
-                .textContent =
-                `£${balance.toFixed(2)} outstanding`;
+                row.querySelector(
+                    "span"
+                ).textContent =
+                    `£${balance.toFixed(2)} outstanding`;
 
-            list.appendChild(row);
-        });
+                list.appendChild(
+                    row
+                );
+            }
+        );
 }
 
-// ======================================================
+// =====================================================
 // REVENUE
-// ======================================================
-// Uses the EXACT fields from Add Order:
+// =====================================================
 //
-// order_date
-// order_total
+// IMPORTANT:
 //
-// Today = today's order date
-// This Week = Monday-Sunday current week
-// This Month = current calendar month
-// Total = all orders
-// ======================================================
+// Revenue uses ORDER DATE.
+//
+// order_date = when the order was made
+// order_total = value of the order
+//
+// date_needed is NOT used here.
+//
+// Therefore:
+//
+// TODAY = orders made today
+// WEEK = orders made Monday-Sunday
+// MONTH = orders made this calendar month
+// TOTAL = all orders
+//
+// =====================================================
 
 function calculateRevenue(){
 
     const now =
         new Date();
 
+    const year =
+        now.getFullYear();
+
+    const month =
+        now.getMonth();
+
+    const day =
+        now.getDate();
+
+    // TODAY
     const todayStart =
-        startOfDay(now);
+        new Date(
+            year,
+            month,
+            day
+        );
 
     const tomorrow =
-        new Date(todayStart);
+        new Date(
+            year,
+            month,
+            day + 1
+        );
 
-    tomorrow.setDate(
-        tomorrow.getDate() + 1
-    );
+    // THIS WEEK
+    const weekday =
+        todayStart.getDay();
+
+    const daysSinceMonday =
+        weekday === 0
+            ? 6
+            : weekday - 1;
 
     const weekStart =
-        startOfWeek(now);
+        new Date(
+            year,
+            month,
+            day -
+            daysSinceMonday
+        );
 
     const nextWeek =
-        new Date(weekStart);
+        new Date(
+            weekStart
+        );
 
     nextWeek.setDate(
         nextWeek.getDate() + 7
     );
 
+    // THIS MONTH
     const monthStart =
-        startOfMonth(now);
+        new Date(
+            year,
+            month,
+            1
+        );
 
     const nextMonth =
-        new Date(monthStart);
+        new Date(
+            year,
+            month + 1,
+            1
+        );
 
-    nextMonth.setMonth(
-        nextMonth.getMonth() + 1
+    let todayRevenue = 0;
+    let weekRevenue = 0;
+    let monthRevenue = 0;
+    let totalRevenue = 0;
+
+    orders.forEach(
+        order => {
+
+            // EXACT FIELD
+            // FROM CREATE ORDER
+            const amount =
+                Number(
+                    order.order_total
+                ) || 0;
+
+            // TOTAL
+            totalRevenue +=
+                amount;
+
+            // EXACT FIELD
+            // FROM CREATE ORDER
+            const rawDate =
+                order.order_date;
+
+            if(!rawDate) return;
+
+            let orderDate;
+
+            // YYYY-MM-DD
+            if(
+                typeof rawDate === "string" &&
+                /^\d{4}-\d{2}-\d{2}$/
+                    .test(rawDate)
+            ){
+
+                const [
+                    orderYear,
+                    orderMonth,
+                    orderDay
+                ] =
+                    rawDate
+                        .split("-")
+                        .map(Number);
+
+                // LOCAL DATE
+                // NO UTC CONVERSION
+                orderDate =
+                    new Date(
+                        orderYear,
+                        orderMonth - 1,
+                        orderDay
+                    );
+
+            }else{
+
+                orderDate =
+                    new Date(
+                        rawDate
+                    );
+            }
+
+            if(
+                Number.isNaN(
+                    orderDate.getTime()
+                )
+            ){
+
+                return;
+            }
+
+            orderDate =
+                new Date(
+                    orderDate.getFullYear(),
+                    orderDate.getMonth(),
+                    orderDate.getDate()
+                );
+
+            // TODAY
+            if(
+                orderDate >= todayStart &&
+                orderDate < tomorrow
+            ){
+
+                todayRevenue +=
+                    amount;
+            }
+
+            // THIS WEEK
+            if(
+                orderDate >= weekStart &&
+                orderDate < nextWeek
+            ){
+
+                weekRevenue +=
+                    amount;
+            }
+
+            // THIS MONTH
+            if(
+                orderDate >= monthStart &&
+                orderDate < nextMonth
+            ){
+
+                monthRevenue +=
+                    amount;
+            }
+
+        }
     );
 
-    let today = 0;
-    let week = 0;
-    let month = 0;
-    let total = 0;
+    const todayBox =
+        document.getElementById(
+            "todayRevenue"
+        );
 
-    orders.forEach(order => {
+    const weekBox =
+        document.getElementById(
+            "weekRevenue"
+        );
 
-        // EXACT field used by Add Order
-        const amount =
-            getOrderTotal(order);
+    const monthBox =
+        document.getElementById(
+            "monthRevenue"
+        );
 
-        // TOTAL
-        total += amount;
+    const totalBox =
+        document.getElementById(
+            "totalRevenue"
+        );
 
-        // EXACT field used by Add Order
-        const orderDate =
-            getOrderDate(order);
+    if(todayBox){
 
-        if(!orderDate){
-            return;
-        }
-
-        // TODAY
-        if(
-            orderDate >= todayStart &&
-            orderDate < tomorrow
-        ){
-            today += amount;
-        }
-
-        // THIS WEEK
-        if(
-            orderDate >= weekStart &&
-            orderDate < nextWeek
-        ){
-            week += amount;
-        }
-
-        // THIS MONTH
-        if(
-            orderDate >= monthStart &&
-            orderDate < nextMonth
-        ){
-            month += amount;
-        }
-    });
-
-    const todayRevenue =
-        document.getElementById("todayRevenue");
-
-    const weekRevenue =
-        document.getElementById("weekRevenue");
-
-    const monthRevenue =
-        document.getElementById("monthRevenue");
-
-    const totalRevenue =
-        document.getElementById("totalRevenue");
-
-    if(todayRevenue){
-        todayRevenue.textContent =
-            `£${today.toFixed(2)}`;
+        todayBox.textContent =
+            `£${todayRevenue.toFixed(2)}`;
     }
 
-    if(weekRevenue){
-        weekRevenue.textContent =
-            `£${week.toFixed(2)}`;
+    if(weekBox){
+
+        weekBox.textContent =
+            `£${weekRevenue.toFixed(2)}`;
     }
 
-    if(monthRevenue){
-        monthRevenue.textContent =
-            `£${month.toFixed(2)}`;
+    if(monthBox){
+
+        monthBox.textContent =
+            `£${monthRevenue.toFixed(2)}`;
     }
 
-    if(totalRevenue){
-        totalRevenue.textContent =
-            `£${total.toFixed(2)}`;
+    if(totalBox){
+
+        totalBox.textContent =
+            `£${totalRevenue.toFixed(2)}`;
     }
 
-    console.log("Revenue calculation:",{
-        today,
-        week,
-        month,
-        total
-    });
+    console.log(
+        "REVENUE:",
+        {
+            today:
+                todayRevenue,
+            week:
+                weekRevenue,
+            month:
+                monthRevenue,
+            total:
+                totalRevenue
+        }
+    );
 }
 
-// ======================================================
+// =====================================================
 // MODAL
-// ======================================================
+// =====================================================
 
 const entryModal =
-    document.getElementById("entryModal");
+    document.getElementById(
+        "entryModal"
+    );
 
 const entryModalInput =
-    document.getElementById("entryModalInput");
+    document.getElementById(
+        "entryModalInput"
+    );
 
 const entryModalTitle =
-    document.getElementById("entryModalTitle");
+    document.getElementById(
+        "entryModalTitle"
+    );
 
 const entryModalSubtitle =
-    document.getElementById("entryModalSubtitle");
+    document.getElementById(
+        "entryModalSubtitle"
+    );
 
 const saveEntryModal =
-    document.getElementById("saveEntryModal");
+    document.getElementById(
+        "saveEntryModal"
+    );
 
 const closeEntryModal =
-    document.getElementById("closeEntryModal");
+    document.getElementById(
+        "closeEntryModal"
+    );
 
 const cancelEntryModal =
-    document.getElementById("cancelEntryModal");
+    document.getElementById(
+        "cancelEntryModal"
+    );
 
 const entryModalBackdrop =
-    document.querySelector(".entryModalBackdrop");
+    document.querySelector(
+        ".entryModalBackdrop"
+    );
 
 let currentModalSave = null;
 
@@ -910,42 +1394,51 @@ function openEntryModal({
 
     currentModalSave =
         onSave ||
-        ((text) => {
+        (
+            text => {
 
-            if(type === "job"){
-                addJob(text);
+                if(type === "job"){
+                    addJob(text);
+                }
+
+                if(type === "note"){
+                    addNote(text);
+                }
+
             }
+        );
 
-            if(type === "note"){
-                addNote(text);
-            }
-
-        });
-
-    entryModal.classList.add("active");
+    entryModal.classList.add(
+        "active"
+    );
 
     entryModal.setAttribute(
         "aria-hidden",
         "false"
     );
 
-    setTimeout(() => {
+    setTimeout(
+        () => {
 
-        entryModalInput.focus();
+            entryModalInput.focus();
 
-        entryModalInput.setSelectionRange(
-            entryModalInput.value.length,
-            entryModalInput.value.length
-        );
+            entryModalInput.setSelectionRange(
+                entryModalInput.value.length,
+                entryModalInput.value.length
+            );
 
-    },50);
+        },
+        50
+    );
 }
 
 function closeEntryModalWindow(){
 
     if(!entryModal) return;
 
-    entryModal.classList.remove("active");
+    entryModal.classList.remove(
+        "active"
+    );
 
     entryModal.setAttribute(
         "aria-hidden",
@@ -957,22 +1450,27 @@ function closeEntryModalWindow(){
     currentModalSave = null;
 }
 
-saveEntryModal?.addEventListener("click",() => {
+saveEntryModal?.addEventListener(
+    "click",
+    () => {
 
-    const value =
-        entryModalInput.value.trim();
+        const value =
+            entryModalInput.value.trim();
 
-    if(!value){
+        if(!value){
 
-        entryModalInput.focus();
+            entryModalInput.focus();
 
-        return;
+            return;
+        }
+
+        currentModalSave?.(
+            value
+        );
+
+        closeEntryModalWindow();
     }
-
-    currentModalSave?.(value);
-
-    closeEntryModalWindow();
-});
+);
 
 closeEntryModal?.addEventListener(
     "click",
@@ -997,6 +1495,7 @@ entryModalInput?.addEventListener(
             (e.ctrlKey || e.metaKey) &&
             e.key === "Enter"
         ){
+
             saveEntryModal.click();
         }
 
@@ -1007,20 +1506,26 @@ document.addEventListener(
     "keydown",
     e => {
 
-        if(e.key === "Escape"){
+        if(
+            e.key === "Escape"
+        ){
+
             closeEntryModalWindow();
         }
 
     }
 );
 
-// ======================================================
+// =====================================================
 // START
-// ======================================================
+// =====================================================
 
 (async function(){
 
-    if(!(await checkLogin())){
+    if(
+        !(await checkLogin())
+    ){
+
         return;
     }
 
