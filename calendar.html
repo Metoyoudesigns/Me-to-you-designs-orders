@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Business Planner | Me To You Designs</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/calendar.css">
+</head>
+<body>
+<div id="overlay"></div>
+
+<nav id="sideMenu">
+    <div class="menuHeader">
+        <img src="logo.PNG" class="menuLogo" alt="Logo">
+        <h2>Me To You Designs</h2>
+    </div>
+    <div class="menuLinks">
+        <a href="dashboard.html">🏠 Dashboard</a>
+        <a href="orders.html">📦 Orders</a>
+        <a href="customers.html">👥 Customers</a>
+        <a href="calendar.html" class="active">📅 Business Planner</a>
+        <a href="payments.html">💷 Payments</a>
+        <a href="invoices.html">🧾 Invoices</a>
+        <a href="settings.html">⚙️ Settings</a>
+        <a href="#" id="logoutButton">🚪 Log Out</a>
+    </div>
+</nav>
+
+<div id="app">
+<header class="topBar">
+    <button id="menuButton" aria-label="Open menu">☰</button>
+</header>
+
+<section class="pageIntro">
+    <div class="introIdentity">
+        <img src="logo.PNG" class="topLogo" alt="Me To You Designs">
+        <div>
+            <h1>Business Planner</h1>
+            <p id="todayDate"></p>
+        </div>
+    </div>
+    <div class="quickActions">
+        <button id="newTaskButton">＋ Task</button>
+        <button id="newJournalButton">📝 Journal</button>
+        <button id="newSeasonButton">🎃 Seasonal</button>
+    </div>
+</section>
+
+<section class="miniStats">
+    <div><b id="statOrders">0</b><span>Orders coming up</span></div>
+    <div><b id="statMoney">£0.00</b><span>Received this month</span></div>
+    <div><b id="statTasks">0</b><span>Open tasks</span></div>
+    <div><b id="statImportant">0</b><span>Important</span></div>
+</section>
+
+<section class="calendarShell">
+    <div class="calendarTop">
+        <div class="monthControls">
+            <button id="prevMonth" aria-label="Previous month">‹</button>
+            <button id="todayButton">Today</button>
+            <button id="nextMonth" aria-label="Next month">›</button>
+        </div>
+        <div class="monthTitleWrap">
+            <h2 id="monthTitle">August 2026</h2>
+            <span>Tap a date to plan your day</span>
+        </div>
+        <div class="viewLabel">MONTH</div>
+    </div>
+
+    <div class="calendarLegend">
+        <span><i class="dot customer"></i>Customer</span>
+        <span><i class="dot task"></i>Task</span>
+        <span><i class="dot seasonal"></i>Seasonal</span>
+        <span><i class="dot deadline"></i>Deadline</span>
+    </div>
+
+    <div class="weekdays">
+        <div>MON</div><div>TUE</div><div>WED</div><div>THU</div><div>FRI</div><div>SAT</div><div>SUN</div>
+    </div>
+    <div id="calendarGrid" class="calendarGrid"></div>
+</section>
+
+<section class="selectedDay">
+    <div class="selectedHeader">
+        <div>
+            <span class="sectionKicker">YOUR DAY</span>
+            <h2 id="selectedDateTitle">Today</h2>
+        </div>
+        <button id="addEntryButton" class="mainAdd">＋ Add to day</button>
+    </div>
+
+    <div class="dayColumns">
+        <div class="dayBlock">
+            <h3>📦 Customer Orders</h3>
+            <div id="selectedOrders"></div>
+        </div>
+
+        <div class="dayBlock">
+            <h3>☑️ Today's Tasks</h3>
+            <div id="selectedTasks"></div>
+        </div>
+
+        <div class="dayBlock journalBlock">
+            <h3>📝 Business Journal</h3>
+            <label for="journalText">Notes, ideas, wins or things to remember</label>
+            <textarea id="journalText" placeholder="Write today's business notes here..."></textarea>
+            <button id="saveJournal" class="saveButton">Save Journal Entry</button>
+        </div>
+    </div>
+</section>
+
+<section class="planningSection">
+    <div class="sectionHeading">
+        <div>
+            <span class="sectionKicker">PLAN AHEAD</span>
+            <h2>Upcoming Business</h2>
+        </div>
+        <span class="sectionHint">Next 12 items</span>
+    </div>
+    <div id="upcomingList" class="upcomingGrid"></div>
+</section>
+
+<section class="planningSection">
+    <div class="sectionHeading">
+        <div>
+            <span class="sectionKicker">SEASONAL WORK</span>
+            <h2>🎃 Seasonal Planner</h2>
+        </div>
+        <button id="addSeasonPlan" class="outlineButton">＋ Add season plan</button>
+    </div>
+
+    <div class="seasonBoard">
+        <article class="seasonFeature halloween">
+            <div class="seasonTitle"><span>🎃</span><div><h3>Halloween</h3><p id="halloweenCountdown"></p></div></div>
+            <div class="seasonChecklist">
+                <label><input type="checkbox"> Decide products</label>
+                <label><input type="checkbox"> Order stock</label>
+                <label><input type="checkbox"> Make samples</label>
+                <label><input type="checkbox"> Photograph products</label>
+                <label><input type="checkbox"> Prepare marketing</label>
+                <label><input type="checkbox"> Launch range</label>
+            </div>
+        </article>
+
+        <article class="seasonFeature christmas">
+            <div class="seasonTitle"><span>🎄</span><div><h3>Christmas</h3><p id="christmasCountdown"></p></div></div>
+            <div class="seasonChecklist">
+                <label><input type="checkbox"> Decide products</label>
+                <label><input type="checkbox"> Order stock</label>
+                <label><input type="checkbox"> Create designs</label>
+                <label><input type="checkbox"> Make samples</label>
+                <label><input type="checkbox"> Photograph products</label>
+                <label><input type="checkbox"> Set final order date</label>
+            </div>
+        </article>
+    </div>
+
+    <div id="customSeasonPlans" class="customSeasonPlans"></div>
+</section>
+
+<section class="planningSection journalArchiveSection">
+    <div class="sectionHeading">
+        <div>
+            <span class="sectionKicker">LOOK BACK</span>
+            <h2>📔 Business Journal</h2>
+        </div>
+        <input id="journalSearch" class="searchInput" type="search" placeholder="Search your journal...">
+    </div>
+    <div id="journalArchive" class="journalArchive"></div>
+</section>
+</div>
+
+<div id="entryModal" class="modal" aria-hidden="true">
+    <div class="modalBackdrop"></div>
+    <div class="modalBox">
+        <button id="closeModal" class="closeModal" type="button">×</button>
+        <span class="modalKicker">BUSINESS PLANNER</span>
+        <h2>Add something to your day</h2>
+        <p>Create a task, deadline, production job or business reminder.</p>
+
+        <label for="entryTitle">Title</label>
+        <input id="entryTitle" type="text" placeholder="e.g. Order Christmas PJ stock">
+
+        <div class="twoFields">
+            <div><label for="entryDate">Date</label><input id="entryDate" type="date"></div>
+            <div><label for="entryTime">Time</label><input id="entryTime" type="time"></div>
+        </div>
+
+        <div class="twoFields">
+            <div>
+                <label for="entryCategory">Category</label>
+                <select id="entryCategory">
+                    <option value="task">☑️ Business Task</option>
+                    <option value="customer">📦 Customer</option>
+                    <option value="production">🛠️ Production</option>
+                    <option value="content">📸 Content</option>
+                    <option value="social">📱 Social Media</option>
+                    <option value="stock">📦 Stock / Supplier</option>
+                    <option value="seasonal">🎃 Seasonal</option>
+                    <option value="deadline">🔴 Deadline</option>
+                    <option value="admin">🧾 Admin</option>
+                </select>
+            </div>
+            <div>
+                <label for="entryPriority">Priority</label>
+                <select id="entryPriority">
+                    <option value="normal">Normal</option>
+                    <option value="important">⭐ Important</option>
+                    <option value="urgent">🔴 Urgent</option>
+                </select>
+            </div>
+        </div>
+
+        <label for="entryNotes">Notes</label>
+        <textarea id="entryNotes" placeholder="Details, supplies needed, ideas, reminders..."></textarea>
+
+        <div class="modalButtons">
+            <button id="cancelModal" class="cancelButton" type="button">Cancel</button>
+            <button id="saveEntry" class="mainAdd" type="button">Save entry</button>
+        </div>
+    </div>
+</div>
+
+<div id="seasonModal" class="modal" aria-hidden="true">
+    <div class="modalBackdrop"></div>
+    <div class="modalBox">
+        <button id="closeSeasonModal" class="closeModal" type="button">×</button>
+        <span class="modalKicker">SEASONAL PLANNER</span>
+        <h2>Create a seasonal plan</h2>
+        <p>Keep all the prep in one place.</p>
+
+        <label for="seasonName">Season</label>
+        <select id="seasonName">
+            <option>🎃 Halloween</option>
+            <option>🎄 Christmas</option>
+            <option>💕 Valentine's Day</option>
+            <option>🐣 Easter</option>
+            <option>🎓 Back to School</option>
+            <option>🎂 Birthday Season</option>
+            <option>✨ Other</option>
+        </select>
+
+        <label for="seasonGoal">Main goal</label>
+        <input id="seasonGoal" type="text" placeholder="e.g. Launch Christmas PJ range">
+
+        <label for="seasonDate">Target date</label>
+        <input id="seasonDate" type="date">
+
+        <label for="seasonNotes">Planning notes</label>
+        <textarea id="seasonNotes" placeholder="Stock, designs, samples, photos, marketing, deadlines..."></textarea>
+
+        <div class="modalButtons">
+            <button id="cancelSeason" class="cancelButton" type="button">Cancel</button>
+            <button id="saveSeason" class="mainAdd" type="button">Save plan</button>
+        </div>
+    </div>
+</div>
+
+<footer class="bottomNav">
+    <a href="customers.html">👥<span>Customers</span></a>
+    <a href="create-order.html" class="addOrder">＋<span>Add Order</span></a>
+    <a href="orders.html">📦<span>Orders</span></a>
+</footer>
+
+<script type="module" src="js/calendar.js"></script>
+</body>
+</html>
