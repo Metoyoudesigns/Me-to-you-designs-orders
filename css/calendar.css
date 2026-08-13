@@ -1,0 +1,59 @@
+*{box-sizing:border-box}
+body{margin:0;background:#fbf6f9;color:#4d3b45;font-family:Poppins,sans-serif;padding-bottom:82px}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+#overlay{display:none;position:fixed;inset:0;background:rgba(55,35,45,.35);z-index:90}
+#overlay.active{display:block}
+#sideMenu{position:fixed;left:-290px;top:0;bottom:0;width:280px;background:#fff;z-index:100;box-shadow:5px 0 25px rgba(0,0,0,.12);transition:.25s;padding:22px}
+#sideMenu.active{left:0}
+.menuHeader{text-align:center;padding-bottom:20px;border-bottom:1px solid #eee2e7}
+.menuLogo{width:70px;height:70px;object-fit:contain;border-radius:50%}
+.menuHeader h2{font-size:17px;margin:8px 0 0}
+.menuLinks{display:flex;flex-direction:column;gap:4px;margin-top:18px}
+.menuLinks a{padding:13px;border-radius:12px;text-decoration:none;color:#66545d}
+.menuLinks a.active,.menuLinks a:hover{background:#f7e8ef;color:#a85e7d}
+#app{max-width:1050px;margin:auto;padding:0 16px}
+.topBar{height:58px;display:flex;align-items:center}
+#menuButton{border:0;background:#fff;border-radius:12px;width:44px;height:44px;font-size:22px;box-shadow:0 3px 12px rgba(0,0,0,.05)}
+.pageIntro{display:flex;justify-content:space-between;align-items:center;gap:18px;padding:12px 0 18px}
+.introIdentity{display:flex;align-items:center;gap:14px}
+.topLogo{width:64px;height:64px;object-fit:contain;border-radius:50%}
+.pageIntro h1{margin:0;font-size:30px;letter-spacing:-.5px}
+.pageIntro p{margin:3px 0 0;color:#947f89;font-size:12px}
+.quickActions{display:flex;gap:7px;flex-wrap:wrap;justify-content:flex-end}
+.quickActions button,.outlineButton{border:1px solid #e6cfd9;background:#fff;color:#9e5d79;border-radius:11px;padding:9px 12px;font-weight:600;font-size:11px}
+.miniStats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px}
+.miniStats div{background:#fff;border:1px solid #f0e2e8;border-radius:13px;padding:10px 12px}
+.miniStats b{display:block;color:#b86789;font-size:17px}.miniStats span{font-size:9px;color:#947f89}
+.calendarShell{background:#fff;border:1px solid #eee1e7;border-radius:18px;padding:15px}
+.calendarTop{display:grid;grid-template-columns:150px 1fr 150px;align-items:center}
+.monthControls{display:flex;gap:6px}
+.monthControls button{height:38px;border:0;border-radius:10px;background:#f7e9ef;color:#a95f7f;font-weight:600}
+.monthControls button:first-child,.monthControls button:last-child{width:38px;font-size:24px;line-height:1}
+.monthControls #todayButton{padding:0 12px;font-size:10px}
+.monthTitleWrap{text-align:center}.monthTitleWrap h2{margin:0;text-transform:uppercase;letter-spacing:1px;font-size:21px;color:#765a67}.monthTitleWrap span{font-size:10px;color:#a18e96}.viewLabel{text-align:right;font-size:9px;color:#b36e89;letter-spacing:1.5px;font-weight:700}
+.calendarLegend{display:flex;justify-content:center;gap:14px;flex-wrap:wrap;margin:12px 0 10px;color:#8f7b84;font-size:9px}.calendarLegend span{display:flex;align-items:center;gap:4px}.dot{width:7px;height:7px;border-radius:50%;display:inline-block}.dot.customer{background:#c87999}.dot.task{background:#9b7b8b}.dot.seasonal{background:#d79b61}.dot.deadline{background:#d86670}
+.weekdays,.calendarGrid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}.weekdays div{text-align:center;color:#a28d96;font-size:9px;font-weight:700;padding:5px 0}
+.calendarDay{min-height:105px;border:1px solid #eee3e8;border-radius:9px;padding:7px;background:#fff;cursor:pointer;position:relative;overflow:hidden}
+.calendarDay:hover{background:#fff9fb}.calendarDay.otherMonth{opacity:.35}.calendarDay.selected{border:2px solid #c27696;background:#fff8fb}.calendarDay.today .dayNumber{background:#b96889;color:#fff}
+.dayNumber{display:flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;font-size:11px;font-weight:700;margin-bottom:3px}
+.calendarEvent{display:block;width:100%;border:0;border-radius:5px;padding:3px 5px;margin-top:3px;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:8px;color:#604c56;background:#f6e9ee}
+.calendarEvent.customer{background:#f7e3eb}.calendarEvent.seasonal{background:#f8eddf}.calendarEvent.deadline{background:#f8e1e2;color:#8e4850}.calendarEvent.task{background:#eee8ec}
+.moreEvents{font-size:8px;color:#a08c95;margin-top:3px}
+.selectedDay,.planningSection{background:#fff;border:1px solid #eee1e7;border-radius:18px;margin-top:12px;padding:16px}
+.selectedHeader,.sectionHeading{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.sectionKicker{display:block;font-size:8px;letter-spacing:1.5px;color:#b26b88;font-weight:700}
+.selectedHeader h2,.sectionHeading h2{margin:2px 0 0;font-size:20px;color:#705665}
+.mainAdd{border:0;background:#b96d8d;color:#fff;border-radius:11px;padding:10px 13px;font-weight:700;font-size:11px}
+.dayColumns{display:grid;grid-template-columns:1fr 1fr 1.35fr;gap:10px;margin-top:14px}
+.dayBlock{border:1px solid #eee3e8;border-radius:12px;padding:12px;min-height:150px}.dayBlock h3{margin:0 0 9px;font-size:12px;color:#765b68}
+.empty{font-size:10px;color:#a18f97;padding:8px 0}.miniItem{background:#fbf4f7;border-radius:9px;padding:8px;margin-bottom:6px;font-size:10px}.miniItem strong{display:block}.miniItem small{display:block;color:#95828b;margin-top:2px}.taskRow{display:flex;align-items:center;gap:6px}.taskRow span{flex:1}.taskRow button{border:0;background:none;color:#a96982}
+.journalBlock label{display:block;font-size:9px;color:#95828b;margin-bottom:5px}.journalBlock textarea{min-height:87px}
+textarea,input,select{width:100%;border:1px solid #e3ced7;border-radius:10px;padding:9px;background:#fff;color:#4c3b43;outline:none;font-size:11px}textarea{resize:vertical}.saveButton{border:0;background:#f3e5eb;color:#9c5d77;border-radius:9px;padding:9px 11px;font-weight:700;font-size:10px;margin-top:7px}
+.sectionHeading{margin-bottom:12px}.sectionHint{font-size:9px;color:#a18e96}.upcomingGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.upcomingItem{border:1px solid #eee2e7;border-radius:10px;padding:9px}.upcomingItem strong{font-size:10px;display:block}.upcomingItem small{font-size:9px;color:#9b8790;display:block;margin-top:3px}
+.seasonBoard{display:grid;grid-template-columns:1fr 1fr;gap:10px}.seasonFeature{border:1px solid #eee2e7;border-radius:13px;padding:13px}.seasonTitle{display:flex;align-items:center;gap:9px}.seasonTitle>span{font-size:28px}.seasonTitle h3{margin:0;font-size:15px}.seasonTitle p{margin:2px 0 0;font-size:9px;color:#9a858e}.seasonChecklist{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:12px}.seasonChecklist label{font-size:9px;color:#765d68}.seasonChecklist input{width:auto;margin-right:4px;accent-color:#b96d8d}.halloween{background:#fffaf5}.christmas{background:#fbf8fa}.customSeasonPlans{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:9px}.customSeasonPlan{border:1px solid #eee2e7;border-radius:10px;padding:10px}.customSeasonPlan h4{margin:0;font-size:11px}.customSeasonPlan p{font-size:9px;color:#95828b;margin:4px 0}
+.searchInput{max-width:270px}.journalArchive{display:flex;flex-direction:column;gap:7px}.journalEntry{border:1px solid #eee2e7;border-radius:11px;padding:10px}.journalEntry header{display:flex;justify-content:space-between;gap:10px}.journalEntry strong{font-size:10px}.journalEntry small{font-size:8px;color:#9a8790;display:block}.journalEntry p{font-size:10px;white-space:pre-wrap;margin:7px 0 0}.deleteMini{border:0;background:none;color:#ad6682;font-size:9px}
+.modal{display:none;position:fixed;inset:0;z-index:200;align-items:center;justify-content:center;padding:14px}.modal.active{display:flex}.modalBackdrop{position:absolute;inset:0;background:rgba(45,30,38,.42)}.modalBox{position:relative;background:#fff;border-radius:18px;padding:20px;width:min(520px,100%);max-height:90vh;overflow:auto;box-shadow:0 15px 45px rgba(0,0,0,.18)}.closeModal{position:absolute;right:12px;top:8px;border:0;background:none;font-size:27px;color:#917783}.modalKicker{font-size:8px;letter-spacing:1.5px;color:#b26b88;font-weight:700}.modalBox h2{margin:3px 0;font-size:21px;color:#6f5361}.modalBox>p{font-size:10px;color:#95818a;margin:0 0 12px}.modalBox label{display:block;font-size:9px;font-weight:700;color:#705966;margin:8px 0 4px}.twoFields{display:grid;grid-template-columns:1fr 1fr;gap:8px}.modalButtons{display:flex;justify-content:flex-end;gap:7px;margin-top:12px}.cancelButton{border:0;background:#f2e7ec;color:#8e6877;border-radius:10px;padding:10px 13px;font-weight:700;font-size:10px}
+.bottomNav{position:fixed;left:0;right:0;bottom:0;height:64px;background:rgba(255,255,255,.98);border-top:1px solid #eadce2;display:flex;justify-content:center;gap:55px;z-index:80}.bottomNav a{display:flex;flex-direction:column;align-items:center;justify-content:center;text-decoration:none;color:#7c6670;font-size:19px}.bottomNav span{font-size:9px}.bottomNav .addOrder{color:#b96d8d;font-size:25px}
+@media(max-width:800px){#app{padding:0 10px}.pageIntro{align-items:flex-start;flex-direction:column}.quickActions{justify-content:flex-start}.calendarTop{grid-template-columns:1fr}.monthTitleWrap{grid-row:1;margin-bottom:8px}.monthControls{grid-row:2;justify-content:center}.viewLabel{display:none}.calendarDay{min-height:82px}.dayColumns{grid-template-columns:1fr 1fr}.journalBlock{grid-column:1/-1}.upcomingGrid{grid-template-columns:1fr 1fr}}
+@media(max-width:560px){.miniStats{grid-template-columns:1fr 1fr}.calendarShell{padding:9px}.calendarDay{min-height:64px;padding:4px}.calendarEvent{font-size:7px;padding:2px 3px}.weekdays div{font-size:8px}.selectedHeader{align-items:flex-start}.dayColumns{grid-template-columns:1fr}.journalBlock{grid-column:auto}.upcomingGrid,.seasonBoard,.customSeasonPlans{grid-template-columns:1fr}.seasonChecklist{grid-template-columns:1fr 1fr}.searchInput{max-width:100%}.sectionHeading{align-items:flex-start;flex-direction:column}.bottomNav{gap:35px}}
