@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Customers | Me To You Designs</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+*{box-sizing:border-box}
+body{
+ margin:0;
+ background:#faf5f8;
+ color:#4a3a43;
+ font-family:Poppins,sans-serif
+}
+.page{
+ max-width:850px;
+ margin:auto;
+ padding:10px 12px 45px
+}
+.top{
+ text-align:center;
+ background:#fff;
+ margin:-10px -12px 15px;
+ padding:12px;
+ border-bottom:1px solid #efd8e3
+}
+.logo{
+ width:78px;
+ height:78px;
+ object-fit:contain;
+ border-radius:50%
+}
+.back{
+ display:inline-block;
+ color:#bd7398;
+ text-decoration:none;
+ font-weight:700;
+ margin:3px 0 12px
+}
+.hero,.customerCard{
+ background:#fff;
+ border:1px solid #efd8e3;
+ border-radius:22px;
+ padding:17px;
+ box-shadow:0 4px 15px rgba(0,0,0,.06)
+}
+.hero h1{
+ margin:0;
+ font-size:30px
+}
+.hero p{
+ margin:4px 0 15px;
+ color:#8d7c85
+}
+.search{
+ width:100%;
+ border:1.5px solid #e6cad6;
+ border-radius:13px;
+ padding:12px;
+ background:#fff;
+ font:inherit;
+ font-size:14px;
+ outline:none
+}
+.summary{
+ color:#8d7c85;
+ font-size:13px;
+ margin:13px 3px 8px
+}
+.customerCard{
+ margin-bottom:12px
+}
+.customerTop{
+ display:flex;
+ justify-content:space-between;
+ align-items:flex-start;
+ gap:10px
+}
+.customerName{
+ font-size:20px;
+ font-weight:700;
+ color:#62465a
+}
+.contact{
+ color:#806d76;
+ font-size:13px;
+ margin-top:3px
+}
+.ordersTitle{
+ margin:13px 0 7px;
+ color:#b86c8d;
+ font-size:13px;
+ font-weight:700
+}
+.orderNumbers{
+ display:flex;
+ flex-wrap:wrap;
+ gap:8px
+}
+.orderLink{
+ display:inline-flex;
+ align-items:center;
+ border:0;
+ border-radius:12px;
+ padding:9px 12px;
+ background:#f7e5ec;
+ color:#a85e7f;
+ font:700 13px Poppins;
+ cursor:pointer;
+ text-decoration:none
+}
+.orderLink:hover{
+ background:#efd2df
+}
+.empty{
+ text-align:center;
+ color:#8d7c85;
+ padding:40px 15px;
+ background:#fff;
+ border:1px solid #efd8e3;
+ border-radius:20px
+}
+.loading{
+ text-align:center;
+ color:#8d7c85;
+ padding:40px 15px
+}
+.noOrders{
+ color:#9a8990;
+ font-size:12px
+}
+@media(max-width:560px){
+ .customerTop{flex-direction:column}
+ .hero h1{font-size:27px}
+}
+</style>
+</head>
+
+<body>
+
+<div class="page">
+
+<header class="top">
+ <img src="logo.PNG" class="logo" alt="Me To You Designs">
+</header>
+
+<a class="back" href="dashboard.html">← Back to Dashboard</a>
+
+<section class="hero">
+ <h1>👥 Customers</h1>
+ <p>Customer details and their order numbers</p>
+ <input
+  id="search"
+  class="search"
+  type="search"
+  placeholder="🔍 Search customer or order number..."
+ >
+</section>
+
+<div id="summary" class="summary">Loading customers…</div>
+
+<div id="customers">
+ <div class="loading">Loading customers…</div>
+</div>
+
+</div>
+
+<script type="module">
+import{createClient}from"https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+
+const supabase=createClient(
+ "https://critutqwakaepgxgpkml.supabase.co",
+ "sb_publishable_KtXAtIRgtZADPODLn7inRw_vC6rBPFb"
+);
+
+const $=id=>document.getElementById(id);
+
+const esc=value=>String(value??"").replace(/[&<>"']/g,char=>({
+ "&":"&amp;",
+ "<":"&lt;",
+ ">":"&gt;",
+ '"':"&quot;",
+ "'":"&#039;"
+}[char]));
+
+function orderNumber(order){
+ return order?.order_number ?? order?.orderNumber ?? "";
+}
+
+function customerName(order){
+ return order?.customer_name ?? order?.customerName ?? "Unnamed customer";
+}
+
+function customerContact(order){
+ return order?.customer_contact ?? order?.customerContact ?? "";
+}
+
+async function checkLogin(){
+ const{data,error}=await supabase.auth.getSession();
+
+ if(error||!data.session){
+  location.href="index.html";
+  return false;
+ }
+
+ return true;
+}
+
+let orders=[];
+let customers=[];
+
+async function loadOrders(){
+
+ $("customers").innerHTML=
+  '<div class="loading">Loading customers…</div>';
+
+ const{data,error}=await supabase
+  .from("orders")
+  .select("*");
+
+ if(error){
+  $("summary").textContent="Customers could not be loaded";
+
+  $("customers").innerHTML=`
+   <div class="empty">
+    <strong>Unable to load customers.</strong>
+    <br>
+    ${esc(error.message)}
+   </div>`;
+
+  return;
+ }
+
+ orders=data||[];
+
+ buildCustomers();
+ renderCustomers();
+}
+
+function buildCustomers(){
+
+ const map=new Map();
+
+ orders.forEach(order=>{
+
+  const name=customerName(order);
+  const key=name.trim().toLowerCase();
+
+  if(!map.has(key)){
+   map.set(key,{
+    name,
+    contact:customerContact(order),
+    orders:[]
+   });
+  }
+
+  const customer=map.get(key);
+
+  if(!customer.contact){
+   customer.contact=customerContact(order);
+  }
+
+  customer.orders.push(order);
+ });
+
+ customers=[...map.values()].sort((a,b)=>
+  a.name.localeCompare(b.name)
+ );
+}
+
+function renderCustomers(){
+
+ const search=$("search")
+  .value
+  .trim()
+  .toLowerCase();
+
+ const filtered=customers.filter(customer=>{
+
+  if(!search)return true;
+
+  const orderText=customer.orders
+   .map(order=>orderNumber(order))
+   .join(" ");
+
+  return(
+   customer.name.toLowerCase().includes(search)||
+   customer.contact.toLowerCase().includes(search)||
+   orderText.toLowerCase().includes(search)
+  );
+ });
+
+ $("summary").textContent=
+  `${filtered.length} customer${filtered.length===1?"":"s"}`;
+
+ if(!filtered.length){
+
+  $("customers").innerHTML=`
+   <div class="empty">
+    👥<br>
+    <strong>No customers found</strong>
+   </div>`;
+
+  return;
+ }
+
+ $("customers").innerHTML=
+  filtered.map((customer,index)=>{
+
+   const orderButtons=customer.orders
+    .slice()
+    .sort((a,b)=>
+     orderNumber(a).localeCompare(orderNumber(b))
+    )
+    .map(order=>{
+
+     const number=orderNumber(order)||"Order";
+
+     /*
+      * IMPORTANT:
+      * This is deliberately just a normal redirect to orders.html.
+      * It does NOT create another View screen.
+      */
+     return`
+      <a
+       class="orderLink"
+       href="orders.html"
+       title="Open Orders"
+      >
+       📦 ${esc(number)}
+      </a>`;
+    })
+    .join("");
+
+   return`
+    <article class="customerCard">
+
+     <div class="customerTop">
+
+      <div>
+       <div class="customerName">
+        ${esc(customer.name)}
+       </div>
+
+       ${
+        customer.contact
+         ?`<div class="contact">
+            📞 ${esc(customer.contact)}
+           </div>`
+         :""
+       }
+      </div>
+
+     </div>
+
+     <div class="ordersTitle">
+      📦 ORDER NUMBERS
+     </div>
+
+     <div class="orderNumbers">
+      ${
+       orderButtons||
+       '<span class="noOrders">No orders recorded.</span>'
+      }
+     </div>
+
+    </article>`;
+  }).join("");
+}
+
+$("search").addEventListener(
+ "input",
+ renderCustomers
+);
+
+(async()=>{
+ if(await checkLogin()){
+  await loadOrders();
+
+  supabase
+   .channel("customers-page")
+   .on(
+    "postgres_changes",
+    {
+     event:"*",
+     schema:"public",
+     table:"orders"
+    },
+    async()=>{
+     await loadOrders();
+    }
+   )
+   .subscribe();
+ }
+})();
+</script>
+
+</body>
+</html>
