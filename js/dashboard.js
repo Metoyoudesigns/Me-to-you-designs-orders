@@ -48,11 +48,8 @@ if(todayDate){
 // =====================================================
 
 document.getElementById("logoutButton")?.addEventListener("click", async e => {
-
     e.preventDefault();
-
     await supabase.auth.signOut();
-
     location.href = "index.html";
 });
 
@@ -62,9 +59,7 @@ async function checkLogin(){
         await supabase.auth.getSession();
 
     if(error || !data.session){
-
         location.href = "index.html";
-
         return false;
     }
 
@@ -78,14 +73,10 @@ async function checkLogin(){
 let orders = [];
 
 let jobs =
-    JSON.parse(
-        localStorage.getItem("todayJobs")
-    ) || [];
+    JSON.parse(localStorage.getItem("todayJobs")) || [];
 
 let notes =
-    JSON.parse(
-        localStorage.getItem("notes")
-    ) || [];
+    JSON.parse(localStorage.getItem("notes")) || [];
 
 // =====================================================
 // LOAD ORDERS
@@ -106,7 +97,6 @@ async function loadOrders(){
         );
 
         orders = [];
-
         updateDashboard();
 
         return;
@@ -135,19 +125,14 @@ function subscribeToOrders(){
             () => loadOrders()
         )
         .subscribe(status => {
-
             console.log(
                 "Order realtime status:",
                 status
             );
-
         });
 }
 
-setInterval(
-    loadOrders,
-    10000
-);
+setInterval(loadOrders,10000);
 
 // =====================================================
 // JOBS
@@ -159,25 +144,24 @@ const jobsList =
 const addJobButton =
     document.getElementById("addJobButton");
 
-addJobButton?.addEventListener(
-    "click",
-    () => openEntryModal({
+addJobButton?.addEventListener("click", () => {
+
+    openEntryModal({
         type:"job",
         title:"Add Today's Job",
         subtitle:
             "Add a job you need to complete today.",
         placeholder:
             "e.g. Finish McKenzie's pyjamas"
-    })
-);
+    });
+
+});
 
 function addJob(value){
 
     if(!value?.trim()) return;
 
-    jobs.push(
-        value.trim()
-    );
+    jobs.push(value.trim());
 
     saveJobs();
 }
@@ -198,66 +182,51 @@ function loadJobs(){
 
     jobsList.innerHTML = "";
 
-    jobs.forEach(
-        (job,index) => {
+    jobs.forEach((job,index) => {
 
-            const li =
-                document.createElement("li");
+        const li =
+            document.createElement("li");
 
-            li.innerHTML = `
-                <span></span>
-                <div>
-                    <button
-                        class="completeButton"
-                        title="Complete"
-                    >✅</button>
+        li.innerHTML = `
+            <span></span>
+            <div>
+                <button
+                    class="completeButton"
+                    title="Complete"
+                >✅</button>
 
-                    <button
-                        class="deleteButton"
-                        title="Delete"
-                    >🗑️</button>
-                </div>
-            `;
+                <button
+                    class="deleteButton"
+                    title="Delete"
+                >🗑️</button>
+            </div>
+        `;
 
-            li.querySelector(
-                "span"
-            ).textContent = job;
+        li.querySelector("span")
+            .textContent = job;
 
-            li.querySelector(
-                ".completeButton"
-            ).onclick = () => {
+        li.querySelector(".completeButton")
+            .onclick = () => {
 
-                jobs.splice(
-                    index,
-                    1
-                );
-
+                jobs.splice(index,1);
                 saveJobs();
+
             };
 
-            li.querySelector(
-                ".deleteButton"
-            ).onclick = () => {
+        li.querySelector(".deleteButton")
+            .onclick = () => {
 
-                if(
-                    confirm(
-                        "Delete this job?"
-                    )
-                ){
+                if(confirm("Delete this job?")){
 
-                    jobs.splice(
-                        index,
-                        1
-                    );
-
+                    jobs.splice(index,1);
                     saveJobs();
+
                 }
 
             };
 
-            jobsList.appendChild(li);
-        }
-    );
+        jobsList.appendChild(li);
+    });
 }
 
 loadJobs();
@@ -272,25 +241,24 @@ const notesList =
 const addNoteButton =
     document.getElementById("addNoteButton");
 
-addNoteButton?.addEventListener(
-    "click",
-    () => openEntryModal({
+addNoteButton?.addEventListener("click", () => {
+
+    openEntryModal({
         type:"note",
         title:"Add Note",
         subtitle:
             "Add a note for your business dashboard.",
         placeholder:
             "Type your note here..."
-    })
-);
+    });
+
+});
 
 function addNote(value){
 
     if(!value?.trim()) return;
 
-    notes.push(
-        value.trim()
-    );
+    notes.push(value.trim());
 
     saveNotes();
 }
@@ -311,34 +279,31 @@ function loadNotes(){
 
     notesList.innerHTML = "";
 
-    notes.forEach(
-        (note,index) => {
+    notes.forEach((note,index) => {
 
-            const li =
-                document.createElement("li");
+        const li =
+            document.createElement("li");
 
-            li.innerHTML = `
-                <span></span>
-                <div>
-                    <button
-                        class="editButton"
-                        title="Edit"
-                    >✏️</button>
+        li.innerHTML = `
+            <span></span>
+            <div>
+                <button
+                    class="editButton"
+                    title="Edit"
+                >✏️</button>
 
-                    <button
-                        class="deleteButton"
-                        title="Delete"
-                    >🗑️</button>
-                </div>
-            `;
+                <button
+                    class="deleteButton"
+                    title="Delete"
+                >🗑️</button>
+            </div>
+        `;
 
-            li.querySelector(
-                "span"
-            ).textContent = note;
+        li.querySelector("span")
+            .textContent = note;
 
-            li.querySelector(
-                ".editButton"
-            ).onclick = () => {
+        li.querySelector(".editButton")
+            .onclick = () => {
 
                 openEntryModal({
                     type:"edit-note",
@@ -351,19 +316,15 @@ function loadNotes(){
 
                     onSave:updated => {
 
-                        if(
-                            !updated.trim()
-                        ){
+                        if(!updated.trim()){
 
-                            notes.splice(
-                                index,
-                                1
-                            );
+                            notes.splice(index,1);
 
                         }else{
 
                             notes[index] =
                                 updated.trim();
+
                         }
 
                         saveNotes();
@@ -372,29 +333,20 @@ function loadNotes(){
 
             };
 
-            li.querySelector(
-                ".deleteButton"
-            ).onclick = () => {
+        li.querySelector(".deleteButton")
+            .onclick = () => {
 
-                if(
-                    confirm(
-                        "Delete this note?"
-                    )
-                ){
+                if(confirm("Delete this note?")){
 
-                    notes.splice(
-                        index,
-                        1
-                    );
-
+                    notes.splice(index,1);
                     saveNotes();
+
                 }
 
             };
 
-            notesList.appendChild(li);
-        }
-    );
+        notesList.appendChild(li);
+    });
 }
 
 loadNotes();
@@ -408,44 +360,32 @@ document
     .forEach(button => {
 
         const card =
-            button.closest(
-                ".dashboardCard"
-            );
+            button.closest(".dashboardCard");
 
         const content =
-            card?.querySelector(
-                ".cardContent"
-            );
+            card?.querySelector(".cardContent");
 
         if(!content) return;
 
-        content.style.display =
-            "none";
-
-        button.textContent =
-            "▶";
+        content.style.display = "none";
+        button.textContent = "▶";
 
         button.onclick = () => {
 
             const closed =
-                content.style.display ===
-                "none";
+                content.style.display === "none";
 
             content.style.display =
-                closed
-                    ? "block"
-                    : "none";
+                closed ? "block" : "none";
 
             button.textContent =
-                closed
-                    ? "▼"
-                    : "▶";
+                closed ? "▼" : "▶";
         };
 
     });
 
 // =====================================================
-// DATE FUNCTIONS
+// DATE HELPERS
 // =====================================================
 
 function parseDate(value){
@@ -454,32 +394,18 @@ function parseDate(value){
 
     if(value instanceof Date){
 
-        return Number.isNaN(
-            value.getTime()
-        )
+        return Number.isNaN(value.getTime())
             ? null
             : value;
     }
 
-    if(
-        typeof value ===
-        "string"
-    ){
+    if(typeof value === "string"){
 
         // YYYY-MM-DD
-        if(
-            /^\d{4}-\d{2}-\d{2}$/
-                .test(value)
-        ){
+        if(/^\d{4}-\d{2}-\d{2}$/.test(value)){
 
-            const [
-                year,
-                month,
-                day
-            ] =
-                value
-                    .split("-")
-                    .map(Number);
+            const [year,month,day] =
+                value.split("-").map(Number);
 
             return new Date(
                 year,
@@ -489,19 +415,10 @@ function parseDate(value){
         }
 
         // DD/MM/YYYY
-        if(
-            /^\d{2}\/\d{2}\/\d{4}$/
-                .test(value)
-        ){
+        if(/^\d{2}\/\d{2}\/\d{4}$/.test(value)){
 
-            const [
-                day,
-                month,
-                year
-            ] =
-                value
-                    .split("/")
-                    .map(Number);
+            const [day,month,year] =
+                value.split("/").map(Number);
 
             return new Date(
                 year,
@@ -511,47 +428,31 @@ function parseDate(value){
         }
     }
 
-    const d =
-        new Date(value);
+    const d = new Date(value);
 
-    return Number.isNaN(
-        d.getTime()
-    )
+    return Number.isNaN(d.getTime())
         ? null
         : d;
 }
 
 function startOfDay(date){
 
-    const d =
-        new Date(date);
+    const d = new Date(date);
 
-    d.setHours(
-        0,
-        0,
-        0,
-        0
-    );
+    d.setHours(0,0,0,0);
 
     return d;
 }
 
 function startOfWeek(date){
 
-    const d =
-        startOfDay(date);
+    const d = startOfDay(date);
 
-    const day =
-        d.getDay();
-
-    const difference =
-        day === 0
-            ? -6
-            : 1 - day;
+    const day = d.getDay();
 
     d.setDate(
         d.getDate() +
-        difference
+        (day === 0 ? -6 : 1 - day)
     );
 
     return d;
@@ -559,8 +460,7 @@ function startOfWeek(date){
 
 function startOfMonth(date){
 
-    const d =
-        startOfDay(date);
+    const d = startOfDay(date);
 
     d.setDate(1);
 
@@ -568,7 +468,7 @@ function startOfMonth(date){
 }
 
 // =====================================================
-// ORDER DATES
+// DATES
 // =====================================================
 
 function getDateNeeded(order){
@@ -581,12 +481,50 @@ function getDateNeeded(order){
     );
 }
 
-// EXACTLY WHAT CREATE-ORDER.HTML SAVES
-function getOrderDate(order){
+// =====================================================
+// REVENUE DATE
+// =====================================================
+//
+// Revenue is based on WHEN THE ORDER WAS CREATED.
+//
+// Your existing orders:
+// £40 -> created 13 August
+// £100 -> created 13 August
+//
+// Therefore August revenue = £140.
+//
+
+function getRevenueDate(order){
 
     return parseDate(
-        order.order_date
+        order.created_at
     );
+}
+
+// =====================================================
+// REVENUE AMOUNT
+// =====================================================
+//
+// Revenue uses TOTAL PAID.
+//
+// £40 order -> total_paid = £40
+// £100 order -> total_paid = £100
+//
+
+function getRevenueAmount(order){
+
+    const value =
+        order.total_paid ?? 0;
+
+    const amount =
+        Number(
+            String(value)
+                .replace(/[£,\s]/g,"")
+        );
+
+    return Number.isFinite(amount)
+        ? amount
+        : 0;
 }
 
 // =====================================================
@@ -596,27 +534,21 @@ function getOrderDate(order){
 function getOrderTotal(order){
 
     const value =
-        order.order_total;
+        order.order_total ?? 0;
 
     const amount =
         Number(
-            String(
-                value ?? 0
-            ).replace(
-                /[£,\s]/g,
-                ""
-            )
+            String(value)
+                .replace(/[£,\s]/g,"")
         );
 
-    return Number.isFinite(
-        amount
-    )
+    return Number.isFinite(amount)
         ? amount
         : 0;
 }
 
 // =====================================================
-// DEPOSIT / BALANCE
+// DEPOSIT
 // =====================================================
 
 function getDeposit(order){
@@ -630,18 +562,17 @@ function getDeposit(order){
     const amount =
         Number(
             String(value)
-                .replace(
-                    /[£,\s]/g,
-                    ""
-                )
+                .replace(/[£,\s]/g,"")
         );
 
-    return Number.isFinite(
-        amount
-    )
+    return Number.isFinite(amount)
         ? amount
         : 0;
 }
+
+// =====================================================
+// BALANCE
+// =====================================================
 
 function getBalance(order){
 
@@ -659,17 +590,10 @@ function getBalance(order){
         const amount =
             Number(
                 String(explicit)
-                    .replace(
-                        /[£,\s]/g,
-                        ""
-                    )
+                    .replace(/[£,\s]/g,"")
             );
 
-        if(
-            Number.isFinite(
-                amount
-            )
-        ){
+        if(Number.isFinite(amount)){
 
             return Math.max(
                 0,
@@ -742,46 +666,39 @@ function updateStats(){
     if(pending){
 
         pending.textContent =
-            orders.filter(
-                isActive
-            ).length;
+            orders.filter(isActive).length;
     }
 }
 
 // =====================================================
-// DUE THIS WEEK / MONTH
+// DUE DATES
 // =====================================================
+//
+// IMPORTANT:
+// This is still based on DATE NEEDED.
+// Revenue does NOT affect this.
+//
 
 function calculateDueDates(){
 
     const today =
-        startOfDay(
-            new Date()
-        );
+        startOfDay(new Date());
 
     const weekStart =
-        startOfWeek(
-            today
-        );
+        startOfWeek(today);
 
     const weekEnd =
-        new Date(
-            weekStart
-        );
+        new Date(weekStart);
 
     weekEnd.setDate(
         weekEnd.getDate() + 7
     );
 
     const monthStart =
-        startOfMonth(
-            today
-        );
+        startOfMonth(today);
 
     const monthEnd =
-        new Date(
-            monthStart
-        );
+        new Date(monthStart);
 
     monthEnd.setMonth(
         monthEnd.getMonth() + 1
@@ -790,42 +707,35 @@ function calculateDueDates(){
     let week = 0;
     let month = 0;
 
-    orders.forEach(
-        order => {
+    orders.forEach(order => {
 
-            if(
-                !isActive(order)
-            ) return;
+        if(!isActive(order)) return;
 
-            const due =
-                getDateNeeded(
-                    order
-                );
+        const due =
+            getDateNeeded(order);
 
-            if(!due) return;
+        if(!due) return;
 
-            const date =
-                startOfDay(
-                    due
-                );
+        const d =
+            startOfDay(due);
 
-            if(
-                date >= weekStart &&
-                date < weekEnd
-            ){
+        if(
+            d >= weekStart &&
+            d < weekEnd
+        ){
 
-                week++;
-            }
-
-            if(
-                date >= monthStart &&
-                date < monthEnd
-            ){
-
-                month++;
-            }
+            week++;
         }
-    );
+
+        if(
+            d >= monthStart &&
+            d < monthEnd
+        ){
+
+            month++;
+        }
+
+    });
 
     const dueWeek =
         document.getElementById(
@@ -838,15 +748,11 @@ function calculateDueDates(){
         );
 
     if(dueWeek){
-
-        dueWeek.textContent =
-            week;
+        dueWeek.textContent = week;
     }
 
     if(dueMonth){
-
-        dueMonth.textContent =
-            month;
+        dueMonth.textContent = month;
     }
 }
 
@@ -865,25 +771,16 @@ function loadNextOrder(){
 
     const active =
         orders
-            .map(
-                order => ({
-                    order,
-                    due:
-                        getDateNeeded(
-                            order
-                        )
-                })
+            .map(order => ({
+                order,
+                due:getDateNeeded(order)
+            }))
+            .filter(x =>
+                x.due &&
+                isActive(x.order)
             )
-            .filter(
-                x =>
-                    x.due &&
-                    isActive(
-                        x.order
-                    )
-            )
-            .sort(
-                (a,b) =>
-                    a.due - b.due
+            .sort((a,b) =>
+                a.due - b.due
             );
 
     if(!active.length){
@@ -897,25 +794,17 @@ function loadNextOrder(){
     const {
         order,
         due
-    } =
-        active[0];
+    } = active[0];
 
     const today =
-        startOfDay(
-            new Date()
-        );
+        startOfDay(new Date());
 
     const dueDay =
-        startOfDay(
-            due
-        );
+        startOfDay(due);
 
     const days =
         Math.round(
-            (
-                dueDay -
-                today
-            ) /
+            (dueDay - today) /
             86400000
         );
 
@@ -957,25 +846,17 @@ function loadNextOrder(){
         <p>✨ </p>
     `;
 
-    box.querySelector(
-        "h3"
-    ).textContent =
-        orderNumber;
+    box.querySelector("h3")
+        .textContent = orderNumber;
 
-    box.querySelector(
-        "strong"
-    ).textContent =
-        customerName;
+    box.querySelector("strong")
+        .textContent = customerName;
 
-    box.querySelectorAll(
-        "p"
-    )[2].textContent =
-        dueText;
+    box.querySelectorAll("p")[2]
+        .textContent = dueText;
 
-    box.querySelectorAll(
-        "p"
-    )[3].textContent =
-        `✨ ${status}`;
+    box.querySelectorAll("p")[3]
+        .textContent = `✨ ${status}`;
 }
 
 // =====================================================
@@ -993,18 +874,13 @@ function loadOutstandingPayments(){
 
     const rows =
         orders
-            .map(
-                order => ({
-                    order,
-                    balance:
-                        getBalance(
-                            order
-                        )
-                })
-            )
-            .filter(
-                x =>
-                    x.balance > 0
+            .map(order => ({
+                order,
+                balance:
+                    getBalance(order)
+            }))
+            .filter(x =>
+                x.balance > 0
             );
 
     if(!rows.length){
@@ -1018,69 +894,62 @@ function loadOutstandingPayments(){
     list.innerHTML = "";
 
     rows
-        .sort(
-            (a,b) =>
-                b.balance -
-                a.balance
+        .sort((a,b) =>
+            b.balance - a.balance
         )
-        .forEach(
-            ({
-                order,
-                balance
-            }) => {
+        .forEach(({order,balance}) => {
 
-                const row =
-                    document.createElement(
-                        "div"
-                    );
+            const row =
+                document.createElement("div");
 
-                row.style.padding =
-                    "10px 0";
+            row.style.padding =
+                "10px 0";
 
-                row.style.borderBottom =
-                    "1px solid #f3e5ec";
+            row.style.borderBottom =
+                "1px solid #f3e5ec";
 
-                row.innerHTML = `
-                    <strong></strong>
-                    <span style="display:block;margin-top:4px;"></span>
-                `;
+            row.innerHTML = `
+                <strong></strong>
+                <span style="display:block;margin-top:4px;"></span>
+            `;
 
-                row.querySelector(
-                    "strong"
-                ).textContent =
-                    `${order.order_number || "Order"} — ${order.customer_name || "Customer"}`;
+            row.querySelector("strong")
+                .textContent =
+                `${order.order_number || "Order"} — ${order.customer_name || "Customer"}`;
 
-                row.querySelector(
-                    "span"
-                ).textContent =
-                    `£${balance.toFixed(2)} outstanding`;
+            row.querySelector("span")
+                .textContent =
+                `£${balance.toFixed(2)} outstanding`;
 
-                list.appendChild(
-                    row
-                );
-            }
-        );
+            list.appendChild(row);
+        });
 }
 
 // =====================================================
 // REVENUE
 // =====================================================
 //
-// IMPORTANT:
+// THIS IS THE FIX.
 //
-// Revenue uses ORDER DATE.
+// Revenue uses:
+//     created_at
+//     total_paid
 //
-// order_date = when the order was made
-// order_total = value of the order
+// NOT:
+//     order_date
+//     date_needed
 //
-// date_needed is NOT used here.
+// Your two orders were created on 13 August:
+//
+//     £40 paid
+//     £100 paid
 //
 // Therefore:
 //
-// TODAY = orders made today
-// WEEK = orders made Monday-Sunday
-// MONTH = orders made this calendar month
-// TOTAL = all orders
+//     Today     £140
+//     This Week £140
+//     This Month £140
+//     Total     £140
 //
 // =====================================================
 
@@ -1089,180 +958,82 @@ function calculateRevenue(){
     const now =
         new Date();
 
-    const year =
-        now.getFullYear();
-
-    const month =
-        now.getMonth();
-
-    const day =
-        now.getDate();
-
-    // TODAY
     const todayStart =
-        new Date(
-            year,
-            month,
-            day
-        );
+        startOfDay(now);
 
     const tomorrow =
-        new Date(
-            year,
-            month,
-            day + 1
-        );
+        new Date(todayStart);
 
-    // THIS WEEK
-    const weekday =
-        todayStart.getDay();
-
-    const daysSinceMonday =
-        weekday === 0
-            ? 6
-            : weekday - 1;
+    tomorrow.setDate(
+        tomorrow.getDate() + 1
+    );
 
     const weekStart =
-        new Date(
-            year,
-            month,
-            day -
-            daysSinceMonday
-        );
+        startOfWeek(now);
 
     const nextWeek =
-        new Date(
-            weekStart
-        );
+        new Date(weekStart);
 
     nextWeek.setDate(
         nextWeek.getDate() + 7
     );
 
-    // THIS MONTH
     const monthStart =
-        new Date(
-            year,
-            month,
-            1
-        );
+        startOfMonth(now);
 
     const nextMonth =
-        new Date(
-            year,
-            month + 1,
-            1
-        );
+        new Date(monthStart);
+
+    nextMonth.setMonth(
+        nextMonth.getMonth() + 1
+    );
 
     let todayRevenue = 0;
     let weekRevenue = 0;
     let monthRevenue = 0;
     let totalRevenue = 0;
 
-    orders.forEach(
-        order => {
+    orders.forEach(order => {
 
-            // EXACT FIELD
-            // FROM CREATE ORDER
-            const amount =
-                Number(
-                    order.order_total
-                ) || 0;
+        const amount =
+            getRevenueAmount(order);
 
-            // TOTAL
-            totalRevenue +=
-                amount;
+        const revenueDate =
+            getRevenueDate(order);
 
-            // EXACT FIELD
-            // FROM CREATE ORDER
-            const rawDate =
-                order.order_date;
+        // Total revenue
+        totalRevenue += amount;
 
-            if(!rawDate) return;
+        if(!revenueDate) return;
 
-            let orderDate;
+        // TODAY
+        if(
+            revenueDate >= todayStart &&
+            revenueDate < tomorrow
+        ){
 
-            // YYYY-MM-DD
-            if(
-                typeof rawDate === "string" &&
-                /^\d{4}-\d{2}-\d{2}$/
-                    .test(rawDate)
-            ){
-
-                const [
-                    orderYear,
-                    orderMonth,
-                    orderDay
-                ] =
-                    rawDate
-                        .split("-")
-                        .map(Number);
-
-                // LOCAL DATE
-                // NO UTC CONVERSION
-                orderDate =
-                    new Date(
-                        orderYear,
-                        orderMonth - 1,
-                        orderDay
-                    );
-
-            }else{
-
-                orderDate =
-                    new Date(
-                        rawDate
-                    );
-            }
-
-            if(
-                Number.isNaN(
-                    orderDate.getTime()
-                )
-            ){
-
-                return;
-            }
-
-            orderDate =
-                new Date(
-                    orderDate.getFullYear(),
-                    orderDate.getMonth(),
-                    orderDate.getDate()
-                );
-
-            // TODAY
-            if(
-                orderDate >= todayStart &&
-                orderDate < tomorrow
-            ){
-
-                todayRevenue +=
-                    amount;
-            }
-
-            // THIS WEEK
-            if(
-                orderDate >= weekStart &&
-                orderDate < nextWeek
-            ){
-
-                weekRevenue +=
-                    amount;
-            }
-
-            // THIS MONTH
-            if(
-                orderDate >= monthStart &&
-                orderDate < nextMonth
-            ){
-
-                monthRevenue +=
-                    amount;
-            }
-
+            todayRevenue += amount;
         }
-    );
+
+        // THIS WEEK
+        if(
+            revenueDate >= weekStart &&
+            revenueDate < nextWeek
+        ){
+
+            weekRevenue += amount;
+        }
+
+        // THIS MONTH
+        if(
+            revenueDate >= monthStart &&
+            revenueDate < nextMonth
+        ){
+
+            monthRevenue += amount;
+        }
+
+    });
 
     const todayBox =
         document.getElementById(
@@ -1308,19 +1079,12 @@ function calculateRevenue(){
             `£${totalRevenue.toFixed(2)}`;
     }
 
-    console.log(
-        "REVENUE:",
-        {
-            today:
-                todayRevenue,
-            week:
-                weekRevenue,
-            month:
-                monthRevenue,
-            total:
-                totalRevenue
-        }
-    );
+    console.log("REVENUE:", {
+        today:todayRevenue,
+        week:weekRevenue,
+        month:monthRevenue,
+        total:totalRevenue
+    });
 }
 
 // =====================================================
@@ -1394,19 +1158,17 @@ function openEntryModal({
 
     currentModalSave =
         onSave ||
-        (
-            text => {
+        ((text) => {
 
-                if(type === "job"){
-                    addJob(text);
-                }
-
-                if(type === "note"){
-                    addNote(text);
-                }
-
+            if(type === "job"){
+                addJob(text);
             }
-        );
+
+            if(type === "note"){
+                addNote(text);
+            }
+
+        });
 
     entryModal.classList.add(
         "active"
@@ -1417,19 +1179,16 @@ function openEntryModal({
         "false"
     );
 
-    setTimeout(
-        () => {
+    setTimeout(() => {
 
-            entryModalInput.focus();
+        entryModalInput.focus();
 
-            entryModalInput.setSelectionRange(
-                entryModalInput.value.length,
-                entryModalInput.value.length
-            );
+        entryModalInput.setSelectionRange(
+            entryModalInput.value.length,
+            entryModalInput.value.length
+        );
 
-        },
-        50
-    );
+    },50);
 }
 
 function closeEntryModalWindow(){
@@ -1464,9 +1223,7 @@ saveEntryModal?.addEventListener(
             return;
         }
 
-        currentModalSave?.(
-            value
-        );
+        currentModalSave?.(value);
 
         closeEntryModalWindow();
     }
@@ -1506,9 +1263,7 @@ document.addEventListener(
     "keydown",
     e => {
 
-        if(
-            e.key === "Escape"
-        ){
+        if(e.key === "Escape"){
 
             closeEntryModalWindow();
         }
@@ -1522,10 +1277,7 @@ document.addEventListener(
 
 (async function(){
 
-    if(
-        !(await checkLogin())
-    ){
-
+    if(!(await checkLogin())){
         return;
     }
 
