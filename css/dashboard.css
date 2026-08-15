@@ -1,0 +1,83 @@
+/* ==========================================
+   ME TO YOU DESIGNS
+   DASHBOARD
+========================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Dancing+Script:wght@700&display=swap');
+
+*{margin:0;padding:0;box-sizing:border-box;}
+
+body{
+    font-family:'Poppins',sans-serif;
+    background:linear-gradient(180deg,#fff7fb 0%,#fdeef5 45%,#f9e4ef 100%);
+    min-height:100vh;color:#5b4752;overflow-x:hidden;
+}
+body::before{
+    content:"";position:fixed;inset:0;background:url("../logo.PNG") center center no-repeat;
+    background-size:260px;opacity:.03;pointer-events:none;z-index:-1;
+}
+#app{max-width:430px;margin:auto;padding:18px 18px 120px;}
+#sideMenu{
+    position:fixed;top:0;left:-300px;width:280px;height:100vh;background:white;
+    transition:.35s;z-index:1000;box-shadow:5px 0 25px rgba(0,0,0,.18);
+}
+#sideMenu.active{left:0;}
+#overlay{position:fixed;inset:0;background:rgba(0,0,0,.25);display:none;z-index:999;}
+#overlay.active{display:block;}
+.menuHeader{padding:30px 20px;text-align:center;background:#fdebf3;}
+.menuLogo{width:90px;margin-bottom:10px;}
+.menuHeader h2{font-family:'Dancing Script',cursive;font-size:34px;color:#b46488;}
+.menuLinks a{
+    display:block;padding:16px 22px;color:#6f5865;text-decoration:none;
+    border-bottom:1px solid #f3e5ec;transition:.2s;
+}
+.menuLinks a:hover,.menuLinks a[href="pricing.html"]{
+    background:#fff5f9;color:#c96f97;
+}
+.topBar{display:flex;align-items:center;margin-bottom:15px;}
+#menuButton{
+    width:48px;height:48px;border:none;border-radius:16px;background:white;font-size:24px;
+    color:#c86f95;cursor:pointer;box-shadow:0 10px 25px rgba(201,111,149,.18);
+}
+.welcomeSection{text-align:center;margin-bottom:22px;}
+.topLogo{width:90px;margin-bottom:8px;}
+.welcomeSection h1{font-family:'Dancing Script',cursive;font-size:42px;color:#b46488;margin-bottom:4px;}
+.heartDivider{color:#d88ead;font-size:22px;margin-bottom:8px;}
+#todayDate{color:#8d7280;font-size:15px;}
+.statsGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-bottom:20px;}
+.statCard{background:white;border-radius:24px;padding:18px;text-align:center;box-shadow:0 12px 30px rgba(212,143,174,.18);}
+.statIcon{font-size:24px;margin-bottom:8px;}
+.statCard h3{font-size:14px;font-weight:500;color:#826674;}
+.statCard h2{font-size:30px;color:#cf7ea2;margin-top:8px;}
+.dashboardCard{background:white;border-radius:18px;margin-bottom:10px;overflow:hidden;box-shadow:0 12px 30px rgba(212,143,174,.15);}
+.cardHeader{display:flex;justify-content:space-between;align-items:center;padding:11px 15px;font-family:'Dancing Script',cursive;font-size:21px;color:#b46488;}
+.cardContent{padding:0 15px 13px;}
+.toggleButton{border:none;background:none;cursor:pointer;color:#cf7ea2;font-size:14px;}
+.addButton{width:100%;border:none;border-radius:13px;padding:10px 12px;background:#cf7ea2;color:white;font-size:14px;font-weight:600;cursor:pointer;transition:.25s;margin-bottom:9px;}
+.addButton:hover{background:#bb688c;transform:translateY(-2px);}
+#jobsList,#notesList{list-style:none;}
+#jobsList li,#notesList li{display:flex;justify-content:space-between;align-items:center;background:#fff6fa;border-radius:13px;padding:10px 12px;margin-bottom:7px;box-shadow:0 4px 12px rgba(212,143,174,.10);}
+.revenueGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;}
+.revenueCard{background:#fff7fb;border-radius:13px;padding:10px;text-align:center;}
+.revenueCard h4{font-size:12px;color:#8a6b79;margin-bottom:4px;}
+.revenueCard p{font-size:18px;font-weight:700;color:#cf7ea2;}
+.completeButton,.deleteButton,.editButton{border:none;background:none;cursor:pointer;font-size:18px;margin-left:8px;transition:.2s;}
+.completeButton{color:#58b26b}.editButton{color:#4b8de0}.deleteButton{color:#d66b8c;}
+.completeButton:hover,.editButton:hover,.deleteButton:hover{transform:scale(1.15);}
+.bottomNav{position:fixed;bottom:15px;left:50%;transform:translateX(-50%);width:90%;max-width:400px;background:white;border-radius:26px;display:flex;justify-content:space-around;padding:12px 0;box-shadow:0 10px 30px rgba(0,0,0,.15);}
+.bottomButton{text-decoration:none;color:#866875;display:flex;flex-direction:column;align-items:center;font-size:13px;}
+.bottomButton span{margin-top:4px}.addOrder{color:#cf7ea2;font-weight:bold;}
+@media(max-width:430px){#app{padding:15px 15px 120px}.welcomeSection h1{font-size:38px}.cardHeader{font-size:20px;}}
+.entryModal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;padding:20px;z-index:3000;}
+.entryModal.active{display:flex;}
+.entryModalBackdrop{position:absolute;inset:0;background:rgba(75,50,62,.38);backdrop-filter:blur(4px);}
+.entryModalBox{position:relative;width:min(100%,390px);background:#fff;border-radius:28px;padding:26px 22px 22px;box-shadow:0 20px 55px rgba(100,55,76,.28);z-index:1;}
+.closeEntryModal{position:absolute;top:12px;right:15px;width:38px;height:38px;border:0;border-radius:50%;background:#fff2f7;color:#b46488;font-size:26px;line-height:1;cursor:pointer;}
+.modalHeart{width:48px;height:48px;margin:0 auto 9px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#fde8f1;color:#c66f95;font-size:28px;}
+.entryModalBox h2{text-align:center;color:#b46488;font-family:'Dancing Script',cursive;font-size:30px;margin-bottom:4px;}
+.entryModalBox p{text-align:center;color:#8d7280;font-size:13px;margin-bottom:14px;}
+#entryModalInput{width:100%;min-height:145px;resize:vertical;border:2px solid #ecd6e0;border-radius:17px;padding:14px;font:400 15px 'Poppins',sans-serif;color:#5b4752;background:#fffafd;outline:none;}
+#entryModalInput:focus{border-color:#d88ead;box-shadow:0 0 0 4px rgba(216,142,173,.12);}
+.modalButtons{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:13px;}
+.modalButtons button{border:0;border-radius:14px;padding:12px;font:600 14px 'Poppins',sans-serif;cursor:pointer;}
+.modalCancel{background:#f7edf2;color:#8b6a78}.modalSave{background:#cf7ea2;color:#fff;}
