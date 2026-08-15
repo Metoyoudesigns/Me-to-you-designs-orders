@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Invoices | Me To You Designs</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}body{margin:0;background:#faf5f8;color:#4a3a43;font-family:Poppins,sans-serif}
+.page{max-width:1050px;margin:auto;padding:12px 14px 50px}.top{text-align:center;background:#fff;margin:-12px -14px 16px;padding:12px;border-bottom:1px solid #efd8e3}.logo{width:105px;height:75px;object-fit:contain}
+.back{display:inline-block;color:#bd7398;text-decoration:none;font-weight:700;margin:2px 0 12px}
+.hero,.invoiceCard{background:#fff;border:1px solid #efd8e3;border-radius:22px;padding:18px;box-shadow:0 4px 15px rgba(0,0,0,.05)}
+.hero h1{margin:0;font-size:30px}.hero p{margin:4px 0 14px;color:#8d7c85;font-size:13px}
+.search{width:100%;border:1.5px solid #e6cad6;border-radius:13px;padding:12px;background:#fff;font:inherit;font-size:14px;margin-bottom:10px}
+.filters{display:flex;gap:8px;flex-wrap:wrap}.filter{border:1.5px solid #e6cad6;background:#fff;color:#62465a;border-radius:22px;padding:9px 15px;font:600 12px Poppins;cursor:pointer}.filter.active{background:#c978a0;border-color:#c978a0;color:#fff}
+.summary{color:#8d7c85;font-size:13px;margin:13px 3px 8px}.invoiceCard{margin-bottom:12px}.invoiceTop{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}.invNo{font-size:20px;font-weight:700;color:#654f59}.customer{font-size:17px;font-weight:700}.badge{padding:7px 10px;border-radius:17px;font-size:11px;font-weight:700;background:#e1f4e8;color:#3d8156}.meta{margin-top:9px;color:#75656d;font-size:12px;line-height:1.7}
+.actions{display:flex;gap:8px;margin-top:13px}.actions button{flex:1;border:0;border-radius:12px;padding:11px 8px;font:700 12px Poppins;cursor:pointer}.view{background:#f7e5ec;color:#a85e7f}.print{background:#c978a0;color:#fff}
+.empty,.loading{text-align:center;color:#8d7c85;padding:38px 15px}.empty{background:#fff;border:1px solid #efd8e3;border-radius:20px}
+.viewer{position:fixed;inset:0;background:rgba(62,43,56,.5);z-index:100;display:flex;align-items:flex-start;justify-content:center;padding:12px;overflow:auto}.sheet{background:#fff;width:min(820px,100%);min-height:1100px;border-radius:8px;padding:34px 42px 45px;box-shadow:0 8px 30px rgba(0,0,0,.2)}
+.sheetHead{display:flex;justify-content:space-between;gap:20px;border-bottom:2px solid #ead7e0;padding-bottom:18px}.sheetLogo{width:210px;height:90px;object-fit:contain;object-position:left center}.invoiceTitle{text-align:right}.invoiceTitle h1{margin:0;color:#8f5773;font-size:30px}.invoiceTitle p{margin:4px 0;color:#777;font-size:12px}
+.infoGrid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin:25px 0}.infoBox{background:#fcf7fa;border:1px solid #f0dfe7;border-radius:14px;padding:14px}.label{font-size:10px;text-transform:uppercase;letter-spacing:.7px;color:#a17d8d;font-weight:700}.value{font-size:13px;margin-top:4px;color:#4e4047;line-height:1.6}
+table{width:100%;border-collapse:collapse;margin-top:12px}th{background:#f7eaf0;color:#6b5360;text-align:left;padding:11px;font-size:11px}td{padding:11px;border-bottom:1px solid #eee2e7;font-size:12px}td.num,th.num{text-align:right}
+.totalBox{margin:18px 0 0 auto;width:min(330px,100%);background:#fcf7fa;border-radius:14px;padding:14px}.totalRow{display:flex;justify-content:space-between;padding:4px 0;font-size:12px}.grand{font-size:19px;font-weight:700;color:#a75e7e;border-top:1px solid #ead7e0;margin-top:8px;padding-top:9px}
+.thanks{margin-top:28px;padding:20px;border-radius:16px;background:#fff8fb;border:1px solid #efdce6;text-align:center}.thanks h2{margin:0;color:#a45d7c;font-size:20px}.thanks p{margin:9px 0 0;color:#75656d;font-size:12px;line-height:1.75}.sheetFoot{text-align:center;margin-top:25px;color:#9a858f;font-size:10px}
+.invoicePrintBtn{position:fixed;right:72px;top:18px;z-index:101;border:0;background:#c978a0;color:#fff;border-radius:22px;padding:11px 16px;font:700 12px Poppins;cursor:pointer}.closeBtn{position:fixed;right:18px;top:18px;border:0;background:#fff;color:#765968;border-radius:50%;width:44px;height:44px;font-size:24px;cursor:pointer;z-index:101}
+@media(max-width:650px){.sheet{padding:22px 18px 30px}.sheetHead{display:block}.sheetLogo{width:190px}.invoiceTitle{text-align:left;margin-top:10px}.infoGrid{grid-template-columns:1fr}}
+@media print{body{background:#fff}.page{display:none}.viewer{position:static;background:#fff;padding:0;display:block}.sheet{width:100%;min-height:auto;box-shadow:none;border-radius:0;padding:10mm}.closeBtn,.invoicePrintBtn{display:none}}
+</style>
+
+<style id="one-page-print">
+/*
+  PRINT ONLY:
+  The normal invoice page above is intentionally left alone.
+  These rules only apply when the browser is printing.
+*/
+@page{
+  size:A4 portrait;
+  margin:7mm;
+}
+
+@media print{
+
+  html,body{
+    width:100%;
+    height:auto!important;
+    min-height:0!important;
+    margin:0!important;
+    padding:0!important;
+    background:#fff!important;
+  }
+
+  /* Hide the invoice list and controls; print only the opened invoice. */
+  body *{
+    visibility:hidden!important;
+  }
+
+  #viewerRoot,
+  #viewerRoot *{
+    visibility:visible!important;
+  }
+
+  #viewerRoot{
+    position:static!important;
+    display:block!important;
+    width:100%!important;
+    min-height:0!important;
+    margin:0!important;
+    padding:0!important;
+    background:#fff!important;
+  }
+
+  #viewerRoot .viewer{
+    position:static!important;
+    display:block!important;
+    width:100%!important;
+    max-width:none!important;
+    min-height:0!important;
+    margin:0!important;
+    padding:0!important;
+    background:#fff!important;
+    overflow:visible!important;
+  }
+
+  /*
+    This is the important bit:
+    the screen design is NOT shrunk down to tiny writing.
+    The print sheet is simply given A4 dimensions and sensible
+    spacing so the same design remains readable.
+  */
+  #viewerRoot .sheet{
+    width:100%!important;
+    max-width:none!important;
+    min-height:0!important;
+    height:auto!important;
+    margin:0!important;
+    padding:4mm 5mm 4mm!important;
+    border:0!important;
+    border-radius:0!important;
+    box-shadow:none!important;
+    overflow:visible!important;
+  }
+
+  /* Keep the logo and INVOICE heading on the same row. */
+  #viewerRoot .sheetHead{
+    display:flex!important;
+    justify-content:space-between!important;
+    align-items:center!important;
+    gap:8mm!important;
+    padding-bottom:3mm!important;
+    border-bottom:2px solid #ead7e0!important;
+  }
+
+  #viewerRoot .sheetLogo{
+    width:52mm!important;
+    height:24mm!important;
+    max-height:none!important;
+    object-fit:contain!important;
+    object-position:left center!important;
+  }
+
+  #viewerRoot .invoiceTitle{
+    text-align:right!important;
+    flex:0 0 auto!important;
+  }
+
+  #viewerRoot .invoiceTitle h1{
+    font-size:24px!important;
+    line-height:1!important;
+    margin:0 0 2mm!important;
+  }
+
+  #viewerRoot .invoiceTitle p{
+    font-size:10px!important;
+    line-height:1.25!important;
+    margin:1mm 0!important;
+  }
+
+  /* Print invoice number/date clearly, but do not print the MTYD order number. */
+  #viewerRoot .invoiceTitle p:nth-child(3){
+    display:none!important;
+  }
+
+  #viewerRoot .infoGrid{
+    display:grid!important;
+    grid-template-columns:1fr 1fr!important;
+    gap:4mm!important;
+    margin:4mm 0!important;
+  }
+
+  #viewerRoot .infoBox{
+    padding:3.5mm!important;
+    border-radius:4mm!important;
+  }
+
+  #viewerRoot .label{
+    font-size:9px!important;
+    line-height:1.2!important;
+  }
+
+  #viewerRoot .value{
+    font-size:10.5px!important;
+    line-height:1.45!important;
+  }
+
+  #viewerRoot table{
+    width:100%!important;
+    margin-top:2mm!important;
+    border-collapse:collapse!important;
+    page-break-inside:avoid!important;
+    break-inside:avoid!important;
+  }
+
+  #viewerRoot th{
+    padding:2.7mm 2.5mm!important;
+    font-size:9.5px!important;
+    line-height:1.2!important;
+  }
+
+  #viewerRoot td{
+    padding:3mm 2.5mm!important;
+    font-size:10px!important;
+    line-height:1.35!important;
+  }
+
+  #viewerRoot .totalBox{
+    width:72mm!important;
+    margin:3mm 0 0 auto!important;
+    padding:3mm 4mm!important;
+    border-radius:4mm!important;
+  }
+
+  #viewerRoot .totalRow{
+    padding:1mm 0!important;
+    font-size:10px!important;
+    line-height:1.3!important;
+  }
+
+  #viewerRoot .grand{
+    font-size:13px!important;
+    margin-top:1.5mm!important;
+    padding-top:1.5mm!important;
+  }
+
+  #viewerRoot .thanks{
+    margin-top:4mm!important;
+    padding:4mm 6mm!important;
+    border-radius:4mm!important;
+  }
+
+  #viewerRoot .thanks h2{
+    font-size:14px!important;
+    line-height:1.25!important;
+    margin:0!important;
+  }
+
+  #viewerRoot .thanks p{
+    font-size:9px!important;
+    line-height:1.4!important;
+    margin:2mm 0 0!important;
+  }
+
+  #viewerRoot .sheetFoot{
+    margin-top:3mm!important;
+    padding-top:2mm!important;
+    font-size:8.5px!important;
+    line-height:1.2!important;
+  }
+
+  /* Never print controls. */
+  #viewerRoot .invoicePrintBtn,
+  #viewerRoot .closeBtn,
+  #viewerRoot button,
+  #viewerRoot .actions,
+  #viewerRoot .no-print{
+    display:none!important;
+  }
+
+  /* Prevent individual sections/rows splitting across pages. */
+  #viewerRoot tr,
+  #viewerRoot .infoBox,
+  #viewerRoot .totalBox,
+  #viewerRoot .thanks{
+    page-break-inside:avoid!important;
+    break-inside:avoid!important;
+  }
+}
+</style>
+
+</head>
+<body>
+<div class="page">
+<header class="top"><img src="logo.PNG" class="logo" alt="Me To You Designs"></header>
+<a class="back" href="dashboard.html">← Back to Dashboard</a>
+<section class="hero">
+<h1>🧾 Invoices</h1>
+<p>Invoices appear here automatically when an order is marked <strong>Ready</strong> or <strong>Completed</strong>.</p>
+<input id="search" class="search" type="search" placeholder="🔍 Search customer, order number or contact...">
+<div class="filters">
+<button class="filter active" data-filter="ready">Ready</button>
+<button class="filter" data-filter="completed">Completed</button>
+<button class="filter" data-filter="all">All</button>
+</div>
+</section>
+<div id="summary" class="summary">Loading invoices…</div>
+<div id="invoices"><div class="loading">Loading invoices…</div></div>
+</div>
+<div id="viewerRoot"></div>
+<script type="module">
+import{createClient}from"https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+const supabase=createClient("https://critutqwakaepgxgpkml.supabase.co","sb_publishable_KtXAtIRgtZADPODLn7inRw_vC6rBPFb");
+const $=id=>document.getElementById(id);
+const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
+const money=v=>"£"+(Number(v)||0).toFixed(2);
+let orders=[],filter="ready";
+function val(o,names,fallback=""){for(const n of names){if(o?.[n]!==undefined&&o?.[n]!==null&&String(o[n]).trim()!=="")return o[n]}return fallback}
+function items(o){return Array.isArray(o?.items)?o.items:[]}
+function total(o){return Number(val(o,["order_total","orderTotal","total","total_amount"],0))||items(o).reduce((s,i)=>s+(Number(i.itemTotal)||((Number(i.quantity)||1)*(Number(i.unitPrice)||0))),0)}
+function paid(o){return Number(val(o,["total_paid","totalPaid","paid","amount_paid"],0))||0}
+function balance(o){return Math.max(0,total(o)-paid(o))}
+function status(o){return String(val(o,["order_status","orderStatus","status"],"New Order"))}
+function orderNo(o){return val(o,["order_number","orderNumber","orderNo","order_no"],"MTYD-????")}
+function customer(o){return val(o,["customer_name","customerName","name"],"Customer")}
+function source(o){return val(o,["order_source","orderSource","where_ordered_from","source"],"")}
+function contact(o){return val(o,["customer_contact","customerContact","contact","phone","email","customer_phone","customer_email"],"")}
+function username(o){return val(o,["social_username","socialUsername","username"],"")}
+function orderDate(o){return val(o,["order_date","orderDate","created_at","createdAt"],"")}
+function dueDate(o){return val(o,["date_needed","dateNeeded","date_needed_by","dateNeededBy","due_date","dueDate"],"")}
+function fmtDate(v){if(!v)return"—";const d=new Date(String(v).length===10?v+"T00:00:00":v);return Number.isNaN(d.getTime())?"—":d.toLocaleDateString("en-GB",{day:"2-digit",month:"short",year:"numeric"})}
+function invNo(o){const m=String(orderNo(o)).match(/(\d+)$/);return"INV-"+String(m?Number(m[1]):1).padStart(4,"0")}
+function contactHtml(o){
+ const s=source(o),u=username(o),c=contact(o);
+ if(u)return`${s?`<strong>Contacted via:</strong> ${esc(s)}<br>`:""}<strong>Username:</strong> ${esc(u)}${c?`<br><strong>Contact:</strong> ${esc(c)}`:""}`;
+ if(c)return`${s?`<strong>Contacted via:</strong> ${esc(s)}<br>`:""}<strong>${String(c).includes("@")?"Email":"Contact"}:</strong> ${esc(c)}`;
+ return s?`<strong>Contacted via:</strong> ${esc(s)}`:"—";
+}
+async function checkLogin(){const{data,error}=await supabase.auth.getSession();if(error||!data.session){location.href="index.html";return false}return true}
+async function load(){
+ const{data,error}=await supabase.from("orders").select("*");
+ if(error){$("summary").textContent="Invoices could not be loaded";$("invoices").innerHTML=`<div class="empty"><strong>Unable to load invoices.</strong><br>${esc(error.message)}</div>`;return}
+ orders=data||[];render();
+ const id=new URLSearchParams(location.search).get("order");if(id){const o=orders.find(x=>String(x.id)===String(id));if(o)openInvoice(o)}
+}
+function render(){
+ const q=$("search").value.toLowerCase().trim();
+ const list=orders.filter(o=>{
+  const st=status(o).toLowerCase();
+  if(filter==="ready"&&!["ready","completed"].includes(st))return false;
+  if(filter==="completed"&&st!=="completed")return false;
+  if(q&&!`${orderNo(o)} ${customer(o)} ${source(o)} ${username(o)} ${contact(o)}`.toLowerCase().includes(q))return false;
+  return true;
+ });
+ $("summary").textContent=`${list.length} invoice${list.length===1?"":"s"}`;
+ if(!list.length){$("invoices").innerHTML='<div class="empty">🧾<br><strong>No invoices yet</strong><br>Mark an order as Ready and it will appear here automatically.</div>';return}
+ $("invoices").innerHTML=list.map(o=>`<article class="invoiceCard">
+  <div class="invoiceTop"><div><div class="invNo">${esc(invNo(o))}</div><div class="customer">${esc(customer(o))}</div></div><span class="badge">${esc(status(o))}</span></div>
+  <div class="meta">Order ${esc(orderNo(o))} · ${esc(fmtDate(orderDate(o)))}<br>${contactHtml(o)}<br>💷 Total ${money(total(o))} · Paid ${money(paid(o))} · Balance ${money(balance(o))}</div>
+  <div class="actions"><button class="view" data-id="${esc(o.id)}">👁 View Invoice</button><button class="print" data-print="${esc(o.id)}">🖨 Print Invoice</button></div>
+ </article>`).join("");
+}
+function openInvoice(o){
+ const its=items(o);
+ $("viewerRoot").innerHTML=`<button class="closeBtn" id="closeInvoice">×</button><div class="viewer"><div class="sheet"><button class="invoicePrintBtn" id="invoicePrintBtn" type="button">🖨 Print Invoice</button>
+  <div class="sheetHead"><img src="logo.PNG" class="sheetLogo" alt="Me To You Designs"><div class="invoiceTitle"><h1>INVOICE</h1><p><strong>${esc(invNo(o))}</strong></p><p>Order ${esc(orderNo(o))}</p><p>${esc(fmtDate(orderDate(o)))}</p></div></div>
+  <div class="infoGrid">
+   <div class="infoBox"><div class="label">Bill To</div><div class="value"><strong>${esc(customer(o))}</strong>${contact(o)?`<br>${esc(contact(o))}`:""}</div></div>
+   <div class="infoBox"><div class="label">How You Contacted Me</div><div class="value">${contactHtml(o)}</div></div>
+  </div>
+  <table><thead><tr><th>Item</th><th class="num">Qty</th><th class="num">Price</th><th class="num">Total</th></tr></thead><tbody>
+  ${its.length?its.map(i=>`<tr><td><strong>${esc(i.product||"Item")}</strong>${i.size?`<br>Size: ${esc(i.size)}`:""}${i.colour?`<br>Colour/Theme: ${esc(i.colour)}`:""}${i.personalised==="Yes"&&i.personalisation?`<br>Personalisation: ${esc(i.personalisation)}`:""}</td><td class="num">${esc(i.quantity||1)}</td><td class="num">${money(i.unitPrice)}</td><td class="num">${money(i.itemTotal||((Number(i.quantity)||1)*(Number(i.unitPrice)||0)))}</td></tr>`).join(""):`<tr><td colspan="4">No items recorded.</td></tr>`}
+  </tbody></table>
+  <div class="totalBox"><div class="totalRow"><span>Total</span><strong>${money(total(o))}</strong></div><div class="totalRow"><span>Paid</span><strong>${money(paid(o))}</strong></div><div class="totalRow"><span>Balance</span><strong>${money(balance(o))}</strong></div><div class="totalRow grand"><span>Total Due</span><strong>${money(balance(o))}</strong></div></div>
+  <div class="thanks"><h2>Thank you so much for supporting Me To You Designs ♡</h2><p>Your support genuinely means the world to my small business. Every order is made with care, love and attention, especially for you. Thank you for choosing my small business and allowing me to create something special for you. 💗</p></div>
+  <div class="sheetFoot">Me To You Designs · Made with love, personalised for every occasion.</div>
+ </div></div>`;
+ $("closeInvoice").onclick=()=>{$("viewerRoot").innerHTML="";history.replaceState({},'',location.pathname)}; $("invoicePrintBtn").onclick=()=>{window.print()};
+}
+$("search").oninput=render;
+document.querySelectorAll(".filter").forEach(b=>b.onclick=()=>{document.querySelectorAll(".filter").forEach(x=>x.classList.remove("active"));b.classList.add("active");filter=b.dataset.filter;render()});
+$("invoices").onclick=e=>{
+ const v=e.target.closest("button[data-id]"),p=e.target.closest("button[data-print]"),id=(v||p)?.dataset.id;
+ if(!id)return;
+ const o=orders.find(x=>String(x.id)===String(id));if(!o)return;
+ if(v)openInvoice(o);
+ if(p){openInvoice(o);setTimeout(()=>{const b=document.getElementById("invoicePrintBtn");if(b)b.click();else window.print()},400)}
+};
+supabase.channel("invoice-page").on("postgres_changes",{event:"*",schema:"public",table:"orders"},()=>load()).subscribe();
+(async()=>{if(await checkLogin())load()})();
+</script>
+</body>
+</html>
