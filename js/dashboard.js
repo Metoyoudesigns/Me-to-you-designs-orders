@@ -3,17 +3,26 @@ import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js
 const SUPABASE_URL = "https://critutqwakaepgxgpkml.supabase.co";
 const SUPABASE_KEY = "sb_publishable_KtXAtIRgtZADPODLn7inRw_vC6rBPFb";
 
-const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+const supabase = createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+);
 
 "use strict";
+
+// =====================================================
+// ELEMENT HELPER
+// =====================================================
+
+const $ = id => document.getElementById(id);
 
 // =====================================================
 // MENU
 // =====================================================
 
-const menuButton = document.getElementById("menuButton");
-const sideMenu = document.getElementById("sideMenu");
-const overlay = document.getElementById("overlay");
+const menuButton = $("menuButton");
+const sideMenu = $("sideMenu");
+const overlay = $("overlay");
 
 function openMenu(){
     sideMenu?.classList.add("active");
@@ -32,14 +41,14 @@ overlay?.addEventListener("click", closeMenu);
 // DATE
 // =====================================================
 
-const todayDate = document.getElementById("todayDate");
+const todayDate = $("todayDate");
 
 if(todayDate){
     todayDate.textContent = new Date().toLocaleDateString("en-GB", {
-        weekday:"long",
-        day:"numeric",
-        month:"long",
-        year:"numeric"
+        weekday: "long",
+        day: "numeric",
+        month: "long",
+        year: "numeric"
     });
 }
 
@@ -47,23 +56,29 @@ if(todayDate){
 // AUTH
 // =====================================================
 
-document.getElementById("logoutButton")?.addEventListener("click", async e => {
+$("logoutButton")?.addEventListener("click", async e => {
     e.preventDefault();
+
     await supabase.auth.signOut();
+
     location.href = "index.html";
 });
 
-async function checkLogin(){
+async function getSession(){
 
-    const {data,error} =
+    const { data, error } =
         await supabase.auth.getSession();
 
     if(error || !data.session){
         location.href = "index.html";
-        return false;
+        return null;
     }
 
-    return true;
+    return data.session;
+}
+
+async function checkLogin(){
+    return !!(await getSession());
 }
 
 // =====================================================
@@ -71,20 +86,16 @@ async function checkLogin(){
 // =====================================================
 
 let orders = [];
-
-let jobs =
-    JSON.parse(localStorage.getItem("todayJobs")) || [];
-
-let notes =
-    JSON.parse(localStorage.getItem("notes")) || [];
+let jobs = [];
+let notes = [];
 
 // =====================================================
-// LOAD ORDERS
+// LOAD ORDERS FROM SUPABASE
 // =====================================================
 
 async function loadOrders(){
 
-    const {data,error} =
+    const { data, error } =
         await supabase
             .from("orders")
             .select("*");
@@ -97,6 +108,7 @@ async function loadOrders(){
         );
 
         orders = [];
+
         updateDashboard();
 
         return;
@@ -108,7 +120,59 @@ async function loadOrders(){
 }
 
 // =====================================================
-// REALTIME
+// LOAD DASHBOARD JOBS + NOTES FROM SUPABASE
+// =====================================================
+
+async function loadDashboardEntries(){
+
+    const session = await getSession();
+
+    if(!session) return;
+
+    const { data, error } =
+        await supabase
+            .from("dashboard_entries")
+            .select("*")
+            .eq("user_id", session.user.id)
+            .order("created_at", {
+                ascending: true
+            });
+
+    if(error){
+
+        console.error(
+            "Could not load dashboard entries:",
+            error
+        );
+
+        jobs = [];
+        notes = [];
+
+        loadJobs();
+        loadNotes();
+
+        return;
+    }
+
+    const entries = data || [];
+
+    jobs = entries
+        .filter(x =>
+            x.entry_type === "job" &&
+            !x.completed
+        );
+
+    notes = entries
+        .filter(x =>
+            x.entry_type === "note"
+        );
+
+    loadJobs();
+    loadNotes();
+}
+
+// =====================================================
+// REALTIME ORDERS
 // =====================================================
 
 function subscribeToOrders(){
@@ -118,62 +182,137 @@ function subscribeToOrders(){
         .on(
             "postgres_changes",
             {
-                event:"*",
-                schema:"public",
-                table:"orders"
+                event: "*",
+                schema: "public",
+                table: "orders"
             },
-            () => loadOrders()
+            () => {
+                loadOrders();
+            }
         )
-        .subscribe(status => {
-            console.log(
-                "Order realtime status:",
-                status
-            );
-        });
+        .subscribe();
 }
 
-setInterval(loadOrders,10000);
+// =====================================================
+// REALTIME DASHBOARD ENTRIES
+// =====================================================
+
+function subscribeToDashboardEntries(){
+
+    supabase
+        .channel("dashboard-entries")
+        .on(
+            "postgres_changes",
+            {
+                event: "*",
+                schema: "public",
+                table: "dashboard_entries"
+            },
+            () => {
+                loadDashboardEntries();
+            }
+        )
+        .subscribe();
+}
 
 // =====================================================
 // JOBS
 // =====================================================
 
-const jobsList =
-    document.getElementById("jobsList");
-
-const addJobButton =
-    document.getElementById("addJobButton");
+const jobsList = $("jobsList");
+const addJobButton = $("addJobButton");
 
 addJobButton?.addEventListener("click", () => {
 
     openEntryModal({
-        type:"job",
-        title:"Add Today's Job",
+        type: "job",
+        title: "Add Today's Job",
         subtitle:
             "Add a job you need to complete today.",
         placeholder:
-            "e.g. Finish McKenzie's pyjamas"
+            "e.g. Finish balloon arch"
     });
 
 });
 
-function addJob(value){
+async function addJob(value){
 
     if(!value?.trim()) return;
 
-    jobs.push(value.trim());
+    const session = await getSession();
 
-    saveJobs();
+    if(!session) return;
+
+    const { error } =
+        await supabase
+            .from("dashboard_entries")
+            .insert({
+                user_id: session.user.id,
+                entry_type: "job",
+                content: value.trim(),
+                completed: false
+            });
+
+    if(error){
+
+        console.error(error);
+
+        alert(
+            "Could not save the job.\n\n" +
+            error.message
+        );
+
+        return;
+    }
+
+    await loadDashboardEntries();
 }
 
-function saveJobs(){
+async function completeJob(id){
 
-    localStorage.setItem(
-        "todayJobs",
-        JSON.stringify(jobs)
-    );
+    const { error } =
+        await supabase
+            .from("dashboard_entries")
+            .update({
+                completed: true,
+                updated_at: new Date().toISOString()
+            })
+            .eq("id", id);
 
-    loadJobs();
+    if(error){
+
+        alert(
+            "Could not complete the job.\n\n" +
+            error.message
+        );
+
+        return;
+    }
+
+    await loadDashboardEntries();
+}
+
+async function deleteJob(id){
+
+    if(!confirm("Delete this job?")) return;
+
+    const { error } =
+        await supabase
+            .from("dashboard_entries")
+            .delete()
+            .eq("id", id);
+
+    if(error){
+
+        alert(
+            "Could not delete the job.\n\n" +
+            error.message
+        );
+
+        return;
+    }
+
+    await loadDashboardEntries();
 }
 
 function loadJobs(){
@@ -182,13 +321,19 @@ function loadJobs(){
 
     jobsList.innerHTML = "";
 
-    jobs.forEach((job,index) => {
+    if(!jobs.length){
+
+        return;
+    }
+
+    jobs.forEach(job => {
 
         const li =
             document.createElement("li");
 
         li.innerHTML = `
             <span></span>
+
             <div>
                 <button
                     class="completeButton"
@@ -203,49 +348,32 @@ function loadJobs(){
         `;
 
         li.querySelector("span")
-            .textContent = job;
+            .textContent = job.content;
 
         li.querySelector(".completeButton")
-            .onclick = () => {
-
-                jobs.splice(index,1);
-                saveJobs();
-
-            };
+            .onclick = () =>
+                completeJob(job.id);
 
         li.querySelector(".deleteButton")
-            .onclick = () => {
-
-                if(confirm("Delete this job?")){
-
-                    jobs.splice(index,1);
-                    saveJobs();
-
-                }
-
-            };
+            .onclick = () =>
+                deleteJob(job.id);
 
         jobsList.appendChild(li);
     });
 }
 
-loadJobs();
-
 // =====================================================
 // NOTES
 // =====================================================
 
-const notesList =
-    document.getElementById("notesList");
-
-const addNoteButton =
-    document.getElementById("addNoteButton");
+const notesList = $("notesList");
+const addNoteButton = $("addNoteButton");
 
 addNoteButton?.addEventListener("click", () => {
 
     openEntryModal({
-        type:"note",
-        title:"Add Note",
+        type: "note",
+        title: "Add Note",
         subtitle:
             "Add a note for your business dashboard.",
         placeholder:
@@ -254,23 +382,105 @@ addNoteButton?.addEventListener("click", () => {
 
 });
 
-function addNote(value){
+async function addNote(value){
 
     if(!value?.trim()) return;
 
-    notes.push(value.trim());
+    const session = await getSession();
 
-    saveNotes();
+    if(!session) return;
+
+    const { error } =
+        await supabase
+            .from("dashboard_entries")
+            .insert({
+                user_id: session.user.id,
+                entry_type: "note",
+                content: value.trim(),
+                completed: false
+            });
+
+    if(error){
+
+        console.error(error);
+
+        alert(
+            "Could not save the note.\n\n" +
+            error.message
+        );
+
+        return;
+    }
+
+    await loadDashboardEntries();
 }
 
-function saveNotes(){
+async function editNote(id, oldValue){
 
-    localStorage.setItem(
-        "notes",
-        JSON.stringify(notes)
-    );
+    openEntryModal({
+        type: "edit-note",
+        title: "Edit Note",
+        subtitle:
+            "Update your note below.",
+        placeholder:
+            "Type your note here...",
+        value: oldValue,
 
-    loadNotes();
+        onSave: async updated => {
+
+            if(!updated.trim()){
+
+                await deleteNote(id);
+
+                return;
+            }
+
+            const { error } =
+                await supabase
+                    .from("dashboard_entries")
+                    .update({
+                        content: updated.trim(),
+                        updated_at:
+                            new Date().toISOString()
+                    })
+                    .eq("id", id);
+
+            if(error){
+
+                alert(
+                    "Could not update the note.\n\n" +
+                    error.message
+                );
+
+                return;
+            }
+
+            await loadDashboardEntries();
+        }
+    });
+}
+
+async function deleteNote(id){
+
+    if(!confirm("Delete this note?")) return;
+
+    const { error } =
+        await supabase
+            .from("dashboard_entries")
+            .delete()
+            .eq("id", id);
+
+    if(error){
+
+        alert(
+            "Could not delete the note.\n\n" +
+            error.message
+        );
+
+        return;
+    }
+
+    await loadDashboardEntries();
 }
 
 function loadNotes(){
@@ -279,13 +489,19 @@ function loadNotes(){
 
     notesList.innerHTML = "";
 
-    notes.forEach((note,index) => {
+    if(!notes.length){
+
+        return;
+    }
+
+    notes.forEach(note => {
 
         const li =
             document.createElement("li");
 
         li.innerHTML = `
             <span></span>
+
             <div>
                 <button
                     class="editButton"
@@ -300,56 +516,22 @@ function loadNotes(){
         `;
 
         li.querySelector("span")
-            .textContent = note;
+            .textContent = note.content;
 
         li.querySelector(".editButton")
-            .onclick = () => {
-
-                openEntryModal({
-                    type:"edit-note",
-                    title:"Edit Note",
-                    subtitle:
-                        "Update your note below.",
-                    placeholder:
-                        "Type your note here...",
-                    value:notes[index],
-
-                    onSave:updated => {
-
-                        if(!updated.trim()){
-
-                            notes.splice(index,1);
-
-                        }else{
-
-                            notes[index] =
-                                updated.trim();
-
-                        }
-
-                        saveNotes();
-                    }
-                });
-
-            };
+            .onclick = () =>
+                editNote(
+                    note.id,
+                    note.content
+                );
 
         li.querySelector(".deleteButton")
-            .onclick = () => {
-
-                if(confirm("Delete this note?")){
-
-                    notes.splice(index,1);
-                    saveNotes();
-
-                }
-
-            };
+            .onclick = () =>
+                deleteNote(note.id);
 
         notesList.appendChild(li);
     });
 }
-
-loadNotes();
 
 // =====================================================
 // COLLAPSIBLE CARDS
@@ -368,6 +550,7 @@ document
         if(!content) return;
 
         content.style.display = "none";
+
         button.textContent = "▶";
 
         button.onclick = () => {
@@ -381,7 +564,6 @@ document
             button.textContent =
                 closed ? "▼" : "▶";
         };
-
     });
 
 // =====================================================
@@ -401,10 +583,9 @@ function parseDate(value){
 
     if(typeof value === "string"){
 
-        // YYYY-MM-DD
         if(/^\d{4}-\d{2}-\d{2}$/.test(value)){
 
-            const [year,month,day] =
+            const [year, month, day] =
                 value.split("-").map(Number);
 
             return new Date(
@@ -414,10 +595,9 @@ function parseDate(value){
             );
         }
 
-        // DD/MM/YYYY
         if(/^\d{2}\/\d{2}\/\d{4}$/.test(value)){
 
-            const [day,month,year] =
+            const [day, month, year] =
                 value.split("/").map(Number);
 
             return new Date(
@@ -468,7 +648,7 @@ function startOfMonth(date){
 }
 
 // =====================================================
-// DATES
+// ORDER DATA HELPERS
 // =====================================================
 
 function getDateNeeded(order){
@@ -481,35 +661,12 @@ function getDateNeeded(order){
     );
 }
 
-// =====================================================
-// REVENUE DATE
-// =====================================================
-//
-// Revenue is based on WHEN THE ORDER WAS CREATED.
-//
-// Your existing orders:
-// £40 -> created 13 August
-// £100 -> created 13 August
-//
-// Therefore August revenue = £140.
-//
-
 function getRevenueDate(order){
 
     return parseDate(
         order.created_at
     );
 }
-
-// =====================================================
-// REVENUE AMOUNT
-// =====================================================
-//
-// Revenue uses TOTAL PAID.
-//
-// £40 order -> total_paid = £40
-// £100 order -> total_paid = £100
-//
 
 function getRevenueAmount(order){
 
@@ -527,10 +684,6 @@ function getRevenueAmount(order){
         : 0;
 }
 
-// =====================================================
-// ORDER TOTAL
-// =====================================================
-
 function getOrderTotal(order){
 
     const value =
@@ -546,10 +699,6 @@ function getOrderTotal(order){
         ? amount
         : 0;
 }
-
-// =====================================================
-// DEPOSIT
-// =====================================================
 
 function getDeposit(order){
 
@@ -569,10 +718,6 @@ function getDeposit(order){
         ? amount
         : 0;
 }
-
-// =====================================================
-// BALANCE
-// =====================================================
 
 function getBalance(order){
 
@@ -595,10 +740,7 @@ function getBalance(order){
 
         if(Number.isFinite(amount)){
 
-            return Math.max(
-                0,
-                amount
-            );
+            return Math.max(0, amount);
         }
     }
 
@@ -647,24 +789,14 @@ function isActive(order){
 
 function updateStats(){
 
-    const total =
-        document.getElementById(
-            "totalOrders"
-        );
-
-    const pending =
-        document.getElementById(
-            "pendingOrders"
-        );
+    const total = $("totalOrders");
+    const pending = $("pendingOrders");
 
     if(total){
-
-        total.textContent =
-            orders.length;
+        total.textContent = orders.length;
     }
 
     if(pending){
-
         pending.textContent =
             orders.filter(isActive).length;
     }
@@ -673,11 +805,6 @@ function updateStats(){
 // =====================================================
 // DUE DATES
 // =====================================================
-//
-// IMPORTANT:
-// This is still based on DATE NEEDED.
-// Revenue does NOT affect this.
-//
 
 function calculateDueDates(){
 
@@ -723,7 +850,6 @@ function calculateDueDates(){
             d >= weekStart &&
             d < weekEnd
         ){
-
             week++;
         }
 
@@ -731,21 +857,12 @@ function calculateDueDates(){
             d >= monthStart &&
             d < monthEnd
         ){
-
             month++;
         }
-
     });
 
-    const dueWeek =
-        document.getElementById(
-            "dueWeek"
-        );
-
-    const dueMonth =
-        document.getElementById(
-            "dueMonth"
-        );
+    const dueWeek = $("dueWeek");
+    const dueMonth = $("dueMonth");
 
     if(dueWeek){
         dueWeek.textContent = week;
@@ -763,9 +880,7 @@ function calculateDueDates(){
 function loadNextOrder(){
 
     const box =
-        document.getElementById(
-            "nextOrderCard"
-        );
+        $("nextOrderCard");
 
     if(!box) return;
 
@@ -773,7 +888,7 @@ function loadNextOrder(){
         orders
             .map(order => ({
                 order,
-                due:getDateNeeded(order)
+                due: getDateNeeded(order)
             }))
             .filter(x =>
                 x.due &&
@@ -817,8 +932,7 @@ function loadNextOrder(){
 
     }else if(days === 0){
 
-        dueText =
-            "Today";
+        dueText = "Today";
 
     }else{
 
@@ -826,37 +940,28 @@ function loadNextOrder(){
             `${days} day(s) remaining`;
     }
 
-    const orderNumber =
-        order.order_number ||
-        "Order";
-
-    const customerName =
-        order.customer_name ||
-        "Customer";
-
-    const status =
-        order.order_status ||
-        "Unknown";
-
     box.innerHTML = `
         <h3></h3>
         <p><strong></strong></p>
         <p>📅 ${due.toLocaleDateString("en-GB")}</p>
         <p></p>
-        <p>✨ </p>
+        <p>✨</p>
     `;
 
     box.querySelector("h3")
-        .textContent = orderNumber;
+        .textContent =
+        order.order_number || "Order";
 
     box.querySelector("strong")
-        .textContent = customerName;
+        .textContent =
+        order.customer_name || "Customer";
 
     box.querySelectorAll("p")[2]
         .textContent = dueText;
 
     box.querySelectorAll("p")[3]
-        .textContent = `✨ ${status}`;
+        .textContent =
+        `✨ ${order.order_status || "Unknown"}`;
 }
 
 // =====================================================
@@ -866,9 +971,7 @@ function loadNextOrder(){
 function loadOutstandingPayments(){
 
     const list =
-        document.getElementById(
-            "paymentList"
-        );
+        $("paymentList");
 
     if(!list) return;
 
@@ -910,7 +1013,12 @@ function loadOutstandingPayments(){
 
             row.innerHTML = `
                 <strong></strong>
-                <span style="display:block;margin-top:4px;"></span>
+                <span
+                    style="
+                        display:block;
+                        margin-top:4px;
+                    "
+                ></span>
             `;
 
             row.querySelector("strong")
@@ -928,35 +1036,10 @@ function loadOutstandingPayments(){
 // =====================================================
 // REVENUE
 // =====================================================
-//
-// THIS IS THE FIX.
-//
-// Revenue uses:
-//     created_at
-//     total_paid
-//
-// NOT:
-//     order_date
-//     date_needed
-//
-// Your two orders were created on 13 August:
-//
-//     £40 paid
-//     £100 paid
-//
-// Therefore:
-//
-//     Today     £140
-//     This Week £140
-//     This Month £140
-//     Total     £140
-//
-// =====================================================
 
 function calculateRevenue(){
 
-    const now =
-        new Date();
+    const now = new Date();
 
     const todayStart =
         startOfDay(now);
@@ -1001,90 +1084,56 @@ function calculateRevenue(){
         const revenueDate =
             getRevenueDate(order);
 
-        // Total revenue
         totalRevenue += amount;
 
         if(!revenueDate) return;
 
-        // TODAY
         if(
             revenueDate >= todayStart &&
             revenueDate < tomorrow
         ){
-
             todayRevenue += amount;
         }
 
-        // THIS WEEK
         if(
             revenueDate >= weekStart &&
             revenueDate < nextWeek
         ){
-
             weekRevenue += amount;
         }
 
-        // THIS MONTH
         if(
             revenueDate >= monthStart &&
             revenueDate < nextMonth
         ){
-
             monthRevenue += amount;
         }
-
     });
 
-    const todayBox =
-        document.getElementById(
-            "todayRevenue"
-        );
-
-    const weekBox =
-        document.getElementById(
-            "weekRevenue"
-        );
-
-    const monthBox =
-        document.getElementById(
-            "monthRevenue"
-        );
-
-    const totalBox =
-        document.getElementById(
-            "totalRevenue"
-        );
+    const todayBox = $("todayRevenue");
+    const weekBox = $("weekRevenue");
+    const monthBox = $("monthRevenue");
+    const totalBox = $("totalRevenue");
 
     if(todayBox){
-
         todayBox.textContent =
             `£${todayRevenue.toFixed(2)}`;
     }
 
     if(weekBox){
-
         weekBox.textContent =
             `£${weekRevenue.toFixed(2)}`;
     }
 
     if(monthBox){
-
         monthBox.textContent =
             `£${monthRevenue.toFixed(2)}`;
     }
 
     if(totalBox){
-
         totalBox.textContent =
             `£${totalRevenue.toFixed(2)}`;
     }
-
-    console.log("REVENUE:", {
-        today:todayRevenue,
-        week:weekRevenue,
-        month:monthRevenue,
-        total:totalRevenue
-    });
 }
 
 // =====================================================
@@ -1092,39 +1141,25 @@ function calculateRevenue(){
 // =====================================================
 
 const entryModal =
-    document.getElementById(
-        "entryModal"
-    );
+    $("entryModal");
 
 const entryModalInput =
-    document.getElementById(
-        "entryModalInput"
-    );
+    $("entryModalInput");
 
 const entryModalTitle =
-    document.getElementById(
-        "entryModalTitle"
-    );
+    $("entryModalTitle");
 
 const entryModalSubtitle =
-    document.getElementById(
-        "entryModalSubtitle"
-    );
+    $("entryModalSubtitle");
 
 const saveEntryModal =
-    document.getElementById(
-        "saveEntryModal"
-    );
+    $("saveEntryModal");
 
 const closeEntryModal =
-    document.getElementById(
-        "closeEntryModal"
-    );
+    $("closeEntryModal");
 
 const cancelEntryModal =
-    document.getElementById(
-        "cancelEntryModal"
-    );
+    $("cancelEntryModal");
 
 const entryModalBackdrop =
     document.querySelector(
@@ -1170,9 +1205,7 @@ function openEntryModal({
 
         });
 
-    entryModal.classList.add(
-        "active"
-    );
+    entryModal.classList.add("active");
 
     entryModal.setAttribute(
         "aria-hidden",
@@ -1195,9 +1228,7 @@ function closeEntryModalWindow(){
 
     if(!entryModal) return;
 
-    entryModal.classList.remove(
-        "active"
-    );
+    entryModal.classList.remove("active");
 
     entryModal.setAttribute(
         "aria-hidden",
@@ -1252,10 +1283,8 @@ entryModalInput?.addEventListener(
             (e.ctrlKey || e.metaKey) &&
             e.key === "Enter"
         ){
-
             saveEntryModal.click();
         }
-
     }
 );
 
@@ -1264,10 +1293,8 @@ document.addEventListener(
     e => {
 
         if(e.key === "Escape"){
-
             closeEntryModalWindow();
         }
-
     }
 );
 
@@ -1283,6 +1310,10 @@ document.addEventListener(
 
     await loadOrders();
 
+    await loadDashboardEntries();
+
     subscribeToOrders();
+
+    subscribeToDashboardEntries();
 
 })();
