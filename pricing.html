@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Pricing & Costs | Me To You Designs</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/pricing.css">
+</head>
+<body>
+
+<div id="overlay"></div>
+
+<nav id="sideMenu">
+  <div class="menuHeader">
+    <img src="logo.PNG" class="menuLogo" alt="Logo">
+    <h2>Me To You Designs</h2>
+  </div>
+  <div class="menuLinks">
+    <a href="dashboard.html">🏠 Dashboard</a>
+    <a href="orders.html">📦 Orders</a>
+    <a href="customers.html">👥 Customers</a>
+    <a href="calendar.html">📅 Calendar</a>
+    <a href="payments.html">💷 Payments</a>
+    <a href="invoices.html">🧾 Invoices</a>
+    <a href="pricing.html" class="active">💰 Pricing &amp; Costs</a>
+    <a href="settings.html">⚙️ Settings</a>
+    <a href="#" id="logoutButton">🚪 Log Out</a>
+  </div>
+</nav>
+
+<main id="app">
+  <header class="topBar">
+    <button id="menuButton" aria-label="Open menu">☰</button>
+  </header>
+
+  <section class="hero">
+    <div class="heroIcon">💰</div>
+    <h1>Pricing &amp; Costs</h1>
+    <p>Work out what something costs you, then decide what you want to charge.</p>
+  </section>
+
+  <div id="message" class="message"></div>
+
+  <div class="mainTabs">
+    <button class="mainTab active" data-screen="materialsScreen">📦<span>My Materials</span></button>
+    <button class="mainTab" data-screen="calculatorScreen">🧮<span>Price Something</span></button>
+    <button class="mainTab" data-screen="savedScreen">⭐<span>Saved Prices</span></button>
+  </div>
+
+  <!-- MATERIALS -->
+  <section id="materialsScreen" class="screen active">
+    <div class="card">
+      <div class="headingRow">
+        <div>
+          <h2>📦 My Materials</h2>
+          <p>Add the things you actually buy and what they cost you.</p>
+        </div>
+        <button id="addMaterialBtn" class="pinkBtn small">＋ Add</button>
+      </div>
+
+      <input id="materialSearch" class="search" type="search" placeholder="Search your materials...">
+
+      <div id="materialsList"></div>
+    </div>
+  </section>
+
+  <!-- CALCULATOR -->
+  <section id="calculatorScreen" class="screen">
+    <div class="card">
+      <div class="headingRow">
+        <div>
+          <h2>🧮 Price Something</h2>
+          <p>Choose materials from your library and add how many you need.</p>
+        </div>
+        <button id="clearCalcBtn" class="textBtn">Clear</button>
+      </div>
+
+      <label>What are you pricing?</label>
+      <input id="jobName" type="text" placeholder="e.g. Full balloon arch">
+
+      <div class="sectionLabel">Materials you're using</div>
+      <div id="calcLines"></div>
+      <button id="addLineBtn" class="outlineBtn">＋ Add Material</button>
+
+      <div class="simpleGrid">
+        <div>
+          <label>Your time</label>
+          <div class="unitInput"><input id="minutes" type="number" min="0" step="5" value="0"><span>mins</span></div>
+        </div>
+        <div>
+          <label>Your hourly rate</label>
+          <div class="moneyInput"><span>£</span><input id="hourlyRate" type="number" min="0" step="0.50" value="12"></div>
+        </div>
+      </div>
+
+      <div class="optionalRow">
+        <div>
+          <label>Packaging / extras <small>(optional)</small></label>
+          <div class="moneyInput"><span>£</span><input id="extras" type="number" min="0" step="0.01" value="0"></div>
+        </div>
+        <div>
+          <label>Waste <small>(optional)</small></label>
+          <div class="unitInput"><input id="waste" type="number" min="0" max="100" step="1" value="0"><span>%</span></div>
+        </div>
+      </div>
+
+      <div class="costSummary">
+        <div><span>Materials</span><strong id="materialsCost">£0.00</strong></div>
+        <div><span>Waste</span><strong id="wasteCost">£0.00</strong></div>
+        <div><span>Your time</span><strong id="labourCost">£0.00</strong></div>
+        <div><span>Packaging / extras</span><strong id="extrasCost">£0.00</strong></div>
+      </div>
+
+      <div class="trueCost">
+        <span>This job costs you</span>
+        <strong id="trueCost">£0.00</strong>
+      </div>
+
+      <div class="chargeSection">
+        <h3>💗 What do you want to charge?</h3>
+        <div class="bigMoneyInput"><span>£</span><input id="chargePrice" type="number" min="0" step="0.01" placeholder="Enter your price"></div>
+        <div class="profitGrid">
+          <div><span>You'll make</span><strong id="profit">£0.00</strong></div>
+          <div><span>Profit margin</span><strong id="margin">0%</strong></div>
+        </div>
+      </div>
+
+      <div class="suggestions">
+        <div class="suggestion min"><span>Don't go below</span><strong id="minimumPrice">£0.00</strong></div>
+        <div class="suggestion recommended"><span>Suggested ⭐</span><strong id="suggestedPrice">£0.00</strong></div>
+        <div class="suggestion premium"><span>Premium</span><strong id="premiumPrice">£0.00</strong></div>
+      </div>
+
+      <div id="pricingMessage" class="pricingMessage"></div>
+
+      <button id="savePriceBtn" class="pinkBtn wide">💾 Save This Price</button>
+    </div>
+  </section>
+
+  <!-- SAVED -->
+  <section id="savedScreen" class="screen">
+    <div class="card">
+      <div class="headingRow">
+        <div>
+          <h2>⭐ Saved Prices</h2>
+          <p>Save regular jobs so you don't have to work them out again.</p>
+        </div>
+      </div>
+      <input id="savedSearch" class="search" type="search" placeholder="Search saved prices...">
+      <div id="savedList"></div>
+    </div>
+  </section>
+</main>
+
+<!-- MATERIAL MODAL -->
+<div id="materialModal" class="modal" aria-hidden="true">
+  <div class="backdrop" data-close="materialModal"></div>
+  <div class="modalBox">
+    <button class="close" data-close="materialModal">×</button>
+    <div class="modalIcon">📦</div>
+    <h2 id="materialModalTitle">Add Material</h2>
+    <p>Add exactly what you paid and how many you got.</p>
+    <input type="hidden" id="editMaterialId">
+
+    <label>Material name</label>
+    <input id="materialName" type="text" placeholder="e.g. 12&quot; latex balloon">
+
+    <label>What did you pay?</label>
+    <div class="moneyInput"><span>£</span><input id="packPrice" type="number" min="0" step="0.01" placeholder="5.99"></div>
+
+    <label>How many did you get?</label>
+    <div class="unitInput"><input id="packQty" type="number" min="0.0001" step="0.01" placeholder="50"><span id="qtyUnitLabel">items</span></div>
+
+    <label>What is the unit?</label>
+    <select id="materialUnit">
+      <option value="each">Each</option>
+      <option value="metre">Metre</option>
+      <option value="sheet">Sheet</option>
+      <option value="gram">Gram</option>
+      <option value="ml">ML</option>
+      <option value="set">Set</option>
+      <option value="other">Other</option>
+    </select>
+
+    <label>Category</label>
+    <select id="materialCategory">
+      <option value="Balloons">🎈 Balloons</option>
+      <option value="Clothing">👕 Clothing</option>
+      <option value="DTF">🔥 DTF</option>
+      <option value="Printing">🖨️ Printing</option>
+      <option value="Packaging">📦 Packaging</option>
+      <option value="Party">🎉 Party Items</option>
+      <option value="Other">✨ Other</option>
+    </select>
+
+    <label>Supplier <small>(optional)</small></label>
+    <input id="supplier" type="text" placeholder="e.g. Amazon">
+
+    <div class="unitResult">Cost per <span id="resultUnit">each</span>: <strong id="unitCost">£0.00</strong></div>
+
+    <div class="modalButtons">
+      <button class="greyBtn" data-close="materialModal">Cancel</button>
+      <button id="saveMaterialBtn" class="pinkBtn">Save Material</button>
+    </div>
+  </div>
+</div>
+
+<!-- SAVE PRICE MODAL -->
+<div id="savePriceModal" class="modal" aria-hidden="true">
+  <div class="backdrop" data-close="savePriceModal"></div>
+  <div class="modalBox">
+    <button class="close" data-close="savePriceModal">×</button>
+    <div class="modalIcon">⭐</div>
+    <h2>Save This Price</h2>
+    <p>Give this price a name so you can reuse it later.</p>
+    <label>Name</label>
+    <input id="savedPriceName" type="text" placeholder="e.g. Full Balloon Arch">
+    <div class="modalButtons">
+      <button class="greyBtn" data-close="savePriceModal">Cancel</button>
+      <button id="confirmSavePrice" class="pinkBtn">Save</button>
+    </div>
+  </div>
+</div>
+
+<script type="module" src="js/pricing.js"></script>
+</body>
+</html>
