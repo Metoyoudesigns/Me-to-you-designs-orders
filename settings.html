@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Settings | Me To You Designs</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}body{margin:0;background:#faf5f8;color:#4a3a43;font-family:Poppins,sans-serif}
+.page{max-width:760px;margin:auto;padding:10px 12px 45px}.top{text-align:center;background:#fff;margin:-10px -12px 15px;padding:12px;border-bottom:1px solid #efd8e3}
+.logo{width:78px;height:78px;object-fit:contain;border-radius:50%}.back{display:inline-block;color:#bd7398;text-decoration:none;font-weight:700;margin:3px 0 12px}
+.hero,.card{background:#fff;border:1px solid #efd8e3;border-radius:22px;padding:20px;box-shadow:0 4px 15px rgba(0,0,0,.06)}
+.hero h1{margin:0;font-size:29px;color:#62465a}.hero p{margin:5px 0 0;color:#8d7c85;font-size:13px}.card{margin-top:12px}
+.card h2{margin:0 0 5px;color:#a85e7f;font-size:19px}.card p{font-size:12px;color:#8d7c85;margin:0 0 14px}
+label{display:block;font-size:12px;font-weight:700;color:#6f5963;margin:11px 0 5px}
+input{width:100%;border:1.5px solid #e6cad6;border-radius:12px;padding:11px;background:#fff;font:inherit;font-size:14px;color:#3e3439;outline:none}
+input:focus{border-color:#c978a0;box-shadow:0 0 0 3px #f8e9ef}.emailBox{background:#faf3f6;border-radius:13px;padding:12px;font-size:13px;color:#62465a}
+.emailBox strong{display:block;font-size:15px;margin-top:2px;word-break:break-word}.btn{width:100%;border:0;border-radius:12px;padding:12px;font:700 13px Poppins;cursor:pointer;margin-top:10px}
+.primary{background:#c978a0;color:#fff}.soft{background:#f5e8ee;color:#8f5773}.danger{background:#fff0f2;color:#a05275}
+.msg{display:none;padding:11px;border-radius:12px;margin-top:10px;font-size:12px}.success{background:#e7f7ed;color:#3d8156}.error{background:#fff0f0;color:#9b4b4b}
+.status{display:flex;align-items:center;gap:8px;background:#faf3f6;border-radius:13px;padding:12px;font-size:12px}.dot{width:9px;height:9px;border-radius:50%;background:#6bb47d}
+.small{font-size:11px;color:#94848b;margin-top:7px;line-height:1.5}@media(max-width:560px){.hero h1{font-size:25px}}
+</style>
+</head>
+<body>
+<div class="page">
+<header class="top"><img src="logo.PNG" class="logo" alt="Me To You Designs"></header>
+<a class="back" href="dashboard.html">← Back to Dashboard</a>
+<section class="hero"><h1>⚙️ Settings</h1><p>Manage your account and security settings.</p></section>
+
+<section class="card">
+<h2>👤 Account</h2><p>Your login details are handled by Supabase.</p>
+<div class="emailBox">Logged in as<strong id="currentEmail">Loading…</strong></div>
+<button class="btn soft" id="refreshAccount">↻ Refresh Account</button>
+</section>
+
+<section class="card">
+<h2>🔐 Change Password</h2><p>Change the password you use to sign in.</p>
+<label for="newPassword">New Password</label>
+<input id="newPassword" type="password" autocomplete="new-password" placeholder="Enter your new password">
+<label for="confirmPassword">Confirm New Password</label>
+<input id="confirmPassword" type="password" autocomplete="new-password" placeholder="Enter it again">
+<button class="btn primary" id="changePassword">🔒 Change Password</button>
+<div id="passwordMsg" class="msg"></div>
+</section>
+
+<section class="card">
+<h2>📧 Change Email Address</h2><p>Change the email address you use to log into the system.</p>
+<label for="newEmail">New Email Address</label>
+<input id="newEmail" type="email" autocomplete="email" placeholder="you@example.com">
+<button class="btn primary" id="changeEmail">📧 Change Email</button>
+<div id="emailMsg" class="msg"></div>
+<div class="small">You may need to confirm the new address from your email.</div>
+</section>
+
+<section class="card">
+<h2>🚪 Sign Out</h2><p>Sign out of this device.</p>
+<button class="btn danger" id="logout">🚪 Log Out</button>
+</section>
+
+<section class="card">
+<h2>🛡️ Security</h2><p>Your password is handled by Supabase authentication. It is not stored in this webpage.</p>
+<div class="status"><span class="dot"></span><strong>Supabase authentication</strong><span style="margin-left:auto">Connected</span></div>
+</section>
+</div>
+
+<script type="module">
+import{createClient}from"https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+const supabase=createClient("https://critutqwakaepgxgpkml.supabase.co","sb_publishable_KtXAtIRgtZADPODLn7inRw_vC6rBPFb");
+const $=id=>document.getElementById(id);
+function show(id,text,type){const el=$(id);el.textContent=text;el.className="msg "+type;el.style.display="block";}
+async function getCurrentUser(){const{data,error}=await supabase.auth.getUser();if(error||!data.user){location.href="index.html";return null}return data.user}
+async function loadAccount(){const user=await getCurrentUser();if(user) $("currentEmail").textContent=user.email||"No email";}
+$("refreshAccount").onclick=loadAccount;
+$("changePassword").onclick=async()=>{
+ const button=$("changePassword"),password=$("newPassword").value,confirm=$("confirmPassword").value;
+ if(password.length<6){show("passwordMsg","Password must be at least 6 characters.","error");return}
+ if(password!==confirm){show("passwordMsg","The two passwords do not match.","error");return}
+ button.disabled=true;
+ const{error}=await supabase.auth.updateUser({password});
+ if(error) show("passwordMsg","Could not change password: "+error.message,"error");
+ else{$("newPassword").value="";$("confirmPassword").value="";show("passwordMsg","Password changed successfully. ❤️","success")}
+ button.disabled=false;
+};
+$("changeEmail").onclick=async()=>{
+ const button=$("changeEmail"),email=$("newEmail").value.trim();
+ if(!email||!email.includes("@")){show("emailMsg","Please enter a valid email address.","error");return}
+ button.disabled=true;
+ const{error}=await supabase.auth.updateUser({email});
+ if(error) show("emailMsg","Could not change email: "+error.message,"error");
+ else{$("newEmail").value="";show("emailMsg","Email change requested. Check your email for the confirmation link.","success")}
+ button.disabled=false;
+};
+$("logout").onclick=async()=>{await supabase.auth.signOut();location.href="index.html"};
+loadAccount();
+</script>
+</body>
+</html>
