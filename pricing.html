@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pricing & Costs | Me To You Designs</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/pricing.css">
+</head>
+<body>
+
+<div id="overlay"></div>
+
+<nav id="sideMenu">
+    <div class="menuHeader">
+        <img src="logo.PNG" class="menuLogo" alt="Logo">
+        <h2>Me To You Designs</h2>
+    </div>
+    <div class="menuLinks">
+        <a href="dashboard.html">🏠 Dashboard</a>
+        <a href="orders.html">📦 Orders</a>
+        <a href="customers.html">👥 Customers</a>
+        <a href="calendar.html">📅 Calendar</a>
+        <a href="payments.html">💷 Payments</a>
+        <a href="invoices.html">🧾 Invoices</a>
+        <a class="active" href="pricing.html">💰 Pricing &amp; Costs</a>
+        <a href="settings.html">⚙️ Settings</a>
+        <a href="#" id="logoutButton">🚪 Log Out</a>
+    </div>
+</nav>
+
+<main id="app">
+    <header class="topBar">
+        <button id="menuButton" aria-label="Open menu">☰</button>
+        <div class="pageTitleSmall">Pricing &amp; Costs</div>
+    </header>
+
+    <section class="hero">
+        <div class="heroIcon">💰</div>
+        <h1>Pricing &amp; Costs</h1>
+        <p>Work out what a job really costs you before deciding what to charge.</p>
+    </section>
+
+    <div id="message" class="message" role="status"></div>
+
+    <section class="tabs">
+        <button class="tab active" data-tab="calculator">🧮 Calculator</button>
+        <button class="tab" data-tab="materials">📦 Materials</button>
+        <button class="tab" data-tab="templates">⭐ Templates</button>
+        <button class="tab" data-tab="settings">⚙️ Settings</button>
+    </section>
+
+    <section id="calculatorTab" class="tabPanel active">
+        <div class="card">
+            <div class="sectionTitle">
+                <div><span class="sectionIcon">🧮</span><div><h2>Price Calculator</h2><p>Build the cost of this job.</p></div></div>
+                <button id="clearCalculator" class="ghostBtn">Clear</button>
+            </div>
+
+            <label>What are you pricing?</label>
+            <div class="row2">
+                <input id="calcName" type="text" placeholder="e.g. Full balloon arch">
+                <select id="calcCategory">
+                    <option value="custom">Custom</option>
+                    <option value="clothing">Clothing</option>
+                    <option value="dtf">DTF</option>
+                    <option value="balloons">Balloons</option>
+                    <option value="printing">Printing</option>
+                    <option value="mugs">Mugs & Tumblers</option>
+                    <option value="party">Party Items</option>
+                </select>
+            </div>
+
+            <div class="subHeading">Materials</div>
+            <div id="calcMaterials"></div>
+            <button id="addMaterialLine" class="outlineBtn">＋ Add Material</button>
+
+            <div class="costGrid">
+                <div>
+                    <label>Packaging (£)</label>
+                    <input id="packagingCost" type="number" min="0" step="0.01" value="0">
+                </div>
+                <div>
+                    <label>Other costs (£)</label>
+                    <input id="otherCost" type="number" min="0" step="0.01" value="0">
+                </div>
+                <div>
+                    <label>Your time (minutes)</label>
+                    <input id="labourMinutes" type="number" min="0" step="5" value="0">
+                </div>
+                <div>
+                    <label>Hourly rate (£)</label>
+                    <input id="hourlyRate" type="number" min="0" step="0.50" value="12">
+                </div>
+                <div>
+                    <label>Waste allowance (%)</label>
+                    <input id="wastePercent" type="number" min="0" max="100" step="1" value="5">
+                </div>
+                <div>
+                    <label>Target profit margin (%)</label>
+                    <input id="profitMargin" type="number" min="0" max="95" step="1" value="45">
+                </div>
+            </div>
+
+            <div class="tipBox">💡 Labour is included so you don't accidentally charge only for materials. Change the hourly rate in Settings whenever you want.</div>
+
+            <div class="results">
+                <div class="resultCard"><span>Materials</span><strong id="resultMaterials">£0.00</strong></div>
+                <div class="resultCard"><span>Waste</span><strong id="resultWaste">£0.00</strong></div>
+                <div class="resultCard"><span>Labour</span><strong id="resultLabour">£0.00</strong></div>
+                <div class="resultCard"><span>Other costs</span><strong id="resultOther">£0.00</strong></div>
+                <div class="resultCard total"><span>Your true cost</span><strong id="resultCost">£0.00</strong></div>
+                <div class="resultCard recommended"><span>Recommended price ⭐</span><strong id="resultRecommended">£0.00</strong></div>
+            </div>
+
+            <div class="priceOptions">
+                <div><span>Absolute minimum</span><strong id="resultMinimum">£0.00</strong></div>
+                <div><span>Recommended ⭐</span><strong id="resultRecommended2">£0.00</strong></div>
+                <div><span>Premium</span><strong id="resultPremium">£0.00</strong></div>
+            </div>
+
+            <div class="chargeBox">
+                <label>What are you thinking of charging?</label>
+                <div class="chargeInput"><span>£</span><input id="customerPrice" type="number" min="0" step="0.01" placeholder="0.00"></div>
+                <div class="chargeStats">
+                    <div><span>Profit</span><strong id="chargeProfit">£0.00</strong></div>
+                    <div><span>Margin</span><strong id="chargeMargin">0%</strong></div>
+                </div>
+                <div id="underchargeWarning" class="warning hidden"></div>
+            </div>
+
+            <button id="saveCalculation" class="primaryBtn">💾 Save This Calculation</button>
+        </div>
+    </section>
+
+    <section id="materialsTab" class="tabPanel">
+        <div class="card">
+            <div class="sectionTitle">
+                <div><span class="sectionIcon">📦</span><div><h2>Material Library</h2><p>Save your regular material costs once.</p></div></div>
+                <button id="addMaterial" class="primarySmall">＋ Add</button>
+            </div>
+            <input id="materialSearch" class="search" type="search" placeholder="Search materials...">
+            <div id="materialsList" class="savedList"></div>
+        </div>
+    </section>
+
+    <section id="templatesTab" class="tabPanel">
+        <div class="card">
+            <div class="sectionTitle">
+                <div><span class="sectionIcon">⭐</span><div><h2>Saved Price Templates</h2><p>Keep your common products ready to price.</p></div></div>
+                <button id="newTemplate" class="primarySmall">＋ New</button>
+            </div>
+            <div id="templatesList" class="savedList"></div>
+        </div>
+    </section>
+
+    <section id="settingsTab" class="tabPanel">
+        <div class="card">
+            <div class="sectionTitle">
+                <div><span class="sectionIcon">⚙️</span><div><h2>Pricing Settings</h2><p>These are only for your private pricing tool.</p></div></div>
+            </div>
+            <div class="costGrid">
+                <div><label>Default hourly rate (£)</label><input id="settingHourlyRate" type="number" min="0" step="0.50"></div>
+                <div><label>Default waste (%)</label><input id="settingWaste" type="number" min="0" max="100" step="1"></div>
+                <div><label>Default profit margin (%)</label><input id="settingMargin" type="number" min="0" max="95" step="1"></div>
+                <div><label>Minimum profit (£)</label><input id="settingMinProfit" type="number" min="0" step="0.50"></div>
+                <div><label>Default packaging (£)</label><input id="settingPackaging" type="number" min="0" step="0.01"></div>
+            </div>
+            <button id="saveSettings" class="primaryBtn">💾 Save Pricing Settings</button>
+        </div>
+    </section>
+</main>
+
+<div id="materialModal" class="modal" aria-hidden="true">
+    <div class="modalBackdrop" data-close="materialModal"></div>
+    <div class="modalBox">
+        <button class="closeModal" data-close="materialModal">×</button>
+        <div class="modalIcon">📦</div>
+        <h2 id="materialModalTitle">Add Material</h2>
+        <p>Save the real cost you pay so the calculator can work out the unit cost.</p>
+        <input type="hidden" id="materialId">
+        <label>Name</label><input id="materialName" type="text" placeholder="e.g. 12&quot; latex balloon">
+        <label>Category</label>
+        <select id="materialCategory">
+            <option value="balloons">Balloons</option><option value="clothing">Clothing</option>
+            <option value="dtf">DTF</option><option value="printing">Printing</option>
+            <option value="packaging">Packaging</option><option value="party">Party Items</option>
+            <option value="other">Other</option>
+        </select>
+        <div class="row2">
+            <div><label>Pack price (£)</label><input id="materialPackPrice" type="number" min="0" step="0.01"></div>
+            <div><label>Pack quantity</label><input id="materialPackQty" type="number" min="0.0001" step="0.01"></div>
+        </div>
+        <div class="row2">
+            <div><label>Unit</label><select id="materialUnit"><option>each</option><option>metre</option><option>sheet</option><option>gram</option><option>ml</option><option>set</option><option>other</option></select></div>
+            <div><label>Supplier (optional)</label><input id="materialSupplier" type="text" placeholder="Supplier"></div>
+        </div>
+        <div class="calculatedUnit">Cost per unit: <strong id="materialUnitCost">£0.00</strong></div>
+        <div class="modalButtons"><button class="secondaryBtn" data-close="materialModal">Cancel</button><button id="saveMaterial" class="primaryBtn">Save Material</button></div>
+    </div>
+</div>
+
+<div id="templateModal" class="modal" aria-hidden="true">
+    <div class="modalBackdrop" data-close="templateModal"></div>
+    <div class="modalBox">
+        <button class="closeModal" data-close="templateModal">×</button>
+        <div class="modalIcon">⭐</div>
+        <h2 id="templateModalTitle">New Price Template</h2>
+        <p>Save the calculator setup so you can reuse it later.</p>
+        <input type="hidden" id="templateId">
+        <label>Template name</label><input id="templateName" type="text" placeholder="e.g. Personalised Children's T-Shirt">
+        <label>Category</label><select id="templateCategory">
+            <option value="custom">Custom</option><option value="clothing">Clothing</option><option value="dtf">DTF</option>
+            <option value="balloons">Balloons</option><option value="printing">Printing</option><option value="mugs">Mugs & Tumblers</option><option value="party">Party Items</option>
+        </select>
+        <div class="modalButtons"><button class="secondaryBtn" data-close="templateModal">Cancel</button><button id="saveTemplate" class="primaryBtn">Save Template</button></div>
+    </div>
+</div>
+
+<script type="module" src="js/pricing.js"></script>
+</body>
+</html>
